@@ -5,6 +5,7 @@
 .classpath
 .project
 .settings/
+/.factorypath
 
 # IntelliJ IDEA files
 .idea/
@@ -111,3 +112,7 @@ buildNumber.properties
 
 # macOS
 .DS_Store
+
+# Configuration files
+src/main/resources/application.yml
+src/main/resources/secret.properties
