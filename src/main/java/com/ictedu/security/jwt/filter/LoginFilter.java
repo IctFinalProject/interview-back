@@ -86,6 +86,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String phone = customUserDetails.getPhone();
         String birth = customUserDetails.getBirth(); 
         String gender = customUserDetails.getGender();
+        Long id = customUserDetails.getId();
 
         // 사용자 이름을 사용하여 JWT를 생성합니다.
         String access  = jwtUtil.generateToken(username,"access",accessExpiredMs);
@@ -121,11 +122,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         boolean isAdmin = customUserDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         Map<String, Object> responseBody = new HashMap<>();
         
+        System.out.println("추출한 ID: "+id);
         System.out.println("추출한 주소: "+address);
         System.out.println("추출한 폰번호: "+phone);
         System.out.println("추출한 생일: "+birth);
         System.out.println("추출한 성별: "+gender);
         
+        responseBody.put("id", id);
         responseBody.put("gender", gender);
         responseBody.put("birth", birth);
         responseBody.put("phone", phone);

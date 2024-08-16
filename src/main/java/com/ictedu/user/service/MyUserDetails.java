@@ -88,4 +88,8 @@ public class MyUserDetails implements UserDetails {
 		public byte[] getProfile() {
 			return user.getProfileImage();
 		}
+
+		public Long getId() {
+			return user.getId();
+		}
 }
