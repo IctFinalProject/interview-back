@@ -130,6 +130,7 @@ public class UserController {
         if (user.isPresent() && user.get().getProfileImage() != null) {
             byte[] profileImage = user.get().getProfileImage();
             String base64Image = Base64.getEncoder().encodeToString(profileImage);
+            System.out.println("프로필사진: "+ base64Image);
             return ResponseEntity.ok("data:image/jpeg;base64," + base64Image);
         } else if (user.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("프로필 사진이 없습니다.");

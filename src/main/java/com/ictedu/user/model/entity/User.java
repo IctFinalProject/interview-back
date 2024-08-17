@@ -34,7 +34,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_id")
 	private Long id;
 	
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -49,7 +49,7 @@ public class User {
     @Column(name = "gender", nullable = true, length = 10)
     private String gender;
 
-    @Column(name = "birth")
+    @Column(name = "birth", nullable = true)
     private String birth;
 
     @Column(name = "address", nullable = true)
@@ -62,7 +62,7 @@ public class User {
     private String phone;
 
     @Lob
-    @Column(name = "profile_image")
+    @Column(name = "profile_image", nullable = true)
     private byte[] profileImage;
 
     @ColumnDefault("SYSDATE")
