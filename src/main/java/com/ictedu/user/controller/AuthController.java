@@ -37,6 +37,16 @@ import java.util.UUID;
 @Slf4j
 public class AuthController {
 	
+    //구글 로그인 값
+    @Value("${googleLogin.client.id}")
+    private String googleClientId;
+    
+    @Value("${googleLogin.client.secret}")
+    private String googleClientSecret;
+    
+    @Value("${googleLogin.redirect.uri}")
+    private String googleRedirectUri;
+    
 	//카카오 로그인 값
     @Value("${kakaoLogin.client.id}")
     private String kakaoClientId;
@@ -64,6 +74,151 @@ public class AuthController {
         this.refreshService = refreshService;
         this.jwtUtil = jwtUtil;
     }
+    
+    @GetMapping("/google/callback")
+    public void googleLogin(@RequestParam String code, HttpServletResponse response) throws IOException, JSONException {
+    	log.info("code = {}", code);
+    	
+        // 액세스 토큰을 요청하기 위한 URL 및 헤더 설정
+        String tokenUrl = "https://oauth2.googleapis.com/token";
+        HttpHeaders tokenHeaders = new HttpHeaders();
+        tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        String tokenRequestBody = "grant_type=authorization_code"
+                + "&client_id=" + googleClientId
+                + "&client_secret=" + googleClientSecret
+                + "&redirect_uri=" + googleRedirectUri
+                + "&code=" + code;
+        
+        // 토큰 요청
+        HttpEntity<String> tokenRequestEntity = new HttpEntity<>(tokenRequestBody, tokenHeaders);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> tokenResponse = restTemplate.exchange(tokenUrl, HttpMethod.POST, tokenRequestEntity, String.class);
+        log.info("token response = {}", tokenResponse.getBody());
+        
+        JSONObject tokenJson = new JSONObject(tokenResponse.getBody());
+        String accessToken = tokenJson.getString("access_token");
+        log.info("accessToken = {}", accessToken);
+    	
+        // 사용자 정보를 요청하기 위한 URL 및 헤더 설정
+        String userInfoUrl = "https://www.googleapis.com/userinfo/v2/me";
+        HttpHeaders userInfoHeaders = new HttpHeaders();
+        userInfoHeaders.set("Authorization", "Bearer " + accessToken);
+
+        // 사용자 정보 요청
+        HttpEntity<String> userInfoRequestEntity = new HttpEntity<>(userInfoHeaders);
+        ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, userInfoRequestEntity, String.class);
+        log.info("user info response = {}", userInfoResponse.getBody());
+
+        JSONObject userJson = new JSONObject(userInfoResponse.getBody());
+    	
+        //Email 처리
+        String email = userJson.has("email") ?
+                userJson.getString("email") : "이메일 정보가 없습니다.";
+        
+        //username 처리
+        String name = userJson.has("name") ?
+                userJson.getString("name") : "이름 정보가 없습니다.";
+        
+        // Profile Image 처리
+        String profileImageUrl = userJson.has("picture")?
+        		userJson.getString("picture") : "프로필 정보가 없습니다.";
+        byte[] profileImage = null;
+        try (InputStream in = new URL(profileImageUrl).openStream()) {
+            profileImage = in.readAllBytes();
+        } catch (IOException e) {
+            log.error("Failed to download profile image", e);
+        }
+    	
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setLastLogin(LocalDateTime.now());
+            user.setSnsAccessToken(accessToken);
+            user.setIsNaver(0);
+            user.setIsGoogle(1);
+            user.setIsKakao(0);
+            user.setProfileImage(profileImage);
+            userRepository.save(user);
+
+            // JWT 토큰 발급
+            Long accessExpiredMs = 600000L;
+            String accessTokenJwt = jwtUtil.generateToken(email, "access", accessExpiredMs);
+            Long refreshExpiredMs = 86400000L;
+            String refreshTokenJwt = jwtUtil.generateToken(email, "refresh", refreshExpiredMs);
+
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .status("activated")
+                    .userAgent(response.getHeader("User-Agent"))
+                    .user(user)
+                    .tokenValue(refreshTokenJwt)
+                    .expiresTime(refreshExpiredMs)
+                    .build();
+
+            refreshService.save(refreshToken);
+
+            // 로그인 성공 후 URL에 토큰 정보 포함
+            Optional<User> optinalUserForId = userRepository.findByEmailAndIsGoogle(email, 1);
+            Long id = optinalUserForId.get().getId();
+            String encodedUsername = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
+            
+            String redirectUrl = String.format("http://localhost:3000/auth/successSocialLogin?access=%s&refresh=%s&isAdmin=%s&id=%s&username=%s&email=%s&profile=%s",
+                    accessTokenJwt, refreshTokenJwt, optinalUserForId.get().getIsAdmin(), id, encodedUsername, email, profileImageUrl);
+
+            response.sendRedirect(redirectUrl);
+            log.info("로그인 성공: {}", email);
+        } else {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setUsername(name);
+            newUser.setProfileImage(profileImage);
+            newUser.setIsKakao(0);
+            newUser.setCreatedTime(LocalDateTime.now());
+            newUser.setIsDeleted(0);
+            newUser.setIsActivated(1);
+            newUser.setIsEmailVerified(1);
+            newUser.setIsAdmin(0);
+            newUser.setIsGoogle(1);
+            newUser.setIsNaver(0);
+            newUser.setPassword("");
+            userRepository.save(newUser);
+            log.info("회원가입 성공: {}", email);
+
+            // 구글 로그아웃 처리
+            String logoutUrl = "https://accounts.google.com/logout";
+            HttpHeaders logoutHeaders = new HttpHeaders();
+            HttpEntity<String> logoutRequestEntity = new HttpEntity<>(logoutHeaders);
+            ResponseEntity<String> logoutResponse = restTemplate.exchange(logoutUrl, HttpMethod.GET, logoutRequestEntity, String.class);
+            
+            // JWT 토큰 발급
+            Long accessExpiredMs = 600000L;
+            String accessTokenJwt = jwtUtil.generateToken(email, "access", accessExpiredMs);
+            Long refreshExpiredMs = 86400000L;
+            String refreshTokenJwt = jwtUtil.generateToken(email, "refresh", refreshExpiredMs);
+
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .status("activated")
+                    .userAgent(response.getHeader("User-Agent"))
+                    .user(newUser)
+                    .tokenValue(refreshTokenJwt)
+                    .expiresTime(refreshExpiredMs)
+                    .build();
+
+            refreshService.save(refreshToken);
+            
+            Optional<User> optinalUserForId = userRepository.findByEmailAndIsGoogle(email, 1);
+            Long id = optinalUserForId.get().getId();
+            String encodedUsername = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
+            
+            String redirectUrl = String.format("http://localhost:3000/auth/successSocialLogin?access=%s&refresh=%s&isAdmin=%s&id=%s&username=%s&email=%s&profile=%s",
+                    accessTokenJwt, refreshTokenJwt, optinalUserForId.get().getIsAdmin(), id, encodedUsername, email, profileImageUrl);
+
+            response.sendRedirect(redirectUrl);
+        }
+    }
+    
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////
     
     @GetMapping("/naver/callback")
     public void naverLogin(@RequestParam String code, @RequestParam String state, HttpServletResponse response) throws IOException, JSONException {
@@ -115,7 +270,7 @@ public class AuthController {
         String birthday = userJson.getJSONObject("response").has("birthday") ?
                 userJson.getJSONObject("response").getString("birthday") : "생일 정보가 없습니다.";
         String birth = "출생년도 정보가 없습니다.".equals(birthyear) || "생일 정보가 없습니다.".equals(birthday) ?
-                "출생일 정보가 없습니다." : birthyear + "-" + birthday.substring(0, 2) + "-" + birthday.substring(3);
+                "생일 정보가 없습니다." : birthyear + "-" + birthday.substring(0, 2) + "-" + birthday.substring(3);
         
         // Phone 처리
         String phone = userJson.getJSONObject("response").has("mobile_e164") ?
@@ -147,12 +302,16 @@ public class AuthController {
             log.error("Failed to download profile image", e);
         }
         
-        Optional<User> optionalUser = userRepository.findByEmailAndIsNaver(email, 1);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setLastLogin(LocalDateTime.now());
             user.setSnsAccessToken(accessToken);
+            user.setIsNaver(1);
+            user.setIsGoogle(0);
+            user.setIsKakao(0);
+            user.setProfileImage(profileImage);
             userRepository.save(user);
 
             // JWT 토큰 발급
@@ -306,12 +465,16 @@ public class AuthController {
             log.error("Failed to download profile image", e);
         }
         
-        Optional<User> optionalUser = userRepository.findByEmailAndIsKakao(email, 1);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setLastLogin(LocalDateTime.now());
             user.setSnsAccessToken(accessToken);
+            user.setIsNaver(0);
+            user.setIsGoogle(0);
+            user.setIsKakao(1);
+            user.setProfileImage(profileImage);
             userRepository.save(user);
 
             // JWT 토큰 발급
