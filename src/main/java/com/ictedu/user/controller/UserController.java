@@ -74,6 +74,13 @@ public class UserController {
 		return user;
     }
     
+    @GetMapping("/findUserByEmail")
+    public ResponseEntity<?> findUserByEmail(@RequestParam("email") String email){
+    	Optional<User> user = userService.findByEmail(email);
+    	System.out.println("이메일로 찾은 유저: "+ user);
+    	return ResponseEntity.ok(user.get());
+    }
+    
     @GetMapping("/find-email")
     public ResponseEntity<?> findEmailByUsernameAndPhone(
             @RequestParam("username") String username, 
