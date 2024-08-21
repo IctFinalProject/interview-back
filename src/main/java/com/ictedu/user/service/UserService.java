@@ -1,6 +1,7 @@
 package com.ictedu.user.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -82,6 +83,11 @@ public class UserService {
         String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
         int updatedRows = userRepository.updatePasswordByUsernameAndEmail(encodedPassword, username, email);
         return updatedRows > 0;
+    }
+    
+    @Transactional
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 	
 }

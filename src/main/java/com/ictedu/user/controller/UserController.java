@@ -2,6 +2,7 @@ package com.ictedu.user.controller;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -66,6 +67,13 @@ public class UserController {
         }
     }
     
+    @GetMapping("/findAllUser")
+    public List<?> getAllUsers() {
+        List<User> user = userService.getAllUsers();
+        System.out.println("user: "+user);
+		return user;
+    }
+    
     @GetMapping("/find-email")
     public ResponseEntity<?> findEmailByUsernameAndPhone(
             @RequestParam("username") String username, 
@@ -80,6 +88,7 @@ public class UserController {
             return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
         }
     }
+    
     
     @GetMapping("/verify-user")
     public ResponseEntity<?> verifyUserByUsernameAndEmail(
