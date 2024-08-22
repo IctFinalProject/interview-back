@@ -1,7 +1,9 @@
 package com.ictedu.user.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,11 +69,81 @@ public class UserController {
         }
     }
     
+    @PostMapping("/edituser")
+    public ResponseEntity<?> editUser(
+            @RequestParam("email") String email,
+            @RequestParam("username") String username,
+            @RequestParam("address") String address,
+            @RequestParam("birth") String birth,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+        try {
+			InputUser inputUser = new InputUser(
+			        email, 
+			        username, 
+			        address, 
+			        birth, 
+			        profileImage != null ? profileImage.getBytes() : null);
+	        boolean isUpdated = userService.updateUser(inputUser);
+	        System.out.println("isUpdated: " + isUpdated);
+	        
+	        if (isUpdated) {
+	            return ResponseEntity.ok("유저정보가 성공적으로 변경되었습니다.");
+	        } else {
+	            return ResponseEntity.status(515).body("유저정보 변경에 실패하였습니다.");
+	        }
+		} catch (IOException e) {
+			return ResponseEntity.status(514).body("프로필 사진에서 오류가 발생하였습니다.");
+		}
+    }
+    
+	//    @GetMapping("/findAllUser")
+	//    public List<?> getAllUsers() {
+	//        List<User> user = userService.getAllUsers();
+	//        System.out.println("user: "+user);
+	//		return user;
+	//    }
     @GetMapping("/findAllUser")
-    public List<?> getAllUsers() {
-        List<User> user = userService.getAllUsers();
-        System.out.println("user: "+user);
-		return user;
+    public List<Map<String, Object>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        
+        // 결과를 저장할 리스트
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (User user : users) {
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", user.getId());
+            userMap.put("email", user.getEmail());
+            userMap.put("username", user.getUsername());
+            userMap.put("address", user.getAddress());
+            userMap.put("birth", user.getBirth());
+            userMap.put("createdTime", user.getCreatedTime());
+            userMap.put("deletedTime", user.getDeletedTime());
+            userMap.put("gender", user.getGender());
+            userMap.put("isActivated", user.getIsActivated());
+            userMap.put("isAdmin", user.getIsAdmin());
+            userMap.put("isDeleted", user.getIsDeleted());
+            userMap.put("isEmailVerified", user.getIsEmailVerified());
+            userMap.put("isGoogle", user.getIsGoogle());
+            userMap.put("isKakao", user.getIsKakao());
+            userMap.put("isNaver", user.getIsNaver());
+            userMap.put("lastLogin", user.getLastLogin());
+            userMap.put("password", user.getPassword());
+            userMap.put("phone", user.getPhone());
+            userMap.put("snsAccessToken", user.getSnsAccessToken());
+            userMap.put("updatedTime", user.getUpdatedTime());
+
+            // 프로필 이미지를 "data:image/jpeg;base64," 형식으로 변환
+            if (user.getProfileImage() != null) {
+                byte[] base64Image = user.getProfileImage(); // 이미 Base64로 인코딩된 값이라고 가정
+                userMap.put("profileImage", "data:image/jpeg;base64," + base64Image);
+            } else {
+                userMap.put("profileImage", null);
+            }
+
+            result.add(userMap);
+        }
+        System.out.println("결과 출력!");
+        return result;
     }
     
     @GetMapping("/findUserByEmail")

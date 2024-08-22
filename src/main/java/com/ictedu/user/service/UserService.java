@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ictedu.user.model.entity.User;
@@ -89,5 +90,11 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Transactional
+	public boolean updateUser(InputUser user) {
+        int updatedRows = userRepository.updateUserByEmail(user.getUsername(), user.getAddress(), user.getBirth(), user.getProfileImage(), user.getEmail());
+        return updatedRows > 0;
+	}
 	
 }
