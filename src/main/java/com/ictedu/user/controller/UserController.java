@@ -134,7 +134,7 @@ public class UserController {
 
             // 프로필 이미지를 "data:image/jpeg;base64," 형식으로 변환
             if (user.getProfileImage() != null) {
-                byte[] base64Image = user.getProfileImage(); // 이미 Base64로 인코딩된 값이라고 가정
+                String base64Image = Base64.getEncoder().encodeToString(user.getProfileImage()); // 이미 Base64로 인코딩된 값이라고 가정
                 userMap.put("profileImage", "data:image/jpeg;base64," + base64Image);
             } else {
                 userMap.put("profileImage", null);
