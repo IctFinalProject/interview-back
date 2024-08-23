@@ -222,11 +222,11 @@ public class UserController {
         String beforePassword = user.get().getPassword();
         if(bCryptPasswordEncoder.matches(newPassword, beforePassword)) {
         	System.out.println("이전 비밀번호랑 일치!");
-        	return ResponseEntity.status(512).body("이전 비밀번호는 사용할 수 없습니다.");
+        	return ResponseEntity.status(512).body("* 이전 비밀번호는 사용할 수 없습니다.");
         }
         if(!(bCryptPasswordEncoder.matches(beforePasswordInput, beforePassword))) {
         	System.out.println("이전 비밀번호랑 불일치!");
-        	return ResponseEntity.status(514).body("현재 비밀번호가 일치하지 않습니다.");
+        	return ResponseEntity.status(514).body("* 현재 비밀번호가 일치하지 않습니다.");
         }
         System.out.println("password1: " + beforePassword);
         System.out.println("username2: " + username);
