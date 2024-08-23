@@ -20,7 +20,16 @@ public class ChatRoomDTO {
     private LocalDateTime createdTime;  // 필요한 경우 LocalDateTime으로 변경 가능
     private LocalDateTime deletedTime;
 
-    // Entity -> DTO 변환
+    public ChatRoom toEntity() {
+        return ChatRoom.builder()
+                       .id(id)
+                       .chatRoomTitle(chatRoomTitle)
+                       .lastMessage(lastMessage)
+                       .createdTime(createdTime)
+                       .deletedTime(deletedTime)
+                       .build();
+    }
+    
     public static ChatRoomDTO toDto(ChatRoom chatRoom) {
         return ChatRoomDTO.builder()
                           .id(chatRoom.getId())
@@ -31,12 +40,5 @@ public class ChatRoomDTO {
                           .build();
     }
 
-    // DTO -> Entity 변환
-    public static ChatRoom toEntity(ChatRoomDTO chatRoomDTO) {
-        return ChatRoom.builder()
-                       .id(chatRoomDTO.getId())
-                       .chatRoomTitle(chatRoomDTO.getChatRoomTitle())
-                       .lastMessage(chatRoomDTO.getLastMessage())
-                       .build();
-    }
+
 }

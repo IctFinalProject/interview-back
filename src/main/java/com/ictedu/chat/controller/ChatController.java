@@ -27,20 +27,13 @@ public class ChatController {
 	
 	private final ChatRoomService chatRoomService;
 	
-	@PostMapping("/createChatroom")
-	public ResponseEntity<ChatRoomDTO> createChatRoom(
-			@RequestParam String chatRoomTitle,
-			@RequestParam String lastMessage,
-			@RequestParam Long[] userIds) {
-
-	    ChatRoomDTO chatRoomDTO = ChatRoomDTO.builder()
-	                                          .chatRoomTitle(chatRoomTitle)
-	                                          .lastMessage(lastMessage)
-	                                          .build();
-
-	    ChatRoomDTO createChatRoomDTO = chatRoomService.createChatRoom(chatRoomDTO, userIds);
-
-	    return ResponseEntity.ok(createChatRoomDTO);
-	}
+//	@PostMapping("/createChatroom")
+//	public ResponseEntity<ChatRoomDTO> createChatRoom(
+//			@RequestParam Long[] userIds) {
+//
+//	    ChatRoomDTO createChatRoomDTO = chatRoomService.createChatRoom(userIds);
+//
+//	    return ResponseEntity.ok(createChatRoomDTO);
+//	}
 	
 }
