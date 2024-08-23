@@ -211,6 +211,38 @@ public class UserController {
         }
     }
     
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String email = request.get("email");
+        String newPassword = request.get("newPassword");
+        String beforePasswordInput = request.get("currentPassword");
+        
+        Optional<User> user = userService.verifyUserByUsernameAndEmail(username, email);
+        String beforePassword = user.get().getPassword();
+        if(bCryptPasswordEncoder.matches(newPassword, beforePassword)) {
+        	System.out.println("이전 비밀번호랑 일치!");
+        	return ResponseEntity.status(512).body("이전 비밀번호는 사용할 수 없습니다.");
+        }
+        if(!(bCryptPasswordEncoder.matches(beforePasswordInput, beforePassword))) {
+        	System.out.println("이전 비밀번호랑 불일치!");
+        	return ResponseEntity.status(514).body("현재 비밀번호가 일치하지 않습니다.");
+        }
+        System.out.println("password1: " + beforePassword);
+        System.out.println("username2: " + username);
+        System.out.println("email2: " + email);
+        System.out.println("newPassword: " + newPassword);
+        
+        boolean isUpdated = userService.updatePassword(username, email, newPassword);
+        System.out.println("isUpdated: " + isUpdated);
+        
+        if (isUpdated) {
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } else {
+            return ResponseEntity.status(513).body("비밀번호 변경에 실패하였습니다.");
+        }
+    }
+    
     @GetMapping("/profile-image")
     public ResponseEntity<?> getProfileImage(@RequestParam("email") String email) {
         Optional<User> user = userService.findByEmail(email);
