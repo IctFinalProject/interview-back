@@ -27,7 +27,7 @@ public class ChatController {
 	
 	private final ChatRoomService chatRoomService;
 	
-	@PostMapping("/chatroom")
+	@PostMapping("/createChatroom")
 	public ResponseEntity<ChatRoomDTO> createChatRoom(
 			@RequestParam String chatRoomTitle,
 			@RequestParam String lastMessage,
