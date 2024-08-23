@@ -1,6 +1,10 @@
 package com.ictedu.user.controller;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -9,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,7 +40,11 @@ public class UserController {
 
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    
+    //토스 결제 키 값
+    @Value("${toss.client.secret}")
+    private String tossSecret;
+    
     @Autowired
     public UserController(BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService) {
     	this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -257,5 +266,62 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
         }
+    }
+    
+    
+    @PostMapping("/paymentCheck")
+    public ResponseEntity<?> paymentCheck(
+            @RequestParam("orderId") String orderId,
+            @RequestParam("paymentKey") String paymentKey,
+            @RequestParam("amount") String amount) throws IOException, InterruptedException {
+    	System.out.println("orderId: "+orderId);
+    	System.out.println("paymentKey: "+paymentKey);
+    	System.out.println("amount: "+amount);
+    	String toEncode = tossSecret + ":";
+    	String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
+    	System.out.println("Encoded String: " + encodedString);
+        // HTTP 요청 작성
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+                .header("Authorization", "Basic " + encodedString)
+                .header("Content-Type", "application/json")
+                .method("POST", HttpRequest.BodyPublishers.ofString(
+                    "{\"paymentKey\":\"" + paymentKey + "\",\"amount\":" + amount + ",\"orderId\":\"" + orderId + "\"}"
+                ))
+                .build();
+
+        // HTTP 요청 보내기
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+        System.out.println("응답! : "+response);
+        // 상태 코드 추출
+        int statusCode = response.statusCode();
+        // 응답 상태 코드 반환
+        return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode);
+    }
+    
+    @PostMapping("/paymentCancel")
+    public ResponseEntity<?> paymentCancel(
+            @RequestParam("paymentKey") String paymentKey) throws IOException, InterruptedException {
+    	System.out.println("paymentKey: "+paymentKey);
+    	String toEncode = tossSecret + ":";
+    	String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
+    	System.out.println("Encoded String: " + encodedString);
+        // HTTP 요청 작성
+    	HttpRequest request = HttpRequest.newBuilder()
+    		    .uri(URI.create("https://api.tosspayments.com/v1/payments/"+paymentKey+"/cancel"))
+    		    .header("Authorization", "Basic "+encodedString)
+    		    .header("Content-Type", "application/json")
+    		    .method("POST", HttpRequest.BodyPublishers.ofString("{\"cancelReason\":\"고객 변심\"}"))
+    		    .build();
+    		HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+    	System.out.println(response.body());
+
+        // HTTP 요청 보내기
+        System.out.println("취소! : "+response);
+        // 상태 코드 추출
+        int statusCode = response.statusCode();
+        // 응답 상태 코드 반환
+        return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode);
     }
 }
