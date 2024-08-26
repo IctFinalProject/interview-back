@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ictedu.payment.service.PaymentService;
 import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.InputUser;
 import com.ictedu.user.service.UserService;
@@ -39,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
     private final UserService userService;
+    private final PaymentService paymentService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     
     //토스 결제 키 값
@@ -46,9 +48,10 @@ public class UserController {
     private String tossSecret;
     
     @Autowired
-    public UserController(BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService) {
+    public UserController(BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService, PaymentService paymentService) {
     	this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
+        this.paymentService = paymentService;
     }
     
     @PostMapping("/user")
@@ -273,10 +276,12 @@ public class UserController {
     public ResponseEntity<?> paymentCheck(
             @RequestParam("orderId") String orderId,
             @RequestParam("paymentKey") String paymentKey,
-            @RequestParam("amount") String amount) throws IOException, InterruptedException {
+            @RequestParam("amount") String amount,
+            @RequestParam("id") String id) throws IOException, InterruptedException {
     	System.out.println("orderId: "+orderId);
     	System.out.println("paymentKey: "+paymentKey);
     	System.out.println("amount: "+amount);
+    	System.out.println("id: "+ id);
     	String toEncode = tossSecret + ":";
     	String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
     	System.out.println("Encoded String: " + encodedString);
