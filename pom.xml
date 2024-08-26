@@ -39,6 +39,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+		  <!-- pdf저장기능의존성인데 토요일날추가한것추인철 Apache PDFBox -->
+	    <dependency>
+	        <groupId>org.apache.pdfbox</groupId>
+	        <artifactId>pdfbox</artifactId>
+	        <version>2.0.27</version> <!-- 최신 버전을 사용할 수 있습니다 -->
+	    </dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -118,7 +125,13 @@
 		    <artifactId>service</artifactId>
 		    <version>0.18.2</version>
 		</dependency>
-		
+		<!--OpenAI API호출용-->
+		<dependency>
+		    <groupId>com.squareup.okhttp3</groupId>
+		    <artifactId>okhttp</artifactId>
+		    <version>4.9.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
