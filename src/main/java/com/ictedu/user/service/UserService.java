@@ -96,5 +96,15 @@ public class UserService {
         int updatedRows = userRepository.updateUserByEmail(user.getUsername(), user.getAddress(), user.getBirth(), user.getProfileImage(), user.getEmail());
         return updatedRows > 0;
 	}
+    
+    @Transactional
+    public Optional<User> findById(String id) {
+        try {
+            Long longId = Long.parseLong(id);
+            return userRepository.findById(longId);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 	
 }

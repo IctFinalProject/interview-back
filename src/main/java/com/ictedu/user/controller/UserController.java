@@ -168,6 +168,24 @@ public class UserController {
     	return ResponseEntity.ok(user.get());
     }
     
+    @GetMapping("/findPaymentInfoById")
+    public ResponseEntity<?> findPaymentInfoById(@RequestParam("id") String id) {
+        Optional<User> optionalUser = userService.findById(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // 여러 개의 결제 정보를 가져오기 위해 findAllByUserId 사용
+        List<PaymentInfo> paymentInfoList = paymentService.findAllByUserId(optionalUser.get());
+        
+        if (paymentInfoList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        System.out.println("결제정보 찾은 유저: " + paymentInfoList);
+        return ResponseEntity.ok(paymentInfoList);
+    }
+    
     @GetMapping("/find-email")
     public ResponseEntity<?> findEmailByUsernameAndPhone(
             @RequestParam("username") String username, 
@@ -302,6 +320,12 @@ public class UserController {
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
         System.out.println("응답! : "+response);
+        // 상태 코드 확인
+        int statusCode = response.statusCode();
+        if (statusCode >= 400) {
+            // 에러 응답이면 바로 반환
+            return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode + ", 오류: " + response.body());
+        }
         // JSON 객체로 변환
         JSONObject jsonObject = new JSONObject(response.body());
         // 필요한 값들을 추출
@@ -344,10 +368,9 @@ public class UserController {
             // 기본 처리 또는 예외 처리 (필요하다면)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 orderName입니다.");
         }
-        // 상태 코드 추출
-        int statusCode = response.statusCode();
         // 응답 상태 코드 반환
-        return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode);
+        System.out.println("newPay: "+ newPaymentInfo);
+        return ResponseEntity.status(statusCode).body(newPaymentInfo);
     }
     
     @PostMapping("/paymentCancel")
