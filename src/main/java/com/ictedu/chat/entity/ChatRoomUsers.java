@@ -34,16 +34,16 @@ import lombok.NoArgsConstructor;
 public class ChatRoomUsers {
 	
 	@Id
-	@SequenceGenerator(name="seq_id",sequenceName = "seq_id",allocationSize = 1,initialValue = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_id")
+	@SequenceGenerator(name="seq_chatroom_users",sequenceName = "seq_chatroom_users",allocationSize = 1,initialValue = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_chatroom_users")
 	private Long id;
 	
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "users_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "chatroom_id")
     private ChatRoom chatroom;
 
 }

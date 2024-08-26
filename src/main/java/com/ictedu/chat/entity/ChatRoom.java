@@ -31,8 +31,8 @@ import lombok.NoArgsConstructor;
 public class ChatRoom {
 	
 	@Id
-	@SequenceGenerator(name="seq_id",sequenceName = "seq_id",allocationSize = 1,initialValue = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_id")
+	@SequenceGenerator(name="seq_chatroom",sequenceName = "seq_chatroom",allocationSize = 1,initialValue = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_chatroom")
 	private Long id;
 	
 	@Column(name = "chatroom_title", nullable = true)

@@ -34,8 +34,8 @@ import lombok.NoArgsConstructor;
 public class ChatMessageRead {
 	
 	@Id
-	@SequenceGenerator(name="seq_id",sequenceName = "seq_id",allocationSize = 1,initialValue = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_id")
+	@SequenceGenerator(name="seq_chatmessage_read",sequenceName = "seq_chatmessage_read",allocationSize = 1,initialValue = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_chatmessage_read")
 	private Long id;
 	
     @ManyToOne(fetch = FetchType.LAZY)
