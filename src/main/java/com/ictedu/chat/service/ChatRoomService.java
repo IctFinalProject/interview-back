@@ -30,7 +30,7 @@ public class ChatRoomService {
     	List<User> users = userRepository.findAllById(userIds);
     	String usernames = users.stream()
                 .map(User::getUsername)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(", "));
     	
         ChatRoom chatRoom = ChatRoom.builder()
                                     .chatRoomTitle(usernames)  // 기본 이름, 필요시 수정 가능
