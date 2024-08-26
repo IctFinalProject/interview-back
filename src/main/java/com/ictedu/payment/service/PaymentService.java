@@ -6,17 +6,23 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ictedu.payment.model.entity.PaymentInfo;
 import com.ictedu.payment.repository.PaymentRepository;
 import com.ictedu.user.model.entity.User;
+import com.ictedu.user.repository.UserRepository;
 import com.ictedu.user.service.InputUser;
 
 @Service
 public class PaymentService {
 	private final PaymentRepository paymentRepository;
+	@Autowired
+	private UserRepository userRepository;
 	
 	public PaymentService(PaymentRepository paymentRepository) {
 		this.paymentRepository = paymentRepository;
@@ -37,7 +43,35 @@ public class PaymentService {
         return paymentRepository.findByPaymentKey(paymentKey);
     }
     
+    @Transactional
+    public PaymentInfo paymentBasicInputUser(InputPayment inputPayment) {
+        // changedId로 Users 테이블에서 userId를 조회
+        Optional<User> optionalUser = userRepository.findById(inputPayment.getChangedId());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            inputPayment.setUser(user); // inputPayment에 User 객체 추가
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 사용자 ID: " + inputPayment.getChangedId());
+        }
 
+        // PaymentInfo 생성 및 저장
+        return paymentRepository.save(createBasicPayment(inputPayment));
+    }
+
+    @Transactional
+    public PaymentInfo paymentPremiumInputUser(InputPayment inputPayment) {
+        // Premium 결제에서도 동일하게 처리
+        Optional<User> optionalUser = userRepository.findById(inputPayment.getChangedId());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            inputPayment.setUser(user); // inputPayment에 User 객체 추가
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 사용자 ID: " + inputPayment.getChangedId());
+        }
+
+        return paymentRepository.save(createPremiumPayment(inputPayment));
+    }
+	
     private PaymentInfo createBasicPayment(InputPayment payment) {
         String requestedAt = payment.getRequestedAt();
         String approvedAt = payment.getApprovedAt();
@@ -63,7 +97,7 @@ public class PaymentService {
             OffsetDateTime canceledOffsetDateTime = OffsetDateTime.parse(canceledAt, formatter);
             canceledDateTime = canceledOffsetDateTime.atZoneSameInstant(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         }
-        
+        System.out.println("빌드 직전!");
         return PaymentInfo.builder()
         		.orderId(payment.getOrderId())
         		.orderName(payment.getOrderName())
@@ -82,10 +116,11 @@ public class PaymentService {
         		.requestedAt(requestedDateTime)
         		.approvedAt(approvedDateTime)
         		.canceledAt(canceledDateTime)
+                .userId(payment.getUser()) // User 객체 전달
                 .build();
     }
     
-    private PaymentInfo createPremiumPayment(InputPayment payment) {
+    public PaymentInfo createPremiumPayment(InputPayment payment) {
         String requestedAt = payment.getRequestedAt();
         String approvedAt = payment.getApprovedAt();
         String canceledAt = payment.getCanceledAt();
@@ -129,6 +164,7 @@ public class PaymentService {
         		.requestedAt(requestedDateTime)
         		.approvedAt(approvedDateTime)
         		.canceledAt(canceledDateTime)
+        		.userId(payment.getUser()) // User 객체 전달
                 .build();
     }
 }

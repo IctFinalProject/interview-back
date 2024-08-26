@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ictedu.payment.model.entity.PaymentInfo;
+import com.ictedu.payment.service.InputPayment;
 import com.ictedu.payment.service.PaymentService;
 import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.InputUser;
@@ -299,6 +302,48 @@ public class UserController {
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
         System.out.println("응답! : "+response);
+        // JSON 객체로 변환
+        JSONObject jsonObject = new JSONObject(response.body());
+        // 필요한 값들을 추출
+        Integer totalAmount = jsonObject.getInt("totalAmount");
+        String orderName = jsonObject.getString("orderName");
+        String method = jsonObject.getString("method");
+        String status = jsonObject.getString("status");
+        String lastTransactionKey = jsonObject.getString("lastTransactionKey");
+        String cancels = String.valueOf(jsonObject.get("cancels")); // null 값일 수 있음
+        String secret = jsonObject.getString("secret");
+        String requestedAt = jsonObject.getString("requestedAt");
+        String approvedAt = jsonObject.getString("approvedAt");
+        Long changedId = Long.parseLong(id);
+        
+        
+        // InputPayment 객체 생성
+        InputPayment inputPayment = new InputPayment(
+            totalAmount,
+            orderId,
+            paymentKey,
+            orderName,
+            method,
+            status,
+            lastTransactionKey,
+            cancels,
+            secret,
+            requestedAt,
+            approvedAt,
+            changedId
+        );
+        PaymentInfo newPaymentInfo;
+        // orderName에 따라 다른 메서드 호출
+        if ("베이직플랜".equals(orderName)) {
+            newPaymentInfo = paymentService.paymentBasicInputUser(inputPayment);
+            System.out.println("베이직!");
+        } else if ("프리미엄플랜".equals(orderName)) {
+            newPaymentInfo = paymentService.paymentPremiumInputUser(inputPayment);
+            System.out.println("프리미엄!");
+        } else {
+            // 기본 처리 또는 예외 처리 (필요하다면)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 orderName입니다.");
+        }
         // 상태 코드 추출
         int statusCode = response.statusCode();
         // 응답 상태 코드 반환

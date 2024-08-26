@@ -34,9 +34,10 @@ public class ChatGPTService {
         promptBuilder.append("\n4. 국내회사만 추천하는거야.");
         promptBuilder.append("\n5. 이중에서 너가 생각하기에 고액 연봉 3개와 저액 연봉 3개, 총 직업 6개를 선정해줘.");
         promptBuilder.append("\n6. 직업 6개를 선정했으면 그 직업을 가진 사람들이 다니는 회사를 추천해줘.");
-        promptBuilder.append("\n7. 회사는 6개까지만 말해.");
-        promptBuilder.append("\n8. 아래에서 말할 때 고액 연봉, 저액 연봉 언급 금지.");
-        promptBuilder.append("\n9. <필수> 아래에 있는 양식은 반드시 지켜야 한다.");
+        promptBuilder.append("\n7. 직업당 회사를 3개 추천해야해.");
+        promptBuilder.append("\n8. 회사는 18개까지만 말해.");
+        promptBuilder.append("\n9. 아래에서 말할 때 고액 연봉, 저액 연봉 언급 금지.");
+        promptBuilder.append("\n10. <필수> 아래에 있는 양식은 반드시 지켜야 한다.");
 
         promptBuilder.append("\n\n<필수>");
         promptBuilder.append("\n여기까지는 내가 설명한 거고, 답변은 아래와 같은 양식으로 해야 해.");
@@ -46,13 +47,13 @@ public class ChatGPTService {
         promptBuilder.append("\n\n추천해드리는 직업은 다음과 같습니다.\n");
         promptBuilder.append("\n직업 이름 6개 :\n");
         promptBuilder.append("\n각 직업의 회사들을 추천드리면\n");
-        promptBuilder.append("\n1. 직업 이름: 회사 이름 ");
-        promptBuilder.append("\n2. 직업 이름: 회사 이름 ");
-        promptBuilder.append("\n3. 직업 이름: 회사 이름 ");
-        promptBuilder.append("\n4. 직업 이름: 회사 이름 ");
-        promptBuilder.append("\n5. 직업 이름: 회사 이름 ");
-        promptBuilder.append("\n6. 직업 이름: 회사 이름 ");
-        promptBuilder.append("\n입니다.");
+        promptBuilder.append("\n1. 직업 이름: 회사 이름,회사 이름,회사 이름 ");
+        promptBuilder.append("\n2. 직업 이름: 회사 이름,회사 이름,회사 이름 ");
+        promptBuilder.append("\n3. 직업 이름: 회사 이름,회사 이름,회사 이름 ");
+        promptBuilder.append("\n4. 직업 이름: 회사 이름,회사 이름,회사 이름 ");
+        promptBuilder.append("\n5. 직업 이름: 회사 이름,회사 이름,회사 이름 ");
+        promptBuilder.append("\n6. 직업 이름: 회사 이름,회사 이름,회사 이름");
+        
 
 
         String prompt = promptBuilder.toString();
