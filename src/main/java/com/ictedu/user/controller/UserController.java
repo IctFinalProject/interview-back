@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,12 +179,17 @@ public class UserController {
         // 여러 개의 결제 정보를 가져오기 위해 findAllByUserId 사용
         List<PaymentInfo> paymentInfoList = paymentService.findAllByUserId(optionalUser.get());
         
-        if (paymentInfoList.isEmpty()) {
+        // isCanceled가 0인 결제 정보만 필터링
+        List<PaymentInfo> filteredPaymentInfoList = paymentInfoList.stream()
+            .filter(paymentInfo -> paymentInfo.getIsCanceled() == 0)
+            .collect(Collectors.toList());
+
+        if (filteredPaymentInfoList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        System.out.println("결제정보 찾은 유저: " + paymentInfoList);
-        return ResponseEntity.ok(paymentInfoList);
+        System.out.println("결제정보 찾은 유저: " + filteredPaymentInfoList);
+        return ResponseEntity.ok(filteredPaymentInfoList);
     }
     
     @GetMapping("/find-email")
