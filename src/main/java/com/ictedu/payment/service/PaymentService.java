@@ -174,4 +174,8 @@ public class PaymentService {
         		.userId(payment.getUser()) // User 객체 전달
                 .build();
     }
+
+	public List<PaymentInfo> findAll() {
+		return paymentRepository.findAll();
+	}
 }
