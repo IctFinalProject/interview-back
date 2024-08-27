@@ -166,7 +166,7 @@ public class PaymentService {
         		.isCanceled(0)
         		.isSuccessed(1)
         		.lastTransactionKey(payment.getLastTransactionKey())
-        		.useCount(21)
+        		.useCount(20)
         		.paymentKey(payment.getPaymentKey())
         		.requestedAt(requestedDateTime)
         		.approvedAt(approvedDateTime)
