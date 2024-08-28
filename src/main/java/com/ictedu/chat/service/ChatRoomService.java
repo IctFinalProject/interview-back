@@ -44,5 +44,12 @@ public class ChatRoomService {
         return chatRoomRepository.findAll();
     }
     
+    public List<ChatRoomDTO> findChatroomsByIds(List<Long> chatroomIds) {
+        List<ChatRoom> chatrooms = chatRoomRepository.findAllById(chatroomIds);
+        return chatrooms.stream()
+                        .map(ChatRoomDTO::toDto)
+                        .collect(Collectors.toList());
+    }
+    
     
 }

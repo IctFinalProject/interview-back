@@ -39,9 +39,15 @@ public class ChatController {
         chatRoomUsersService.createChatRoomUsers(chatroomId, userIds);
     }
 	
-	@GetMapping("/chatroomList")
+	@GetMapping("/allChatroomList")
     public List<ChatRoom> getAllChatRooms() {
-        return chatRoomService.getAllChatRooms();
+        return chatRoomService.getAllChatRooms(); 
+    }
+	
+	@PostMapping("/userChatrooms")
+    public List<ChatRoomDTO> getUserChatrooms(@RequestBody Long userId) {
+        List<Long> chatroomIds = chatRoomUsersService.findChatroomIdsByUserId(userId);
+        return chatRoomService.findChatroomsByIds(chatroomIds);
     }
 	
 }
