@@ -40,7 +40,7 @@ public class PaymentService {
     }
     
     @Transactional
-    public Optional<PaymentInfo> findByPaymentKey(String paymentKey) {
+    public PaymentInfo findByPaymentKey(String paymentKey) {
         return paymentRepository.findByPaymentKey(paymentKey);
     }
     
