@@ -31,7 +31,12 @@ public class QnaController {
     
 	@GetMapping
 	public List<QnaModel> getAllQna(){
-		return qnaService.getAllQna();
+		List<QnaModel> qnaList = qnaService.getAllQna();
+	    qnaList.forEach(qna -> {
+	        System.out.println("QnA Title: " + qna.getQnaTitle());
+	        System.out.println("QnA Question: " + qna.getQnaQuestion());
+	    });
+	    return qnaList;
 	}
 	
 	@GetMapping("/{id}")
@@ -72,7 +77,7 @@ public class QnaController {
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteQna(@PathVariable Long id) {
-		qnaService.deleteQna(id);;
+		qnaService.deleteQna(id);
 		return ResponseEntity.noContent().build();
 	}
 }
