@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ictedu.proofread.service.ProofreadService;
+import com.ictedu.proofread.service.ProofreadSelfService;
 
 @RestController
-public class ProofreadController {
+public class ProofreadSelfController {
 
-    private final ProofreadService proofreadService;
+    private final ProofreadSelfService proofreadService;
 
-    public ProofreadController(ProofreadService proofreadService) {
+    public ProofreadSelfController(ProofreadSelfService proofreadService) {
         this.proofreadService = proofreadService;
     }
 
