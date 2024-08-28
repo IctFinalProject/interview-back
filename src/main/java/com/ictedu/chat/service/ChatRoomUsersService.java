@@ -39,6 +39,7 @@ public class ChatRoomUsersService {
     }
     
     public List<Long> findChatroomIdsByUserId(Long userId) {
+    	System.out.println("여기는 챗룸유저스 서비스단의 userId: " + userId);
         return chatRoomUsersRepository.findByUserId(userId)
                                       .stream()
                                       .map(chatRoomUsers -> chatRoomUsers.getChatroom().getId())
