@@ -72,7 +72,7 @@ public class BbsController {
         return ResponseEntity.ok(bbsDto);
     }
     
-    /*
+    
     //게시글 수정
     @PutMapping("/{id}")
     public ResponseEntity<Bbs> updateBbs(@PathVariable("id") Long id, @RequestBody Bbs bbsDetails) {
@@ -85,7 +85,8 @@ public class BbsController {
                     return ResponseEntity.ok().body(updatedBbs);
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }*/
+    }
+    /*
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId, @RequestBody Bbs bbsDetails) {
         return bbsService.findById(id)
@@ -104,7 +105,7 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    /*
+    */
     //게시글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteBbs(@PathVariable("id") Long id) {
@@ -115,7 +116,7 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    */
+    /*
     @DeleteMapping("/{id}")
     public ResponseEntity<? extends Object> deleteBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId) {
         return bbsService.findById(id)
@@ -131,4 +132,5 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+     */
 }
