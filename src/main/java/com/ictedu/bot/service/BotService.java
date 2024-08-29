@@ -1,5 +1,6 @@
 package com.ictedu.bot.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ictedu.bot.dto.request.*;
 import com.ictedu.bot.dto.response.*;
@@ -9,10 +10,13 @@ import com.ictedu.bot.repository.*;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,14 +37,15 @@ public class BotService {
     
     private static final Logger logger = LoggerFactory.getLogger(BotService.class);
     
-    private final OpenAiServiceWrapper openAiService;
-    
+    private final OpenAiServiceWrapper openAiService;    
     private final BotRepository botRepository;
     private final BotQuestionRepository questionRepository;
     private final BotAnswerRepository answerRepository;
     private final BotFileRepository fileRepository;
     private final BotAnswerFeedbackRepository feedbackRepository;
     private final FineTuningJobsRepository fineTuningJobsRepository;
+    private final ObjectMapper objectMapper;
+    private final ResourceLoader resourceLoader;
     
     @Value("${chatbot.data.file.path}")
     private String botDataFilePath;
@@ -51,8 +58,29 @@ public class BotService {
 
     @Value("${spring.ai.openai.finetuned.model.id}")
     private String fineTunedModelId;
+    
+    private List<Map<String, Object>> localDataset;
+    
+    @PostConstruct
+    public void init() {
+    	loadLocalDataset();
+    }
 
-    public BotResponse createChat(Long id) {
+    private void loadLocalDataset() {
+    	 try {
+             Resource resource = resourceLoader.getResource("classpath:" + botDataFilePath);
+             try (InputStream inputStream = resource.getInputStream()) {
+                 localDataset = objectMapper.readValue(inputStream, new TypeReference<List<Map<String, Object>>>(){});
+             }
+             logger.info("Local dataset loaded successfully. Size: {}", localDataset.size());
+         } catch (IOException e) {
+             logger.error("Error loading local dataset: {}", e.getMessage(), e);
+             localDataset = new ArrayList<>();
+         }
+     }
+
+
+	public BotResponse createChat(Long id) {
         Bot bot = botRepository.save(Bot.builder().id(id).build());
         return BotResponse.from(bot);
     }
@@ -73,22 +101,23 @@ public class BotService {
         try {
             BotQuestion question = questionRepository.findById(questionId)
                     .orElseThrow(() -> new ResourceNotFoundException("Question not found with id: " + questionId));
-            
-            String generatedAnswer = openAiService.generateResponseWithFineTunedModel(question.getContent());
-            
+
+            // generateBotResponse 메서드를 사용하여 응답을 생성합니다.
+            String generatedAnswer = generateBotResponse(question.getContent());
+
             if (generatedAnswer == null || generatedAnswer.trim().isEmpty()) {
                 logger.warn("Generated answer is null or empty for question ID: {}", questionId);
                 throw new IllegalArgumentException("Generated answer cannot be null or empty");
             }
-            
+
             BotAnswer answer = BotAnswer.builder()
                     .question(question)
                     .content(generatedAnswer)
                     .bot(question.getBot())
                     .build();
-            
+
             answer = answerRepository.save(answer);
-            
+
             logger.info("Answer added successfully for question ID: {}", questionId);
             return new BotAnswerResponse(answer);
         } catch (Exception e) {
@@ -282,7 +311,38 @@ public class BotService {
          
     
     public String generateBotResponse(String userInput) {
+        logger.info("Generating bot response for input: {}", userInput);
+        // 먼저 로컬 데이터셋에서 응답을 찾습니다.
+        String localResponse = getResponseFromLocalDataset(userInput);
+        System.out.println("1번: " + localResponse);
+        if (localResponse != null) {
+            logger.info("Response found in local dataset for input: {}", userInput);
+            return localResponse;
+        }
+        // 로컬 데이터셋에서 응답을 찾지 못한 경우에만 OpenAI API를 호출합니다.
+        logger.info("No response found in local dataset. Using OpenAI API for input: {}", userInput);
         return openAiService.generateResponseWithFineTunedModel(userInput);
+    }
+    
+    private String getResponseFromLocalDataset(String userInput) {
+        if (localDataset == null || localDataset.isEmpty()) {
+            logger.warn("Local dataset is null or empty");
+            return null;
+        }
+
+        for (Map<String, Object> entry : localDataset) {
+            String prompt = (String) entry.get("prompt");
+            if (prompt != null && userInput.toLowerCase().trim().equals(prompt.toLowerCase().trim())) {
+                String completion = (String) entry.get("completion");
+                if (completion != null && !completion.isEmpty()) {
+                    logger.info("Found matching prompt: '{}'. Selected response: '{}'", prompt, completion);
+                    return completion;
+                }
+            }
+        }
+
+        logger.info("No matching prompt found in local dataset for input: '{}'", userInput);
+        return null;
     }
     
     public BotResponse endChat(Long chatId) {
