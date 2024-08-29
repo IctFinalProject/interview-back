@@ -29,9 +29,9 @@ public class ChatGPTService {
 
         // OkHttpClient 생성 시 타임아웃 설정 추가
         OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)  // 연결 타임아웃: 30초
-            .writeTimeout(30, TimeUnit.SECONDS)    // 쓰기 타임아웃: 30초
-            .readTimeout(30, TimeUnit.SECONDS)     // 읽기 타임아웃: 30초
+            .connectTimeout(60, TimeUnit.SECONDS)  // 연결 타임아웃: 60초
+            .writeTimeout(60, TimeUnit.SECONDS)    // 쓰기 타임아웃: 60초
+            .readTimeout(60, TimeUnit.SECONDS)     // 읽기 타임아웃: 60초
             .build();
 
         String prompt = buildPrompt(jobList);
@@ -91,25 +91,31 @@ public class ChatGPTService {
         promptBuilder.append("\n\n6. 선정된 5개 직업에 종사하는 사람들이 근무할 만한 국내 회사를 각 직업당 4개씩 추천해줘. 모든 직업에 대해 반드시 국내 기업을 추천해줘. 외국 기업은 제외해줘.");
 
         promptBuilder.append("\n\n7. 총 추천 회사 수는 20개를 넘지 않도록 해줘.");
-        
-        promptBuilder.append("\n\n8. 각 직업이름과 회사 4개가  서로 연관있어야만해.");
 
-       
+        promptBuilder.append("\n\n8. 각 직업 이름과 회사 4개가 서로 연관 있어야만 해.");
+
+        // 추가된 직업 전망에 대한 정보 요청
+        promptBuilder.append("\n\n9. 추천된 각 직업에 대한 간단한 전망도 제공해줘.");
+
         promptBuilder.append("\n\n위의 조건들을 충족하는지 한 번 더 확실히 확인해줘.");
 
-        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘. 다시 한번 강조한다 아래 양식대로 해.");
+        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘. 다시 한번 강조한다 아래 양식 외에 다른말이 나와서는 절대안돼!.");
+        
+        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘. 다시 한번 강조한다 아래 양식 외에 다른말이 나와서는 절대안돼!.");
 
         promptBuilder.append("\n\n추천드리는 직업은 다음과 같습니다:\n");
         promptBuilder.append("\n직업 이름 5개:\n");
 
-        promptBuilder.append("\n각 직업에 대한 회사 추천 목록:\n");
+        promptBuilder.append("\n각 직업에 대한 회사 추천 목록 및 직업 전망:\n");
 
         for (int i = 0; i < jobList.size(); i++) {
-            promptBuilder.append("\n").append(i + 1).append(". 직업 이름: [회사 이름 1], [회사 이름 2], [회사 이름 3],[회사 이름 4]");
+            promptBuilder.append("\n").append(i + 1).append(". 직업 이름: [회사 이름 1], [회사 이름 2], [회사 이름 3], [회사 이름 4]");
+            promptBuilder.append("\n   간단한 전망: [직업 전망]");
         }
 
         return promptBuilder.toString();
     }
+
     private Map<String, Object> createRequestBody(String prompt) {
         Map<String, Object> jsonBody = new HashMap<>();
         jsonBody.put("model", "gpt-4");
@@ -119,7 +125,7 @@ public class ChatGPTService {
         message.put("content", prompt);
 
         jsonBody.put("messages", new Object[]{message});
-        jsonBody.put("max_tokens", 1600);  // 안정성을 위해 max_tokens 값을 줄임
+        jsonBody.put("max_tokens", 1400);  // 안정성을 위해 max_tokens 값을 줄임
 
         return jsonBody;
     }
