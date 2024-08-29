@@ -29,8 +29,8 @@ public class QnaService {
     }
     
     // ID로 특정 QnA를 가져오는 메서드
-    public Optional<QnaModel> getQnaById(Long id) {
-        return qnaRepository.findById(id);
+    public Optional<QnaModel> getQnaById(Long qnaId) {
+        return qnaRepository.findById(qnaId);
     }
     
     // QnA를 생성하는 메서드
@@ -38,7 +38,7 @@ public class QnaService {
 
         // 생성 시간 설정 (기존 값이 없다면)
         if (qnaModel.getQnaCreatedTime() == null) {
-            qnaModel.setQnaCreatedTime(LocalDate.now());
+            qnaModel.setQnaCreatedTime(null);
         }
 
         // QnA 엔티티를 DB에 저장
@@ -46,20 +46,18 @@ public class QnaService {
     }
     
     // QnA를 삭제하는 메서드
-    public void deleteQna(Long id) {
-        qnaRepository.deleteById(id);
+    public void deleteQna(Long qnaId) {
+        qnaRepository.deleteById(qnaId);
     } 
     
     // QnA를 업데이트하는 메서드
-    public QnaModel updateQna(Long id, String answer, String status) {
+    public QnaModel updateQna(Long qnaId) {
         // 주어진 ID로 QnA 엔티티를 조회
-        Optional<QnaModel> qnaOpt = qnaRepository.findById(id);
+        Optional<QnaModel> qnaOpt = qnaRepository.findById(qnaId);
         
         // 만약 해당 QnA가 존재한다면, 업데이트 후 저장
         if (qnaOpt.isPresent()) {
             QnaModel qnaModel = qnaOpt.get();
-            qnaModel.setQnaAnswer(answer);
-            qnaModel.setQnaStatus(status);
             qnaModel.setQnaEditedTime(LocalDate.now()); // 수정 시간 업데이트
             return qnaRepository.save(qnaModel);
         }

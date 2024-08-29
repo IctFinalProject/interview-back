@@ -30,11 +30,6 @@ public class InsertFaqService {
 		return faqRepository.findByFaqCategory(faqCategory);
 	}
 	
-	//기존 FaqModel을 수정(Update)
-	public FaqModel updateFaq(FaqModel faqModel) {
-		return faqRepository.save(faqModel);
-	}
-	
 	//삭제
 	public void deleteFaq(Long faqId) {
 		faqRepository.deleteById(faqId);

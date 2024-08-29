@@ -33,25 +33,30 @@ public class QnaController {
 	public List<QnaModel> getAllQna(){
 		List<QnaModel> qnaList = qnaService.getAllQna();
 	    qnaList.forEach(qna -> {
-	        System.out.println("QnA Title: " + qna.getQnaTitle());
-	        System.out.println("QnA Question: " + qna.getQnaQuestion());
 	    });
 	    return qnaList;
 	}
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<QnaModel> getQnaById(@PathVariable Long id) {
-		return qnaService.getQnaById(id)
-				.map(ResponseEntity::ok)
-				.orElse(ResponseEntity.notFound().build());
+	@GetMapping("/{qnaId}")
+	public ResponseEntity<QnaModel> getQnaById(@PathVariable String qnaId) {
+	    try {
+	        // String 타입의 qnaId를 long 타입으로 변환
+	        long id = Long.parseLong(qnaId);
+	        return qnaService.getQnaById(id)
+	                .map(ResponseEntity::ok)
+	                .orElse(ResponseEntity.notFound().build());
+	    } catch (NumberFormatException e) {
+	        // qnaId가 숫자로 변환될 수 없을 때 예외 처리
+	        return ResponseEntity.badRequest().build();
+	    }
 	}
 	
 	@PostMapping
 	public QnaModel createQna(@RequestBody Map<String, Object> qnaRequest) {
 	    // Request에서 필요한 데이터를 추출합니다.
 	    String category = (String) qnaRequest.get("category");
+	    String qnaTitle = (String) qnaRequest.get("qnaTitle");
 	    String qnaQuestion = (String) qnaRequest.get("qnaQuestion");
-	    String qnaContent = (String) qnaRequest.get("qnaContent");
 	    Long userId = Long.parseLong(qnaRequest.get("id").toString());
 
 	    // 사용자 엔티티를 데이터베이스에서 조회합니다.
@@ -62,22 +67,21 @@ public class QnaController {
 	    QnaModel qnaModel = new QnaModel();
 	    qnaModel.setQnaCategory(category);
 	    qnaModel.setQnaQuestion(qnaQuestion);
-	    qnaModel.setQnaTitle(qnaContent); // qnaTitle을 설정해야 하는지 확인해주세요.
+	    qnaModel.setQnaTitle(qnaTitle); //
 	    qnaModel.setUser(user);
 
 	    // QnaModel 객체를 서비스로 넘겨서 저장합니다.
 	    return qnaService.createQna(qnaModel);
 	}
+	@PutMapping("/{qnaId}")
+	public ResponseEntity<QnaModel> updateQna(@PathVariable Long qnaId, @RequestBody QnaModel qnaModel) {
+	    QnaModel updatedQna = qnaService.updateQna(qnaId);
+	    return updatedQna != null ? ResponseEntity.ok(updatedQna) : ResponseEntity.notFound().build();
+	}
 	
-	@PutMapping("/{id}")
-    public ResponseEntity<QnaModel> updateQna(@PathVariable Long id, @RequestBody QnaModel qnaModel) {
-        QnaModel updatedQna = qnaService.updateQna(id, qnaModel.getQnaAnswer(), qnaModel.getQnaStatus());
-        return updatedQna != null ? ResponseEntity.ok(updatedQna) : ResponseEntity.notFound().build();
-    }
-	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteQna(@PathVariable Long id) {
-		qnaService.deleteQna(id);
-		return ResponseEntity.noContent().build();
+	@DeleteMapping("/{qnaId}")
+	public ResponseEntity<Void> deleteQna(@PathVariable Long qnaId) {
+	    qnaService.deleteQna(qnaId);
+	    return ResponseEntity.noContent().build();
 	}
 }

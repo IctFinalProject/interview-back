@@ -43,11 +43,6 @@ public class InsertFaqController {
 		return insertFaqService.insertFaq(faqModel);
 	}
 	
-	// FaqModel을 수정 (Update)
-	@PutMapping("/update")
-	public FaqModel updateFaq(@RequestBody FaqModel faqModel) {
-		return insertFaqService.updateFaq(faqModel);
-	}
 
 	// FaqModel을 삭제 (Delete)
 	@DeleteMapping("/delete/{faqId}")

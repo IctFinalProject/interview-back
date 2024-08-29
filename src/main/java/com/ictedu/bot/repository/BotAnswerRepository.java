@@ -9,4 +9,6 @@ import com.ictedu.bot.entity.BotAnswer;
 
 public interface BotAnswerRepository extends JpaRepository<BotAnswer, Long> {
 	List<BotAnswer> findTop10ByBotOrderByCreatedTimeDesc(Bot bot);
+
+	List<BotAnswer> findByBotId(Long botId);
 }

@@ -1,13 +1,6 @@
 package com.ictedu.bot.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
 
 import com.ictedu.bot.dto.request.BotFileRequest;
 import com.ictedu.bot.dto.request.QuestionRequest;
@@ -18,8 +11,11 @@ import com.ictedu.bot.dto.response.BotFileResponse;
 import com.ictedu.bot.dto.response.BotQuestionResponse;
 import com.ictedu.bot.dto.response.BotResponse;
 import com.ictedu.bot.service.BotService;
-
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/bot")

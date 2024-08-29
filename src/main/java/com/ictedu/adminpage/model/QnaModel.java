@@ -1,6 +1,7 @@
 package com.ictedu.adminpage.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ictedu.user.model.entity.User;
@@ -37,9 +38,8 @@ public class QnaModel {
 	@Column(name ="qna_id")
 	private Long qnaId; //문의 ID
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
-	@JsonIgnore
 	private User user;
 
 	@Column(name = "qna_category", nullable = false, length = 50)
@@ -52,16 +52,17 @@ public class QnaModel {
 	@Column(name ="qna_question", nullable = false, length = 255)
 	private String qnaQuestion; //문의 내용
 
-	@Column(name = "qna_answer", length = 255)
+	@Column(name = "qna_answer", nullable = true, length = 255)
 	private String qnaAnswer;  // 답변 내용
 
 	@Column(name = "qna_created_time",nullable = false)
-	private LocalDate qnaCreatedTime = LocalDate.now(); //생성시간
+	private LocalDateTime qnaCreatedTime = LocalDateTime.now(); //생성시간
 
 	@Column(name = "qna_edited_time")
 	private LocalDate qnaEditedTime; //수정시간
 
 	@Column(name = "qna_status", nullable = false, length = 1)
-	private String qnaStatus = "P";  // 상태 ('N' - New, 'T' - In Progress, 'P' - Processed)
+	private String qnaStatus = "N";  // 상태 ('N' - New, 'T' - In Progress, 'P' - Processed)
 
+	
 }

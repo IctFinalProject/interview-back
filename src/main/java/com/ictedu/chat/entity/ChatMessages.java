@@ -47,7 +47,11 @@ public class ChatMessages {
     private ChatRoom chatroom;
 	
 	@Column(name = "message")
-    private LocalDateTime message;
+    private String message;
+	
+	@ColumnDefault("0")
+	@Column(name = "is_deleted")
+    private Integer isDeleted;
 	
     @ColumnDefault("SYSDATE")
     @CreationTimestamp

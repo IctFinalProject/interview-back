@@ -82,7 +82,7 @@ public class ReissueController {
 
         // 새로운 액세스 토큰 생성
         // 액세스 토큰의 유효 시간 (밀리초 단위)
-        Long accessExpiredMs = 600000L;
+        Long accessExpiredMs = 86400000L;
         String access = jwtUtil.generateToken(username, "access", accessExpiredMs);
 
         // 응답에 새로운 액세스 토큰 추가
