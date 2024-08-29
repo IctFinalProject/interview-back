@@ -35,7 +35,7 @@ public class FaqModel {
 	@Column(name = "faq_question" , nullable = false )
 	private String faqQuestion;
 	
-	@Column(name = "faq_answer", nullable = true)
+	@Column(name = "faq_answer", nullable = false)
 	private String faqAnswer;
 	
 	@Column(name = "faq_category", nullable = false)
@@ -44,11 +44,6 @@ public class FaqModel {
 	@CreationTimestamp
 	@Column(name = "faq_created_time", nullable = false, updatable = false)
 	private LocalDateTime faqCreatedTime;
-	
-	@UpdateTimestamp
-	@Column(name = "faq_edited_time")
-	private LocalDateTime faqEditedTime;
-	
 	
 }
 	

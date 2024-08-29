@@ -29,8 +29,8 @@ public class QnaService {
     }
     
     // ID로 특정 QnA를 가져오는 메서드
-    public Optional<QnaModel> getQnaById(Long id) {
-        return qnaRepository.findById(id);
+    public Optional<QnaModel> getQnaById(Long qnaId) {
+        return qnaRepository.findById(qnaId);
     }
     
     // QnA를 생성하는 메서드
@@ -46,14 +46,14 @@ public class QnaService {
     }
     
     // QnA를 삭제하는 메서드
-    public void deleteQna(Long id) {
-        qnaRepository.deleteById(id);
+    public void deleteQna(Long qnaId) {
+        qnaRepository.deleteById(qnaId);
     } 
     
     // QnA를 업데이트하는 메서드
-    public QnaModel updateQna(Long id) {
+    public QnaModel updateQna(Long qnaId) {
         // 주어진 ID로 QnA 엔티티를 조회
-        Optional<QnaModel> qnaOpt = qnaRepository.findById(id);
+        Optional<QnaModel> qnaOpt = qnaRepository.findById(qnaId);
         
         // 만약 해당 QnA가 존재한다면, 업데이트 후 저장
         if (qnaOpt.isPresent()) {

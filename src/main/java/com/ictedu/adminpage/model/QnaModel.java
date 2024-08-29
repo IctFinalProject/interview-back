@@ -38,9 +38,8 @@ public class QnaModel {
 	@Column(name ="qna_id")
 	private Long qnaId; //문의 ID
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
-	@JsonIgnore
 	private User user;
 
 	@Column(name = "qna_category", nullable = false, length = 50)
@@ -65,4 +64,5 @@ public class QnaModel {
 	@Column(name = "qna_status", nullable = false, length = 1)
 	private String qnaStatus = "N";  // 상태 ('N' - New, 'T' - In Progress, 'P' - Processed)
 
+	
 }

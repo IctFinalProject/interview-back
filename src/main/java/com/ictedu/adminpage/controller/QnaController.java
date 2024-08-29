@@ -37,11 +37,18 @@ public class QnaController {
 	    return qnaList;
 	}
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<QnaModel> getQnaById(@PathVariable Long id) {
-		return qnaService.getQnaById(id)
-				.map(ResponseEntity::ok)
-				.orElse(ResponseEntity.notFound().build());
+	@GetMapping("/{qnaId}")
+	public ResponseEntity<QnaModel> getQnaById(@PathVariable String qnaId) {
+	    try {
+	        // String 타입의 qnaId를 long 타입으로 변환
+	        long id = Long.parseLong(qnaId);
+	        return qnaService.getQnaById(id)
+	                .map(ResponseEntity::ok)
+	                .orElse(ResponseEntity.notFound().build());
+	    } catch (NumberFormatException e) {
+	        // qnaId가 숫자로 변환될 수 없을 때 예외 처리
+	        return ResponseEntity.badRequest().build();
+	    }
 	}
 	
 	@PostMapping
@@ -66,16 +73,15 @@ public class QnaController {
 	    // QnaModel 객체를 서비스로 넘겨서 저장합니다.
 	    return qnaService.createQna(qnaModel);
 	}
+	@PutMapping("/{qnaId}")
+	public ResponseEntity<QnaModel> updateQna(@PathVariable Long qnaId, @RequestBody QnaModel qnaModel) {
+	    QnaModel updatedQna = qnaService.updateQna(qnaId);
+	    return updatedQna != null ? ResponseEntity.ok(updatedQna) : ResponseEntity.notFound().build();
+	}
 	
-	@PutMapping("/{id}")
-    public ResponseEntity<QnaModel> updateQna(@PathVariable Long id, @RequestBody QnaModel qnaModel) {
-        QnaModel updatedQna = qnaService.updateQna(id);
-        return updatedQna != null ? ResponseEntity.ok(updatedQna) : ResponseEntity.notFound().build();
-    }
-	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteQna(@PathVariable Long id) {
-		qnaService.deleteQna(id);
-		return ResponseEntity.noContent().build();
+	@DeleteMapping("/{qnaId}")
+	public ResponseEntity<Void> deleteQna(@PathVariable Long qnaId) {
+	    qnaService.deleteQna(qnaId);
+	    return ResponseEntity.noContent().build();
 	}
 }
