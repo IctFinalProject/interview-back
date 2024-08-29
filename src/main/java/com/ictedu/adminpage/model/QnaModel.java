@@ -2,6 +2,7 @@ package com.ictedu.adminpage.model;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ictedu.user.model.entity.User;
 
 import jakarta.persistence.Column;
@@ -38,6 +39,7 @@ public class QnaModel {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
 	private User user;
 
 	@Column(name = "qna_category", nullable = false, length = 50)
