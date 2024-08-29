@@ -50,8 +50,8 @@ public class QnaController {
 	public QnaModel createQna(@RequestBody Map<String, Object> qnaRequest) {
 	    // Request에서 필요한 데이터를 추출합니다.
 	    String category = (String) qnaRequest.get("category");
+	    String qnaTitle = (String) qnaRequest.get("qnaTitle");
 	    String qnaQuestion = (String) qnaRequest.get("qnaQuestion");
-	    String qnaContent = (String) qnaRequest.get("qnaContent");
 	    Long userId = Long.parseLong(qnaRequest.get("id").toString());
 
 	    // 사용자 엔티티를 데이터베이스에서 조회합니다.
@@ -62,7 +62,7 @@ public class QnaController {
 	    QnaModel qnaModel = new QnaModel();
 	    qnaModel.setQnaCategory(category);
 	    qnaModel.setQnaQuestion(qnaQuestion);
-	    qnaModel.setQnaTitle(qnaContent); // qnaTitle을 설정해야 하는지 확인해주세요.
+	    qnaModel.setQnaTitle(qnaTitle); //
 	    qnaModel.setUser(user);
 
 	    // QnaModel 객체를 서비스로 넘겨서 저장합니다.
@@ -71,7 +71,7 @@ public class QnaController {
 	
 	@PutMapping("/{id}")
     public ResponseEntity<QnaModel> updateQna(@PathVariable Long id, @RequestBody QnaModel qnaModel) {
-        QnaModel updatedQna = qnaService.updateQna(id, qnaModel.getQnaAnswer(), qnaModel.getQnaStatus());
+        QnaModel updatedQna = qnaService.updateQna(id);
         return updatedQna != null ? ResponseEntity.ok(updatedQna) : ResponseEntity.notFound().build();
     }
 	

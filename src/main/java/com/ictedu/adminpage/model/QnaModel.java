@@ -1,6 +1,7 @@
 package com.ictedu.adminpage.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ictedu.user.model.entity.User;
@@ -56,7 +57,7 @@ public class QnaModel {
 	private String qnaAnswer;  // 답변 내용
 
 	@Column(name = "qna_created_time",nullable = false)
-	private LocalDate qnaCreatedTime = LocalDate.now(); //생성시간
+	private LocalDateTime qnaCreatedTime = LocalDateTime.now(); //생성시간
 
 	@Column(name = "qna_edited_time")
 	private LocalDate qnaEditedTime; //수정시간
