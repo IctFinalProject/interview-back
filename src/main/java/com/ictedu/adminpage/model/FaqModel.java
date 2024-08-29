@@ -35,7 +35,7 @@ public class FaqModel {
 	@Column(name = "faq_question" , nullable = false )
 	private String faqQuestion;
 	
-	@Column(name = "faq_answer", nullable = false)
+	@Column(name = "faq_answer", nullable = true)
 	private String faqAnswer;
 	
 	@Column(name = "faq_category", nullable = false)
