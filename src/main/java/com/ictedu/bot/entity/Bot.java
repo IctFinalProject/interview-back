@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+
 @Entity
 @Table(name = "BOT")
 @Getter @Setter
@@ -23,13 +26,17 @@ public class Bot {
 
     @Column(name = "ID", nullable = false)
     private Long id;
-
+    
+    @ColumnDefault("SYSDATE")
+    @CreationTimestamp
     @Column(name = "CREATED_TIME", nullable = false)
     private LocalDateTime createdTime;
-
+    
+    @ColumnDefault("SYSDATE")
+    @CreationTimestamp
     @Column(name = "LAST_UPDATED_TIME", nullable = false)
     private LocalDateTime lastUpdatedTime;
-
+    
     @Column(name = "ENDED_TIME")
     private LocalDateTime endedTime;
     
@@ -41,14 +48,19 @@ public class Bot {
     @Builder.Default
     private List<BotFile> files = new ArrayList<>();
 
-    @PrePersist
-    protected void onCreate() {
-        createdTime = LocalDateTime.now();
-        lastUpdatedTime = LocalDateTime.now();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        createdTime = LocalDateTime.now();
+//        lastUpdatedTime = LocalDateTime.now();
+//    }
 
-    @PreUpdate
-    protected void onUpdate() {
-        lastUpdatedTime = LocalDateTime.now();
-    }  
+//    @PreUpdate
+//    protected void onUpdate() {
+//        
+//    }
+
+//	public void setStatus(String status) {
+//		// TODO Auto-generated method stub
+//		
+//	}  
 }
