@@ -86,21 +86,26 @@ public class ChatGPTService {
 
         promptBuilder.append("\n\n4. 국내에서 근무할 수 있는 직업만 추천해줘.");
 
-        promptBuilder.append("\n\n5. 총 6개의 직업을 선정해줘.");
+        promptBuilder.append("\n\n5. 총 5개의 직업을 선정해줘.");
 
-        promptBuilder.append("\n\n6. 선정된 6개 직업에 종사하는 사람들이 근무할 만한 국내 회사를 각 직업당 4개씩 추천해줘. 모든 직업에 대해 반드시 국내 기업을 추천해줘. 외국 기업은 제외해줘.");
+        promptBuilder.append("\n\n6. 선정된 5개 직업에 종사하는 사람들이 근무할 만한 국내 회사를 각 직업당 4개씩 추천해줘. 모든 직업에 대해 반드시 국내 기업을 추천해줘. 외국 기업은 제외해줘.");
 
-        promptBuilder.append("\n\n7. 총 추천 회사 수는 24개를 넘지 않도록 해줘.");
+        promptBuilder.append("\n\n7. 총 추천 회사 수는 20개를 넘지 않도록 해줘.");
+        
+        promptBuilder.append("\n\n8. 각 직업이름과 ㄱ회사 4개가 정말 서로 연관있어야만해.");
 
-        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘.다시 한번 강조한다 아래 양식대로 해 ");
+       
+        promptBuilder.append("\n\n위의 조건들을 충족하는지 한 번 더 확실히 확인해줘.");
+
+        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘. 다시 한번 강조한다 아래 양식대로 해.");
 
         promptBuilder.append("\n\n추천드리는 직업은 다음과 같습니다:\n");
-        promptBuilder.append("\n직업 이름 6개:\n");
+        promptBuilder.append("\n직업 이름 5개:\n");
 
         promptBuilder.append("\n각 직업에 대한 회사 추천 목록:\n");
 
         for (int i = 0; i < jobList.size(); i++) {
-            promptBuilder.append("\n").append(i + 1).append(". 직업 이름: [회사 이름 1], [회사 이름 2], [회사 이름 3], [회사 이름 4]");
+            promptBuilder.append("\n").append(i + 1).append(". 직업 이름: [회사 이름 1], [회사 이름 2], [회사 이름 3],[회사 이름 4]");
         }
 
         return promptBuilder.toString();
@@ -114,7 +119,7 @@ public class ChatGPTService {
         message.put("content", prompt);
 
         jsonBody.put("messages", new Object[]{message});
-        jsonBody.put("max_tokens", 2000);  // 안정성을 위해 max_tokens 값을 줄임
+        jsonBody.put("max_tokens", 2200);  // 안정성을 위해 max_tokens 값을 줄임
 
         return jsonBody;
     }
