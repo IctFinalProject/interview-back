@@ -92,7 +92,7 @@ public class ChatGPTService {
 
         promptBuilder.append("\n\n7. 총 추천 회사 수는 20개를 넘지 않도록 해줘.");
         
-        promptBuilder.append("\n\n8. 각 직업이름과 ㄱ회사 4개가 정말 서로 연관있어야만해.");
+        promptBuilder.append("\n\n8. 각 직업이름과 회사 4개가  서로 연관있어야만해.");
 
        
         promptBuilder.append("\n\n위의 조건들을 충족하는지 한 번 더 확실히 확인해줘.");
@@ -119,7 +119,7 @@ public class ChatGPTService {
         message.put("content", prompt);
 
         jsonBody.put("messages", new Object[]{message});
-        jsonBody.put("max_tokens", 2200);  // 안정성을 위해 max_tokens 값을 줄임
+        jsonBody.put("max_tokens", 1600);  // 안정성을 위해 max_tokens 값을 줄임
 
         return jsonBody;
     }
