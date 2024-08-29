@@ -43,8 +43,8 @@ public class ChatRoom {
     @Column(name = "created_time")
     private LocalDateTime createdTime;
     
-    @Column(name = "deleted_time", nullable = true)
-    private LocalDateTime deletedTime;
+    //@Column(name = "deleted_time", nullable = true)
+    //private LocalDateTime deletedTime;
     
     @Column(name = "last_message", nullable = true)
     private String lastMessage;
