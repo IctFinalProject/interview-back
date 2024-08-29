@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,14 @@ public class PaymentService {
     }
     
     @Transactional
-    public Optional<PaymentInfo> findByPaymentKey(String paymentKey) {
+    public PaymentInfo findByPaymentKey(String paymentKey) {
         return paymentRepository.findByPaymentKey(paymentKey);
+    }
+    
+    // 특정 유저의 모든 결제 정보를 가져오기 위한 메서드
+    @Transactional
+    public List<PaymentInfo> findAllByUserId(User user) {
+        return paymentRepository.findAllByUserId(user);
     }
     
     @Transactional
@@ -159,7 +166,7 @@ public class PaymentService {
         		.isCanceled(0)
         		.isSuccessed(1)
         		.lastTransactionKey(payment.getLastTransactionKey())
-        		.useCount(21)
+        		.useCount(20)
         		.paymentKey(payment.getPaymentKey())
         		.requestedAt(requestedDateTime)
         		.approvedAt(approvedDateTime)
@@ -167,4 +174,8 @@ public class PaymentService {
         		.userId(payment.getUser()) // User 객체 전달
                 .build();
     }
+
+	public List<PaymentInfo> findAll() {
+		return paymentRepository.findAll();
+	}
 }

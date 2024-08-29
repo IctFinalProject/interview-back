@@ -14,7 +14,10 @@ public interface PaymentRepository extends JpaRepository<PaymentInfo, Long>{
 
 	Optional<PaymentInfo> findByUserId(User userId);
 	
+    // 특정 유저의 모든 결제 정보를 가져오기 위한 메서드 추가
+    List<PaymentInfo> findAllByUserId(User userId);
+	
 	Optional<PaymentInfo> findByorderId(String orderId);
 	
-	Optional<PaymentInfo> findByPaymentKey(String paymentKey);
+	PaymentInfo findByPaymentKey(String paymentKey);
 }

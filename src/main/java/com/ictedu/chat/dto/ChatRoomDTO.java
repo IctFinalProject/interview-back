@@ -30,7 +30,7 @@ public class ChatRoomDTO {
                        .chatRoomTitle(chatRoomTitle)
                        .lastMessage(lastMessage)
                        .createdTime(createdTime)
-                       .deletedTime(deletedTime)
+                       //.deletedTime(deletedTime)
                        .build();
     }
     
@@ -40,7 +40,7 @@ public class ChatRoomDTO {
                           .chatRoomTitle(chatRoom.getChatRoomTitle())
                           .lastMessage(chatRoom.getLastMessage())
                           .createdTime(chatRoom.getCreatedTime())
-                          .deletedTime(chatRoom.getDeletedTime() != null ? chatRoom.getDeletedTime() : null)
+                          //.deletedTime(chatRoom.getDeletedTime() != null ? chatRoom.getDeletedTime() : null)
                           .build();
     }
 

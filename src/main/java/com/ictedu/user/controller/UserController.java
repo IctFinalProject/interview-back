@@ -5,12 +5,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +30,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ictedu.payment.model.entity.PaymentInfo;
+import com.ictedu.payment.repository.PaymentRepository;
 import com.ictedu.payment.service.InputPayment;
 import com.ictedu.payment.service.PaymentService;
 import com.ictedu.user.model.entity.User;
@@ -45,16 +51,18 @@ public class UserController {
     private final UserService userService;
     private final PaymentService paymentService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PaymentRepository paymentRepository;
     
     //토스 결제 키 값
     @Value("${toss.client.secret}")
     private String tossSecret;
     
     @Autowired
-    public UserController(BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService, PaymentService paymentService) {
+    public UserController(BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService, PaymentService paymentService, PaymentRepository paymentRepository) {
     	this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
     
     @PostMapping("/user")
@@ -166,6 +174,47 @@ public class UserController {
     	Optional<User> user = userService.findByEmail(email);
     	System.out.println("이메일로 찾은 유저: "+ user);
     	return ResponseEntity.ok(user.get());
+    }
+    
+    @GetMapping("/findPaymentInfoById")
+    public ResponseEntity<?> findPaymentInfoById(@RequestParam("id") String id) {
+        Optional<User> optionalUser = userService.findById(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // 여러 개의 결제 정보를 가져오기 위해 findAllByUserId 사용
+        List<PaymentInfo> paymentInfoList = paymentService.findAllByUserId(optionalUser.get());
+        
+        // isCanceled가 0인 결제 정보만 필터링
+        List<PaymentInfo> filteredPaymentInfoList = paymentInfoList.stream()
+            .filter(paymentInfo -> paymentInfo.getIsCanceled() == 0)
+            .collect(Collectors.toList());
+
+        if (filteredPaymentInfoList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+//        System.out.println("결제정보 찾은 유저: " + filteredPaymentInfoList);
+        return ResponseEntity.ok(filteredPaymentInfoList);
+    }
+    
+    @GetMapping("/findAllPaymentInfo")
+    public ResponseEntity<?> findAllPaymentInfo() {
+        // 모든 결제 정보를 가져오기 위해 findAll 사용
+        List<PaymentInfo> paymentInfoList = paymentService.findAll();
+        
+        // isCanceled가 0인 결제 정보만 필터링
+        List<PaymentInfo> filteredPaymentInfoList = paymentInfoList.stream()
+            .filter(paymentInfo -> paymentInfo.getIsCanceled() == 0)
+            .collect(Collectors.toList());
+
+        if (filteredPaymentInfoList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+//        System.out.println("모든 결제 정보: " + filteredPaymentInfoList);
+        return ResponseEntity.ok(filteredPaymentInfoList);
     }
     
     @GetMapping("/find-email")
@@ -302,6 +351,12 @@ public class UserController {
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
         System.out.println("응답! : "+response);
+        // 상태 코드 확인
+        int statusCode = response.statusCode();
+        if (statusCode >= 400) {
+            // 에러 응답이면 바로 반환
+            return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode + ", 오류: " + response.body());
+        }
         // JSON 객체로 변환
         JSONObject jsonObject = new JSONObject(response.body());
         // 필요한 값들을 추출
@@ -344,34 +399,72 @@ public class UserController {
             // 기본 처리 또는 예외 처리 (필요하다면)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 orderName입니다.");
         }
-        // 상태 코드 추출
-        int statusCode = response.statusCode();
         // 응답 상태 코드 반환
-        return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode);
+        System.out.println("newPay: "+ newPaymentInfo);
+        return ResponseEntity.status(statusCode).body(newPaymentInfo);
     }
     
     @PostMapping("/paymentCancel")
     public ResponseEntity<?> paymentCancel(
-            @RequestParam("paymentKey") String paymentKey) throws IOException, InterruptedException {
-    	System.out.println("paymentKey: "+paymentKey);
-    	String toEncode = tossSecret + ":";
-    	String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
-    	System.out.println("Encoded String: " + encodedString);
-        // HTTP 요청 작성
-    	HttpRequest request = HttpRequest.newBuilder()
-    		    .uri(URI.create("https://api.tosspayments.com/v1/payments/"+paymentKey+"/cancel"))
-    		    .header("Authorization", "Basic "+encodedString)
-    		    .header("Content-Type", "application/json")
-    		    .method("POST", HttpRequest.BodyPublishers.ofString("{\"cancelReason\":\"고객 변심\"}"))
-    		    .build();
-    		HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-    	System.out.println(response.body());
+            @RequestParam("paymentKey") String paymentKey, @RequestParam("cancelReason") String cancelReason) {
+        try {
+            System.out.println("paymentKey: " + paymentKey);
+            System.out.println("cancelReason: " + cancelReason);
+            
+            String toEncode = tossSecret + ":";
+            String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
+            System.out.println("Encoded String: " + encodedString);
+            
+            // JSON 본문 생성
+            String requestBody = String.format("{\"cancelReason\":\"%s\"}", cancelReason);
 
-        // HTTP 요청 보내기
-        System.out.println("취소! : "+response);
-        // 상태 코드 추출
-        int statusCode = response.statusCode();
-        // 응답 상태 코드 반환
-        return ResponseEntity.status(statusCode).body("응답 상태 코드: " + statusCode);
+            // HTTP 요청 작성
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel"))
+                    .header("Authorization", "Basic " + encodedString)
+                    .header("Content-Type", "application/json")
+                    .method("POST", HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+            
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+            
+            // 응답 JSON 파싱
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonResponse = objectMapper.readTree(response.body());
+            
+            // 응답에서 필요한 값 추출
+            String cancelReasonResponse = jsonResponse.at("/cancels/0/cancelReason").asText();
+            String canceledAtResponse = jsonResponse.at("/cancels/0/canceledAt").asText();
+            String cancelStatusResponse = jsonResponse.at("/cancels/0/cancelStatus").asText();
+            
+            // LocalDateTime 변환
+            LocalDateTime canceledAt = LocalDateTime.parse(canceledAtResponse, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            
+            // 데이터베이스 업데이트
+            PaymentInfo paymentInfo = paymentRepository.findByPaymentKey(paymentKey);
+            if (paymentInfo != null) {
+                paymentInfo.setIsCanceled(1);
+                paymentInfo.setCancelReason(cancelReasonResponse);
+                paymentInfo.setCanceledAt(canceledAt);
+                paymentInfo.setCancelStatus(cancelStatusResponse);
+                
+                paymentRepository.save(paymentInfo);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PaymentInfo not found for paymentKey: " + paymentKey);
+            }
+            
+            // 상태 코드 추출
+            int statusCode = response.statusCode();
+            
+            if (statusCode == 200) {
+                return ResponseEntity.ok().body("취소가 성공적으로 처리되었습니다.");
+            } else {
+                return ResponseEntity.status(statusCode).body("취소 처리 실패. 상태 코드: " + statusCode);
+            }
+        } catch (Exception e) {
+            // 예외 발생 시 오류 메시지와 함께 500 응답 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
+        }
     }
 }
