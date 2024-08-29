@@ -33,8 +33,6 @@ public class QnaController {
 	public List<QnaModel> getAllQna(){
 		List<QnaModel> qnaList = qnaService.getAllQna();
 	    qnaList.forEach(qna -> {
-	        System.out.println("QnA Title: " + qna.getQnaTitle());
-	        System.out.println("QnA Question: " + qna.getQnaQuestion());
 	    });
 	    return qnaList;
 	}

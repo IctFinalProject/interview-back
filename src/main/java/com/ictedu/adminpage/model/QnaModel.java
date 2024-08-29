@@ -53,7 +53,7 @@ public class QnaModel {
 	@Column(name ="qna_question", nullable = false, length = 255)
 	private String qnaQuestion; //문의 내용
 
-	@Column(name = "qna_answer", length = 255)
+	@Column(name = "qna_answer", nullable = true, length = 255)
 	private String qnaAnswer;  // 답변 내용
 
 	@Column(name = "qna_created_time",nullable = false)
@@ -63,6 +63,6 @@ public class QnaModel {
 	private LocalDate qnaEditedTime; //수정시간
 
 	@Column(name = "qna_status", nullable = false, length = 1)
-	private String qnaStatus = "P";  // 상태 ('N' - New, 'T' - In Progress, 'P' - Processed)
+	private String qnaStatus = "N";  // 상태 ('N' - New, 'T' - In Progress, 'P' - Processed)
 
 }
