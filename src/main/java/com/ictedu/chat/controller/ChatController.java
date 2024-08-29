@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ictedu.chat.dto.ChatMessagesDTO;
 import com.ictedu.chat.dto.ChatRoomDTO;
+import com.ictedu.chat.entity.ChatMessages;
 import com.ictedu.chat.entity.ChatRoom;
 import com.ictedu.chat.service.ChatRoomService;
 import com.ictedu.chat.service.ChatRoomUsersService;
@@ -44,10 +46,19 @@ public class ChatController {
         return chatRoomService.getAllChatRooms(); 
     }
 	
+	//유저가 참가 중인 채팅방 목록 출력
+	//getChatroomList
 	@PostMapping("/userChatrooms")
     public List<ChatRoomDTO> getUserChatrooms(@RequestBody Long userId) {
         List<Long> chatroomIds = chatRoomUsersService.findChatroomIdsByUserId(userId);
         return chatRoomService.findChatroomsByIds(chatroomIds);
     }
+	
+//	//이전 채팅 목록 출력
+//	@PostMapping("/getPastChatting")
+//    public List<ChatMessagesDTO> getPastChatting(@RequestBody Long chatroomId) {
+//        List<ChatMessages> chatMessages = chatMessagesService.findByChatroomId(chatroomId);
+//        return ;
+//    }
 	
 }

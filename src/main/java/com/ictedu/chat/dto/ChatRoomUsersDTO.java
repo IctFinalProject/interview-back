@@ -2,7 +2,6 @@ package com.ictedu.chat.dto;
 
 import com.ictedu.chat.entity.ChatRoom;
 import com.ictedu.chat.entity.ChatRoomUsers;
-import com.ictedu.user.dto.UserDTO;
 import com.ictedu.user.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
