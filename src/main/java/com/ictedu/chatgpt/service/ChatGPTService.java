@@ -112,7 +112,7 @@ public class ChatGPTService {
     }
     private Map<String, Object> createRequestBody(String prompt) {
         Map<String, Object> jsonBody = new HashMap<>();
-        jsonBody.put("model", "gpt-3.5-turbo");
+        jsonBody.put("model", "gpt-4");
 
         Map<String, String> message = new HashMap<>();
         message.put("role", "user");
