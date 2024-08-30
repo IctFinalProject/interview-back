@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,5 +61,19 @@ public class ChatController {
 //        List<ChatMessages> chatMessages = chatMessagesService.findByChatroomId(chatroomId);
 //        return ;
 //    }
+	
+	@DeleteMapping("/exitChatroom")
+    public ResponseEntity<Void> exitChatroom(@RequestParam Long currentChatRoomId, @RequestParam Long userId) {
+		System.out.println("챗챗 테스트");
+		//ChatRoomUser에서 선택한 방과 채팅삭제 요청한 유저가 같이 들어가있는 컬럼 삭제
+        chatRoomUsersService.deleteChatRoomUser(currentChatRoomId, userId);
+        //요청 유저의 이름을 채팅방에서 삭제해야 함, 근데 제목 수정했을 경우에는 터치 ㄴ isTitleEdited
+        chatRoomService.editChatroomTitleExcludeUser(currentChatRoomId, userId);
+        
+        
+        return ResponseEntity.noContent().build();
+    }
+	
+	
 	
 }

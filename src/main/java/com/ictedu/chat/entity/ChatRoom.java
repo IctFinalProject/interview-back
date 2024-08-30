@@ -38,6 +38,10 @@ public class ChatRoom {
 	@Column(name = "chatroom_title", nullable = true)
     private String chatRoomTitle;
 	
+	@ColumnDefault("0")
+	@Column(name = "is_title_edited")
+    private Integer isTitleEdited;
+	
     @ColumnDefault("SYSDATE")
     @CreationTimestamp
     @Column(name = "created_time")

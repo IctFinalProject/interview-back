@@ -34,6 +34,7 @@ public class ChatRoomService {
     	
         ChatRoom chatRoom = ChatRoom.builder()
                                     .chatRoomTitle(usernames)  // 기본 이름, 필요시 수정 가능
+                                    .isTitleEdited(0)
                                     .build();
         
         chatRoomRepository.save(chatRoom);
@@ -49,6 +50,30 @@ public class ChatRoomService {
         return chatrooms.stream()
                         .map(ChatRoomDTO::toDto)
                         .collect(Collectors.toList());
+    }
+    
+    public void editChatroomTitleExcludeUser(Long chatroomId, Long userId) {
+    	//if isTitleEdited가 1이면 암것도 안하고용 0이면 이름에서 제외하기 작업 ㄱ
+    	
+    	ChatRoom chatRoom = chatRoomRepository.findById(chatroomId)
+                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
+    	
+    	if(chatRoom.getIsTitleEdited() == 0) {
+    		//이게 문제ㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔ
+    		List<Long> userIds = chatRoomUsersRepository.findUserIdsByChatRoomId(chatroomId);
+        	List<User> users = userRepository.findAllById(userIds);
+        	String usernames = users.stream()
+                    .map(User::getUsername)
+                    .collect(Collectors.joining(", "));
+        	System.out.println(usernames);
+        	
+        	chatRoom.setChatRoomTitle(usernames);
+        	chatRoomRepository.save(chatRoom);
+    	}
+    		
+        	
+    	
+    	
     }
     
     

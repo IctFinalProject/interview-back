@@ -1,5 +1,7 @@
 package com.ictedu.chat.dto;
 
+import java.time.LocalDateTime;
+
 import com.ictedu.chat.entity.ChatRoom;
 import com.ictedu.chat.entity.ChatRoomUsers;
 import com.ictedu.user.model.entity.User;
@@ -10,9 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Data
 @Getter
 @Setter
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

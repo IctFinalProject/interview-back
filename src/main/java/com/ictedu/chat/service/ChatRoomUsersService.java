@@ -44,4 +44,14 @@ public class ChatRoomUsersService {
                                       .map(chatRoomUsers -> chatRoomUsers.getChatroom().getId())
                                       .collect(Collectors.toList());
     }
+    
+    public void deleteChatRoomUser(Long chatroomId, Long userId) {
+        ChatRoomUsers chatRoomUser = chatRoomUsersRepository.findByChatroomIdAndUserId(chatroomId, userId);
+        if (chatRoomUser != null) {
+            chatRoomUsersRepository.delete(chatRoomUser);
+        } else {
+            throw new RuntimeException("Chat room user association not found");
+        }
+    }
+    
 }

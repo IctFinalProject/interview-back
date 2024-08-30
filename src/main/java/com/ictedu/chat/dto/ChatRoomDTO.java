@@ -20,6 +20,7 @@ public class ChatRoomDTO {
 	
     private Long id;
     private String chatRoomTitle;
+    private Integer isTitleEdited;
     private String lastMessage;
     private LocalDateTime createdTime;  // 필요한 경우 LocalDateTime으로 변경 가능
     private LocalDateTime deletedTime;
@@ -28,9 +29,9 @@ public class ChatRoomDTO {
         return ChatRoom.builder()
                        .id(id)
                        .chatRoomTitle(chatRoomTitle)
+                       .isTitleEdited(isTitleEdited)
                        .lastMessage(lastMessage)
                        .createdTime(createdTime)
-                       //.deletedTime(deletedTime)
                        .build();
     }
     
@@ -38,9 +39,9 @@ public class ChatRoomDTO {
         return ChatRoomDTO.builder()
                           .id(chatRoom.getId())
                           .chatRoomTitle(chatRoom.getChatRoomTitle())
+                          .isTitleEdited(chatRoom.getIsTitleEdited())
                           .lastMessage(chatRoom.getLastMessage())
                           .createdTime(chatRoom.getCreatedTime())
-                          //.deletedTime(chatRoom.getDeletedTime() != null ? chatRoom.getDeletedTime() : null)
                           .build();
     }
 
