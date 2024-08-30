@@ -29,9 +29,9 @@ public class ChatGPTService {
 
         // OkHttpClient 생성 시 타임아웃 설정 추가
         OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)  // 연결 타임아웃: 60초
-            .writeTimeout(60, TimeUnit.SECONDS)    // 쓰기 타임아웃: 60초
-            .readTimeout(60, TimeUnit.SECONDS)     // 읽기 타임아웃: 60초
+            .connectTimeout(90, TimeUnit.SECONDS)  // 연결 타임아웃: 90초
+            .writeTimeout(90, TimeUnit.SECONDS)    // 쓰기 타임아웃: 90초
+            .readTimeout(90, TimeUnit.SECONDS)     // 읽기 타임아웃: 90초
             .build();
 
         String prompt = buildPrompt(jobList);
@@ -92,7 +92,7 @@ public class ChatGPTService {
 
         promptBuilder.append("\n\n7. 총 추천 회사 수는 20개를 넘지 않도록 해줘.");
 
-        promptBuilder.append("\n\n8. 각 직업 이름과 회사 4개가 서로 연관 있어야만 해.");
+        
 
         // 추가된 직업 전망에 대한 정보 요청
         promptBuilder.append("\n\n9. 추천된 각 직업에 대한 간단한 전망도 제공해줘.");
