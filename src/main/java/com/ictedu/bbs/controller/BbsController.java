@@ -1,9 +1,9 @@
 package com.ictedu.bbs.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-
-
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,34 +45,39 @@ public class BbsController {
                 .map(bbs -> ResponseEntity.ok().body(bbs))
                 .orElse(ResponseEntity.notFound().build());
     }
-    
-    //게시글 등록
+    /*
+    // 게시글 첨부파일 조회
+    @GetMapping("/{id}/files/{fileIndex}")
+    public ResponseEntity<byte[]> getFile(@PathVariable("id") Long id,
+                                           @PathVariable("fileIndex") int fileIndex) {
+        byte[] file = bbsService.getFile(id, fileIndex);
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "file" + fileIndex);
+        return new ResponseEntity<>(file, headers, HttpStatus.OK);
+    }
+    */
     @PostMapping
-    public ResponseEntity<?> createBbs(@RequestParam("title") String title, @RequestParam("content") String content, @RequestParam("id") String userId) throws IOException {
-    	System.out.println("title: "+title);
-    	System.out.println("content: "+content);
-    	System.out.println("userId:"+userId);
-    	
-    	// 사용자 조회
+    public ResponseEntity<?> createBbs(@RequestParam("title") String title,
+                                       @RequestParam("content") String content,
+                                       @RequestParam("id") String userId,
+                                       @RequestParam("files") List<MultipartFile> files) throws IOException {
         Optional<User> userOptional = userService.findById(userId);
         if (!userOptional.isPresent()) {
             return ResponseEntity.badRequest().body("Invalid user ID");
         }
-    	
+
         User user = userOptional.get();
-        System.out.println("user: "+user);
-        
-    	BbsDto bbsDto = new BbsDto(title, content, user);
-    	
-        System.out.println("bbsDto: "+ bbsDto);
-        
-    	Bbs newBbs = bbsService.insertBbs(bbsDto);
-    	
-    	System.out.println("newbbs: "+newBbs);
-        return ResponseEntity.ok(bbsDto);
+        BbsDto bbsDto = new BbsDto(title, content, user);
+        Bbs newBbs = bbsService.insertBbs(bbsDto, files);
+
+        return ResponseEntity.ok(newBbs);
     }
     
-    
+    /*
     //게시글 수정
     @PutMapping("/{id}")
     public ResponseEntity<Bbs> updateBbs(@PathVariable("id") Long id, @RequestBody Bbs bbsDetails) {
@@ -85,8 +90,7 @@ public class BbsController {
                     return ResponseEntity.ok().body(updatedBbs);
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }
-    /*
+    }*/
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId, @RequestBody Bbs bbsDetails) {
         return bbsService.findById(id)
@@ -105,7 +109,7 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    */
+    /*
     //게시글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteBbs(@PathVariable("id") Long id) {
@@ -116,7 +120,7 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    /*
+    */
     @DeleteMapping("/{id}")
     public ResponseEntity<? extends Object> deleteBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId) {
         return bbsService.findById(id)
@@ -132,5 +136,4 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-     */
 }

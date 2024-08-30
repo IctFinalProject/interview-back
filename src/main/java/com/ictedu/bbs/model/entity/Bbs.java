@@ -14,6 +14,7 @@ import com.ictedu.user.model.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -93,8 +94,10 @@ public class Bbs {
 	@Column(name = "type", nullable = false, length = 20)
 	private String type;
 
-	@OneToMany(mappedBy = "bbs", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FileBbs> files;
+	@Lob
+    @ElementCollection
+    @Column(name = "bbs_file", nullable = true)
+    private List<byte[]> Files;
 
 	// Getter와 Setter 메소드
 	public Long getBbs_id() {
