@@ -51,13 +51,16 @@ public class QnaService {
     } 
     
     // QnA를 업데이트하는 메서드
-    public QnaModel updateQna(Long qnaId) {
+    public QnaModel updateQna(Long qnaId, QnaModel updatedQnaData) {
         // 주어진 ID로 QnA 엔티티를 조회
         Optional<QnaModel> qnaOpt = qnaRepository.findById(qnaId);
         
         // 만약 해당 QnA가 존재한다면, 업데이트 후 저장
         if (qnaOpt.isPresent()) {
             QnaModel qnaModel = qnaOpt.get();
+            
+            qnaModel.setQnaAnswer(updatedQnaData.getQnaAnswer());
+            qnaModel.setQnaStatus(updatedQnaData.getQnaStatus());
             qnaModel.setQnaEditedTime(LocalDate.now()); // 수정 시간 업데이트
             return qnaRepository.save(qnaModel);
         }

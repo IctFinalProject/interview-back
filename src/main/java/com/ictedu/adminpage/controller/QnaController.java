@@ -75,7 +75,7 @@ public class QnaController {
 	}
 	@PutMapping("/{qnaId}")
 	public ResponseEntity<QnaModel> updateQna(@PathVariable Long qnaId, @RequestBody QnaModel qnaModel) {
-	    QnaModel updatedQna = qnaService.updateQna(qnaId);
+	    QnaModel updatedQna = qnaService.updateQna(qnaId,qnaModel);
 	    return updatedQna != null ? ResponseEntity.ok(updatedQna) : ResponseEntity.notFound().build();
 	}
 	
