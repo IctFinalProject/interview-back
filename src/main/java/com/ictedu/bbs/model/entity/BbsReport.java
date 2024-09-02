@@ -30,8 +30,8 @@ import lombok.NoArgsConstructor;
 public class BbsReport {
 
 	@Id
-	@SequenceGenerator(name="seq_id",sequenceName = "seq_id",allocationSize = 1,initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_id")
+	@SequenceGenerator(name="seq_bbs_report_id",sequenceName = "seq_bbs_report_id",allocationSize = 1,initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_bbs_report_id")
 	@Column(name = "report_id", nullable = false)
 	private Long id;
 
