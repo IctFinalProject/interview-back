@@ -27,8 +27,8 @@ import lombok.NoArgsConstructor;
 public class BbsLikes {
 
 	@Id
-	@SequenceGenerator(name="seq_id",sequenceName = "seq_id",allocationSize = 1,initialValue = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_id")
+	@SequenceGenerator(name="seq_bbs_likes_id",sequenceName = "seq_bbs_likes_id",allocationSize = 1,initialValue = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_bbs_likes_id")
 	@Column(name = "bbs_id", nullable = false)
 	private Long id;
 
