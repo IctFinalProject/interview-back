@@ -1,5 +1,6 @@
 package com.ictedu.resume.service;
 
+import com.ictedu.proofread.service.ExtractKeywordsService;
 import com.ictedu.resume.entity.ResumeEntity;
 import com.ictedu.resume.entity.ResumeProofreadEntity;
 import com.ictedu.resume.repository.ResumeProofreadRepository;
@@ -24,6 +25,9 @@ public class ResumeService {
     @Autowired
     private ResumeProofreadRepository proofreadRepository;
     
+    @Autowired
+    private ExtractKeywordsService extractKeywordsService;  // 키워드 추출 서비스
+    
     @Transactional
     public ResumeEntity saveResume(MultipartFile file, String title, User user) throws IOException {
         ResumeEntity resumeEntity = ResumeEntity.builder()
@@ -45,7 +49,6 @@ public class ResumeService {
         proofreadRepository.save(proofreadEntity);
     }
     
-
     public List<ResumeEntity> findResumesByUser(User user) {
         return resumeRepository.findByUser(user);
     }
@@ -59,11 +62,7 @@ public class ResumeService {
         Optional<ResumeEntity> resumeOpt = resumeRepository.findById(resumeId);
         if (resumeOpt.isPresent()) {
             ResumeEntity resume = resumeOpt.get();
-
-            // 먼저 자식 엔터티(ResumeProofreadEntity)를 삭제합니다.
             proofreadRepository.deleteByResume(resume);
-
-            // 그런 다음 부모 엔터티(ResumeEntity)를 삭제합니다.
             resumeRepository.delete(resume);
         }
     }
@@ -74,5 +73,20 @@ public class ResumeService {
     }
     public Optional<ResumeProofreadEntity> getProofreadByResumeId(Long resumeId) {
         return proofreadRepository.findByResume_ResumeId(resumeId);
+    }
+    
+    @Transactional
+    public void updateKeywords(Long resumeId, String selfIntroduction, String motivation) throws IOException {
+        Optional<ResumeEntity> resumeOpt = resumeRepository.findById(resumeId);
+        if (resumeOpt.isPresent()) {
+            ResumeEntity resume = resumeOpt.get();
+            
+            String[] keywordsSelfIntroduction = extractKeywordsService.extractKeywords(selfIntroduction);
+            String[] keywordsMotivation = extractKeywordsService.extractKeywords(motivation);
+            
+            resume.setKeywordsSelfIntroduction(String.join(", ", keywordsSelfIntroduction));
+            resume.setKeywordsMotivation(String.join(", ", keywordsMotivation));
+            resumeRepository.save(resume);
+        }
     }
 }

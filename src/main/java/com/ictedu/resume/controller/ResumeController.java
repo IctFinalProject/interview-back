@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,5 +109,18 @@ public class ResumeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("이력서를 찾을 수 없습니다.");
         }
     }
+    
+    @PostMapping("/update-keywords")
+    public ResponseEntity<?> updateKeywords(@RequestBody Map<String, Object> requestData) {
+        Long resumeId = Long.parseLong(requestData.get("resumeId").toString());
+        String selfIntroduction = (String) requestData.get("selfIntroduction");
+        String motivation = (String) requestData.get("motivation");
 
+        try {
+            resumeService.updateKeywords(resumeId, selfIntroduction, motivation);
+            return ResponseEntity.ok("키워드가 성공적으로 업데이트되었습니다.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("키워드 업데이트 중 오류 발생.");
+        }
+    }
 }

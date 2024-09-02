@@ -18,7 +18,7 @@ public class ProofreadSelfController {
         this.proofreadService = proofreadService;
     }
 
-    @PostMapping("/api/chatgpt")
+    @PostMapping("/api/chatgpt-self")
     public String getChatGPTResponse(@RequestBody Map<String, String> requestData) {
         try {
             String text = requestData.get("text");

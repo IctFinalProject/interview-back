@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
@@ -22,9 +21,9 @@ public class ProofreadSelfService {
 
     public String getChatGPTResponse(String text) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(120, TimeUnit.SECONDS)  // 연결 타임아웃 설정
-            .writeTimeout(120, TimeUnit.SECONDS)    // 쓰기 타임아웃 설정
-            .readTimeout(120, TimeUnit.SECONDS)     // 읽기 타임아웃 설정
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
             .build();
 
      // 프롬프트 생성
