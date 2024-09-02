@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class BbsService {
 
-    public final BbsRepository bbsRepository;
+    private final BbsRepository bbsRepository;
 
     @Autowired
     public BbsService(BbsRepository bbsRepository) {
@@ -67,8 +67,17 @@ public class BbsService {
     
     // 파일 데이터 제공 메서드 추가
     public byte[] getFile(Long bbsId, int fileIndex) {
+        System.out.println("Fetching file for Bbs ID: " + bbsId + " at index: " + fileIndex);  // 콘솔 로그 추가
         return bbsRepository.findById(bbsId)
-                .map(bbs -> bbs.getFiles().get(fileIndex))
+                .map(bbs -> {
+                    List<byte[]> files = bbs.getFiles();
+                    if (files != null && fileIndex < files.size()) {
+                        return files.get(fileIndex);
+                    } else {
+                        System.out.println("File index out of bounds or files list is null");  // 콘솔 로그 추가
+                        return null;
+                    }
+                })
                 .orElse(null);
     }
     
