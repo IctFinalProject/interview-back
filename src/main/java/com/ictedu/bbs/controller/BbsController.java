@@ -15,9 +15,6 @@ import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.UserService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,26 +29,53 @@ public class BbsController {
     @Autowired
     private UserService userService;
     
-    //게시글 목록 조회
+    // 게시글 목록 조회
     @GetMapping
     public List<Bbs> getAllBbs() {
         return bbsService.findAll();
     }
     
-    //게시글 단건 조회
+    // 게시글 단건 조회 (GET 요청)
     @GetMapping("/{id}")
-    public ResponseEntity<Bbs> getBbsById(@PathVariable("id") Long id) {
-        return bbsService.findById(id)
-                .map(bbs -> ResponseEntity.ok().body(bbs))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Bbs> getBbsById(@PathVariable("id") String id) {
+        System.out.println("GET Request: Fetching Bbs with ID: " + id);  // 콘솔 로그 추가
+        Optional<Bbs> bbsOptional = bbsService.findById(Long.parseLong(id));
+        
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            System.out.println("Bbs found: " + bbs);  // 콘솔 로그 추가
+            return ResponseEntity.ok().body(bbs);
+        } else {
+            System.out.println("Bbs with ID " + id + " not found");  // 콘솔 로그 추가
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // 게시글 단건 조회 (POST 요청)
+    @PostMapping("/search")
+    public ResponseEntity<Bbs> getBbsByIdPost(@RequestBody BbsDto bbsDto) {
+        Long id = bbsDto.getId();
+        System.out.println("POST Request: Fetching Bbs with ID: " + id);  // 콘솔 로그 추가
+        Optional<Bbs> bbsOptional = bbsService.findById(id);
+        
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            System.out.println("Bbs found: " + bbs);  // 콘솔 로그 추가
+            return ResponseEntity.ok().body(bbs);
+        } else {
+            System.out.println("Bbs with ID " + id + " not found");  // 콘솔 로그 추가
+            return ResponseEntity.notFound().build();
+        }
     }
     
     // 게시글 첨부파일 조회
     @GetMapping("/{id}/files/{fileIndex}")
     public ResponseEntity<byte[]> getFile(@PathVariable("id") Long id,
                                            @PathVariable("fileIndex") int fileIndex) {
+        System.out.println("Fetching file with Bbs ID: " + id + " and file index: " + fileIndex);  // 콘솔 로그 추가
         byte[] file = bbsService.getFile(id, fileIndex);
         if (file == null) {
+            System.out.println("File not found for Bbs ID: " + id + " at index: " + fileIndex);  // 콘솔 로그 추가
             return ResponseEntity.notFound().build();
         }
         HttpHeaders headers = new HttpHeaders();
@@ -67,73 +91,45 @@ public class BbsController {
                                        @RequestParam("files") List<MultipartFile> files) throws IOException {
         Optional<User> userOptional = userService.findById(userId);
         if (!userOptional.isPresent()) {
+            System.out.println("Invalid user ID: " + userId);  // 콘솔 로그 추가
             return ResponseEntity.badRequest().body("Invalid user ID");
         }
 
         User user = userOptional.get();
         BbsDto bbsDto = new BbsDto(title, content, user);
         Bbs newBbs = bbsService.insertBbs(bbsDto, files);
+        System.out.println("New Bbs created: " + newBbs);  // 콘솔 로그 추가
 
         return ResponseEntity.ok(newBbs);
     }
     
-    
-    //게시글 수정
+    // 게시글 수정
     @PutMapping("/{id}")
     public ResponseEntity<Bbs> updateBbs(@PathVariable("id") Long id, @RequestBody Bbs bbsDetails) {
+        System.out.println("Updating Bbs with ID: " + id);  // 콘솔 로그 추가
         return bbsService.findById(id)
                 .map(bbs -> {
                     bbs.setTitle(bbsDetails.getTitle());
                     bbs.setContent(bbsDetails.getContent());
-                    // 기타 필드 업데이트
                     Bbs updatedBbs = bbsService.update(bbs);
+                    System.out.println("Bbs updated: " + updatedBbs);  // 콘솔 로그 추가
                     return ResponseEntity.ok().body(updatedBbs);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    /*
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId, @RequestBody Bbs bbsDetails) {
-        return bbsService.findById(id)
-                .map(bbs -> {
-                    // 게시글 작성자와 요청한 사용자가 일치하는지 확인
-                    if (!bbs.getUserId().getId().equals(userId)) {
-                        return ResponseEntity.status(403).body("You are not authorized to edit this post.");
-                    }
-                    
-                    // 일치하는 경우 수정 작업 수행
-                    bbs.setTitle(bbsDetails.getTitle());
-                    bbs.setContent(bbsDetails.getContent());
-                    // 기타 필드 업데이트
-                    Bbs updatedBbs = bbsService.update(bbs);
-                    return ResponseEntity.ok().body(updatedBbs);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-    */
-    /*
-    //게시글 삭제
+    
+    // 게시글 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteBbs(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId) {
+        System.out.println("Attempting to delete Bbs with ID: " + id + " by user: " + userId);  // 콘솔 로그 추가
         return bbsService.findById(id)
                 .map(bbs -> {
-                    bbsService.deleteById(id);
-                    return ResponseEntity.ok().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-    */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<? extends Object> deleteBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId) {
-        return bbsService.findById(id)
-                .map(bbs -> {
-                    // 게시글 작성자와 요청한 사용자가 일치하는지 확인
                     if (!bbs.getUserId().getId().equals(userId)) {
+                        System.out.println("User ID mismatch: Unauthorized deletion attempt");  // 콘솔 로그 추가
                         return ResponseEntity.status(403).body("You are not authorized to delete this post.");
                     }
-                    
-                    // 일치하는 경우 삭제 작업 수행
                     bbsService.deleteById(id);
+                    System.out.println("Bbs deleted with ID: " + id);  // 콘솔 로그 추가
                     return ResponseEntity.ok().build();
                 })
                 .orElse(ResponseEntity.notFound().build());

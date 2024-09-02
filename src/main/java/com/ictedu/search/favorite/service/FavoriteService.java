@@ -6,6 +6,8 @@ import com.ictedu.user.model.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class FavoriteService {
 
@@ -25,8 +27,7 @@ public class FavoriteService {
 
     public void removeFavoriteCompany(User user, FavoriteCompany favoriteCompany) {
         System.out.println("Removing favorite company: " + favoriteCompany + " for user: " + user.getEmail());
-        FavoriteCompany favoriteToRemove = favoriteRepository
-            .findByUserAndCompanyId(user, favoriteCompany.getCompanyId());
+        FavoriteCompany favoriteToRemove = favoriteRepository.findByUserAndCompanyId(user, favoriteCompany.getCompanyId());
         
         if (favoriteToRemove != null) {
             favoriteRepository.delete(favoriteToRemove);
@@ -34,5 +35,9 @@ public class FavoriteService {
         } else {
             System.out.println("Favorite company not found, nothing to remove.");
         }
+    }
+
+    public List<FavoriteCompany> getFavoriteCompanies(User user) {
+        return favoriteRepository.findByUser(user);
     }
 }

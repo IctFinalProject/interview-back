@@ -71,9 +71,28 @@ public class AdminNoticeController {
 		}
 	
 	@PutMapping("/{adminNoticeId}")
-	public ResponseEntity<AdminNoticeModel> updateAdminNotice(@PathVariable Long adminNoticeId, @RequestBody AdminNoticeModel adminNoticeModel){
-		AdminNoticeModel updatedAdminNotice = adminNoticeService.updateAdminNotice(adminNoticeId, adminNoticeModel);
-		return updatedAdminNotice != null ? ResponseEntity.ok(updatedAdminNotice) : ResponseEntity.notFound().build();
+	public ResponseEntity<AdminNoticeModel> updateAdminNotice(
+			@PathVariable Long adminNoticeId, 
+			@RequestBody Map<String,Object> adminNoticeRequest){
+		// 필드 추출
+	    String adminNoticeTitle = (String) adminNoticeRequest.get("adminNoticeTitle");
+	    String adminNoticeContent = (String) adminNoticeRequest.get("adminNoticeContent");
+	    
+	    // AdminNoticeModel 가져오기
+	    AdminNoticeModel existingNotice = adminNoticeService.getAdminNoticeById(adminNoticeId)
+	        .orElse(null);
+	    if (existingNotice == null) {
+	        return ResponseEntity.notFound().build();
+	    }
+	    
+	    // 업데이트 필드 설정
+	    existingNotice.setAdminNoticeTitle(adminNoticeTitle);
+	    existingNotice.setAdminNoticeContent(adminNoticeContent);
+
+	    // 업데이트된 객체 저장
+	    AdminNoticeModel updatedAdminNotice = adminNoticeService.updateAdminNotice(adminNoticeId, existingNotice);
+
+	    return ResponseEntity.ok(updatedAdminNotice);
 	}
 	
 	@DeleteMapping("/{adminNoticeId}")
