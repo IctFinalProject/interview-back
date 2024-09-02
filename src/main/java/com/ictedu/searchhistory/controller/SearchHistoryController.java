@@ -70,7 +70,7 @@ public class SearchHistoryController {
         }
         
         // 반환할 검색 기록을 출력
-        System.out.println("Returning search terms: " + searchTerms);
+//        System.out.println("Returning search terms: " + searchTerms);
         
         return ResponseEntity.ok(searchTerms);
     }

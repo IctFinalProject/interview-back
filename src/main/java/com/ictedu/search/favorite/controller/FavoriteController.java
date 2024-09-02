@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -52,6 +53,17 @@ public class FavoriteController {
         }
 
         System.out.println("Failed to find user with email: " + favoriteCompany.getUserEmail());
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/getFavorites")
+    public ResponseEntity<List<FavoriteCompany>> getFavorites(@RequestParam String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            List<FavoriteCompany> favorites = favoriteService.getFavoriteCompanies(user);
+            return ResponseEntity.ok(favorites);
+        }
         return ResponseEntity.badRequest().build();
     }
 }
