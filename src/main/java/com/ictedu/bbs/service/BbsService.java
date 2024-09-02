@@ -64,12 +64,12 @@ public class BbsService {
     public Bbs update(Bbs bbs) {
         return bbsRepository.save(bbs);
     }
-    /*
+    
     // 파일 데이터 제공 메서드 추가
     public byte[] getFile(Long bbsId, int fileIndex) {
         return bbsRepository.findById(bbsId)
                 .map(bbs -> bbs.getFiles().get(fileIndex))
                 .orElse(null);
     }
-    */
+    
 }

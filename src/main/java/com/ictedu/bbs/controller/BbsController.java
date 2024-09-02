@@ -45,7 +45,7 @@ public class BbsController {
                 .map(bbs -> ResponseEntity.ok().body(bbs))
                 .orElse(ResponseEntity.notFound().build());
     }
-    /*
+    
     // 게시글 첨부파일 조회
     @GetMapping("/{id}/files/{fileIndex}")
     public ResponseEntity<byte[]> getFile(@PathVariable("id") Long id,
@@ -59,7 +59,7 @@ public class BbsController {
         headers.setContentDispositionFormData("attachment", "file" + fileIndex);
         return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
-    */
+    
     @PostMapping
     public ResponseEntity<?> createBbs(@RequestParam("title") String title,
                                        @RequestParam("content") String content,
@@ -77,7 +77,7 @@ public class BbsController {
         return ResponseEntity.ok(newBbs);
     }
     
-    /*
+    
     //게시글 수정
     @PutMapping("/{id}")
     public ResponseEntity<Bbs> updateBbs(@PathVariable("id") Long id, @RequestBody Bbs bbsDetails) {
@@ -90,7 +90,8 @@ public class BbsController {
                     return ResponseEntity.ok().body(updatedBbs);
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }*/
+    }
+    /*
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId, @RequestBody Bbs bbsDetails) {
         return bbsService.findById(id)
@@ -109,6 +110,7 @@ public class BbsController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+    */
     /*
     //게시글 삭제
     @DeleteMapping("/{id}")
