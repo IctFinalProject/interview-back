@@ -212,8 +212,22 @@ public class UserController {
         if (filteredPaymentInfoList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(filteredPaymentInfoList);
+    }
+    
+    @GetMapping("/findAllRefundInfo")
+    public ResponseEntity<?> findAllRefundInfo() {
+        // 모든 결제 정보를 가져오기 위해 findAll 사용
+        List<PaymentInfo> paymentInfoList = paymentService.findAll();
+        
+        // isCanceled가 1인 결제 정보만 필터링
+        List<PaymentInfo> filteredPaymentInfoList = paymentInfoList.stream()
+            .filter(paymentInfo -> paymentInfo.getIsCanceled() == 1)
+            .collect(Collectors.toList());
 
-//        System.out.println("모든 결제 정보: " + filteredPaymentInfoList);
+        if (filteredPaymentInfoList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(filteredPaymentInfoList);
     }
     
