@@ -15,7 +15,9 @@ import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.UserService;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -67,7 +69,7 @@ public class BbsController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+    /*
     // 게시글 첨부파일 조회
     @GetMapping("/{id}/files/{fileIndex}")
     public ResponseEntity<byte[]> getFile(@PathVariable("id") Long id,
@@ -83,7 +85,36 @@ public class BbsController {
         headers.setContentDispositionFormData("attachment", "file" + fileIndex);
         return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
-    
+    */
+ // 게시글의 모든 파일 목록 조회
+    @GetMapping("/{id}/files")
+    public ResponseEntity<Map<String, String>> getFilesByBbsId(@PathVariable("id") Long id) {
+        Map<String, byte[]> filesMap = bbsService.getFilesByBbsId(id);
+        if (filesMap.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        // 파일 이름만 반환
+        Map<String, String> fileNamesMap = new HashMap<>();
+        filesMap.forEach((fileName, fileData) -> fileNamesMap.put(fileName, fileName));
+
+        return ResponseEntity.ok(fileNamesMap);
+    }
+
+    @GetMapping("/{id}/files/{fileName}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable("id") Long id,
+                                                @PathVariable("fileName") String fileName) {
+        byte[] fileData = bbsService.getFile(id, fileName);
+        if (fileData != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", fileName);
+            return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    //게시글 등록
     @PostMapping
     public ResponseEntity<?> createBbs(@RequestParam("title") String title,
                                        @RequestParam("content") String content,

@@ -8,7 +8,9 @@ import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.repository.BbsRepository;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -33,11 +35,11 @@ public class BbsService {
     public Bbs insertBbs(BbsDto bbsDto, List<MultipartFile> files) throws IOException {
         Bbs bbs = inputBbs(bbsDto);
         if (files != null && !files.isEmpty()) {
-            List<byte[]> fileList = new ArrayList<>();
+            Map<String, byte[]> fileMap = new HashMap<>();
             for (MultipartFile file : files) {
-                fileList.add(file.getBytes());
+            	 fileMap.put(file.getOriginalFilename(), file.getBytes());
             }
-            bbs.setFiles(fileList);
+            bbs.setFiles(fileMap);
         }
         return bbsRepository.save(bbs);
     }
@@ -64,13 +66,13 @@ public class BbsService {
     public Bbs update(Bbs bbs) {
         return bbsRepository.save(bbs);
     }
-    
+    /*
     // 파일 데이터 제공 메서드 추가
     public byte[] getFile(Long bbsId, int fileIndex) {
         System.out.println("Fetching file for Bbs ID: " + bbsId + " at index: " + fileIndex);  // 콘솔 로그 추가
         return bbsRepository.findById(bbsId)
                 .map(bbs -> {
-                    List<byte[]> files = bbs.getFiles();
+                    Map<String, byte[]> files = bbs.getFiles();
                     if (files != null && fileIndex < files.size()) {
                         return files.get(fileIndex);
                     } else {
@@ -80,5 +82,35 @@ public class BbsService {
                 })
                 .orElse(null);
     }
-    
+    */
+    /*
+    public byte[] getFile(Long bbsId, String fileName) {
+        Optional<Bbs> bbsOptional = bbsRepository.findById(bbsId);
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            return bbs.getFiles().get(fileName);
+        }
+        return null;
+    }
+    */
+    public byte[] getFile(Long bbsId, String fileName) {
+        Optional<Bbs> bbsOptional = bbsRepository.findById(bbsId);
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            Map<String, byte[]> files = bbs.getFiles();
+            if (files != null && files.containsKey(fileName)) {
+                return files.get(fileName);
+            } else {
+                System.out.println("File not found in the map for fileName: " + fileName);
+                return null;
+            }
+        }
+        System.out.println("Bbs not found for ID: " + bbsId);
+        return null;
+    }
+    public Map<String, byte[]> getFilesByBbsId(Long bbsId) {
+        return bbsRepository.findById(bbsId)
+            .map(Bbs::getFiles)
+            .orElse(new HashMap<>());
+    }
 }

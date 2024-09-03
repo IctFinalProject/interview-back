@@ -3,7 +3,9 @@ import java.time.LocalDate;
 
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import com.ictedu.user.model.entity.User;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
@@ -22,6 +25,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -94,10 +98,12 @@ public class Bbs {
 	@Column(name = "type", nullable = false, length = 20)
 	private String type;
 
+	@ElementCollection
 	@Lob
-    @ElementCollection
-    @Column(name = "bbs_file", nullable = true)
-    private List<byte[]> Files;
+    @CollectionTable(name = "BBS_FILE", joinColumns = @JoinColumn(name = "bbs_id"))
+    @MapKeyColumn(name = "file_name")
+    @Column(name = "file_data")
+    private Map<String, byte[]> files = new HashMap<>();
 
 	// Getter와 Setter 메소드
 	public Long getBbs_id() {
