@@ -30,7 +30,7 @@ public class BbsDto {
 	private String username;
 	private String title;
 	private String content;
-	private LocalDate createdAt;
+	private LocalDateTime createdAt; // LocalDate를 LocalDateTime으로 변경
 	private Long hitCount;
 	private Integer active;
 	private Integer inactive;

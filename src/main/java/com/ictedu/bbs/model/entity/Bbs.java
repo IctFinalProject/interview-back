@@ -60,11 +60,12 @@ public class Bbs {
 
 	@Column(name = "content", nullable = false, length = 2000)
 	private String content;
-
-	@ColumnDefault("SYSDATE")
+// 아래가 바꾼거 (날짜 -> 날짜+시간) 
+	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "createdAt", nullable = false, updatable = false)
 	@CreationTimestamp
-	private LocalDate createdAt;
+	private LocalDateTime createdAt;
+
 
 	@Column(name = "hitcount", nullable = false)
 	@ColumnDefault("0")
@@ -137,13 +138,13 @@ public class Bbs {
 	public void setContent(String content) {
 		this.content = content;
 	}
-
-	public LocalDate getCreatedAt() {
-		return createdAt;
+// 아래 두개 바꾼거임 (날짜 -> 날짜 +시간) 
+	public LocalDateTime getCreatedAt() {
+	    return createdAt;
 	}
 
-	public void setCreatedAt(LocalDate createdAt) {
-		this.createdAt = createdAt;
+	public void setCreatedAt(LocalDateTime createdAt) {
+	    this.createdAt = createdAt;
 	}
 
 	public Long getHitCount() {
