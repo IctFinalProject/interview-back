@@ -137,7 +137,7 @@ public class InterviewService {
     }
     
     private List<String> extractKeywords(String text) {
-        String keywordPrompt = "다음 텍스트에서 주요 키워드를 5개 이내로 추출해주세요: " + text;
+        String keywordPrompt = "다음 텍스트에서 주요 키워드를 5개 이내로 추출해주세요(공백으로 구분해주세요): " + text;
         String keywordsString = callChatGPTApi(keywordPrompt);
         return Arrays.asList(keywordsString.split(","));
     }

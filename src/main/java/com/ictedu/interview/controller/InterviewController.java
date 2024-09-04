@@ -65,7 +65,7 @@ public class InterviewController {
 	        Map<String, List<Question>> response = new HashMap<>();
 	        response.put("commonQuestions", commonQuestions);
 	        response.put("resumeQuestions", resumeQuestions);
-
+	        System.out.println("끝났어요");
 	        return ResponseEntity.ok(response);
 	    } catch (NumberFormatException e) {
 	        // 변환 실패 시 예외 처리
