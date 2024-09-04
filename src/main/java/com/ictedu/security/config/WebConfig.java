@@ -3,6 +3,7 @@ package com.ictedu.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,5 +22,10 @@ public class WebConfig {
                         .allowCredentials(true); // 인증 정보를 포함한 요청을 허용
             }
         };
+    }
+    
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
