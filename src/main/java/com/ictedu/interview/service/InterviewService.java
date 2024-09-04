@@ -73,7 +73,7 @@ public class InterviewService {
 
 	    // 질문 생성 및 interview_id 설정
 	    for (int i = 0; i < count; i++) {
-	        String prompt = createPrompt(type, count, keywords);
+	        String prompt = createPrompt(type, keywords);
 	        String questionText = callChatGPTApi(prompt);
 	        String script = generateScript(questionText);       
 	        List<String> generatedKeywords = extractKeywords(questionText + " " + script);
@@ -98,9 +98,9 @@ public class InterviewService {
 	    return questions;
 	}
 	
-	private String createPrompt(String type, int count, List<String> keywords) {
-	    String basePrompt = "다음 키워드를 기반으로 '한국어'로 %s 면접 질문을 %d개 생성해주세요: %s";
-	    return String.format(basePrompt, type, count, String.join(", ", keywords));
+	private String createPrompt(String type, List<String> keywords) {
+	    String basePrompt = "다음 키워드를 기반으로 '한국어'로 %s 면접 질문을 1개 생성해주세요: %s";
+	    return String.format(basePrompt, type, String.join(", ", keywords));
 	}
 	private String callChatGPTApi(String prompt) {
 		// ChatGPT API 설정

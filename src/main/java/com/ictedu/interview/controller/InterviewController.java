@@ -58,8 +58,8 @@ public class InterviewController {
 				selfIntroduction = resume.getKeywordsSelfIntroduction();
 			}
 			List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
-			List<Question> commonQuestions = interviewService.generateQuestions("common", dbKeywords, 1, user);
-			List<Question> resumeQuestions = interviewService.generateQuestions("resume", dbKeywords, 1, user);
+			List<Question> commonQuestions = interviewService.generateQuestions("common", dbKeywords, 3, user);
+			List<Question> resumeQuestions = interviewService.generateQuestions("resume", dbKeywords, 3, user);
 
 	        // Map을 사용하여 두 리스트를 하나로 묶어 반환
 	        Map<String, List<Question>> response = new HashMap<>();
