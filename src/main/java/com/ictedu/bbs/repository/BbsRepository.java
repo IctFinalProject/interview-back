@@ -13,7 +13,9 @@ import com.ictedu.user.model.entity.User;
 public interface BbsRepository extends JpaRepository<Bbs, Long>{
 	List<Bbs> findByActiveTrue();
     List<Bbs> findByUserIdAndActiveTrue(User userId);
+    List<Bbs> findByDeleted(int deleted);  // 삭제 여부로 필터링된 게시글 조회
 	
+    
 	
 
 }

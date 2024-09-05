@@ -26,6 +26,11 @@ public class BbsService {
     public List<Bbs> findAll() {
         return bbsRepository.findAll();
     }
+    
+ // 삭제되지 않은 게시글 조회 메서드
+    public List<Bbs> findAllByDeleted(int deleted) {
+        return bbsRepository.findByDeleted(deleted);  // 삭제 여부에 따른 게시글 조회
+    }
 
     public Optional<Bbs> findById(Long id) {
         return bbsRepository.findById(id);
@@ -64,7 +69,7 @@ public class BbsService {
     }
 
     public Bbs update(Bbs bbs) {
-        return bbsRepository.save(bbs);
+    	return bbsRepository.save(bbs);  // 게시글 업데이트(삭제 상태 포함)
     }
     /*
     // 파일 데이터 제공 메서드 추가
@@ -113,4 +118,6 @@ public class BbsService {
             .map(Bbs::getFiles)
             .orElse(new HashMap<>());
     }
+
+    
 }

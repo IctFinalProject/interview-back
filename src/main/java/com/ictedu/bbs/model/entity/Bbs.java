@@ -60,6 +60,7 @@ public class Bbs {
 
 	@Column(name = "content", nullable = false, length = 2000)
 	private String content;
+	
 // 아래가 바꾼거 (날짜 -> 날짜+시간) 
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "createdAt", nullable = false, updatable = false)
