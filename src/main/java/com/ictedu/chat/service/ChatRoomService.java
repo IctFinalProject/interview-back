@@ -59,21 +59,49 @@ public class ChatRoomService {
                 .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
     	
     	if(chatRoom.getIsTitleEdited() == 0) {
-    		//이게 문제ㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔㅔ
     		List<Long> userIds = chatRoomUsersRepository.findUserIdsByChatRoomId(chatroomId);
         	List<User> users = userRepository.findAllById(userIds);
-        	String usernames = users.stream()
-                    .map(User::getUsername)
-                    .collect(Collectors.joining(", "));
-        	System.out.println(usernames);
         	
-        	chatRoom.setChatRoomTitle(usernames);
-        	chatRoomRepository.save(chatRoom);
+        	System.out.println("users.size() : " + users.size());
+        	
+        	if(users.size() == 0) {
+        		chatRoomRepository.deleteById(chatroomId);
+        	}
+        	else {
+        		String usernames = users.stream()
+                        .map(User::getUsername)
+                        .collect(Collectors.joining(", "));
+            	
+            	System.out.println(usernames);
+            	
+            	chatRoom.setChatRoomTitle(usernames);
+            	chatRoomRepository.save(chatRoom);
+        	}
     	}
-    		
-        	
+    }
+    
+    public String getChatroomTitle(Long chatRoomId) {
+        // 채팅방 ID로 채팅방을 찾음
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
+        if (chatRoom != null) {
+            return chatRoom.getChatRoomTitle();
+        } else {
+            throw new RuntimeException("Chat room not found");
+        }
+    }
+    
+    public void updateChatRoomTitle(Long chatRoomId, String newTitle) {
+    	ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid chat room ID: " + chatRoomId));
     	
+    	ChatRoomDTO chatRoomDTO = ChatRoomDTO.toDto(chatRoom);
+    	chatRoomDTO.setChatRoomTitle(newTitle);
+    	chatRoomDTO.setIsTitleEdited(1);
     	
+    	ChatRoom updateChatRoomTitle = chatRoomDTO.toEntity();
+    	chatRoomRepository.save(updateChatRoomTitle);
+
+    
     }
     
     
