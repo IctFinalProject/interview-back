@@ -12,9 +12,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.service.BbsDto;
+import com.ictedu.bbs.service.BbsReportService;
 import com.ictedu.bbs.service.BbsService;
+import com.ictedu.bbs.service.ReportRequestDto;
 import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.UserService;
+
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,6 +36,9 @@ public class BbsController {
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private BbsReportService bbsReportService;  // BbsReportService 주입
     
     //게시글 목록 조회
     @GetMapping
@@ -233,7 +239,18 @@ public class BbsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
     }
-
+    
+    @PostMapping("/report")
+    public ResponseEntity<String> reportPost(@RequestBody ReportRequestDto request) {
+        Optional<Bbs> bbsOptional = bbsService.findById(request.getPostId());
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            bbsReportService.saveReport(bbs, request.getReason(), request.getAdditionalInfo());
+            return ResponseEntity.ok("신고가 접수되었습니다.");
+        } else {
+            return ResponseEntity.status(404).body("게시글을 찾을 수 없습니다.");
+        }
+    }
 
 
 
