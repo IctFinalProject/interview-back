@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BbsCommentService {
@@ -22,18 +21,8 @@ public class BbsCommentService {
         this.commentRepository = commentRepository;
     }
 
-    public List<CommentRequestDto> getCommentsByBbsId(Long bbsId) {
-        // BbsComment에서 댓글과 함께 user의 username을 가져옴
-        return commentRepository.findByBbs_BbsId(bbsId)
-            .stream()
-            .map(comment -> new CommentRequestDto(
-                comment.getCommentId(),
-                comment.getContent(),
-                comment.getCreatedAt(),
-                comment.getUser().getUsername(), // User의 username 가져옴
-                comment.getUser().getId() // User의 ID도 함께 가져옴
-            ))
-            .collect(Collectors.toList());
+    public List<BbsComment> getCommentsByBbsId(Long bbsId) {
+        return commentRepository.findByBbs_BbsId(bbsId);
     }
 
     public BbsComment createComment(Bbs bbs, String content, User user) {

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CommentRequestDto {
+	
     private Long commentId;
     private String content;
     private LocalDateTime createdAt;

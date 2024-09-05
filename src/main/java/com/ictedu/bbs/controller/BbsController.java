@@ -262,7 +262,7 @@ public class BbsController {
 
     // 댓글 목록 조회
     @GetMapping("/{bbsId}/comments")
-    public List<CommentRequestDto> getComments(@PathVariable Long bbsId) {
+    public List<BbsComment> getComments(@PathVariable Long bbsId) {
         return bbsCommentService.getCommentsByBbsId(bbsId);
     }
 
@@ -276,7 +276,7 @@ public class BbsController {
     }
 
     // 댓글 수정
-    @PutMapping("/{commentId}")
+    @PutMapping("/comments/{commentId}")
     public BbsComment updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDto request) {
         return bbsCommentService.updateComment(commentId, request.getContent());
     }
