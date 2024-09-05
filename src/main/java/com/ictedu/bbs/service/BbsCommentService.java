@@ -42,4 +42,11 @@ public class BbsCommentService {
         comment.setEditedAt(LocalDateTime.now());
         return commentRepository.save(comment);
     }
+    
+    public void deleteComment(Long commentId) {
+        BbsComment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+        commentRepository.delete(comment);
+    }
+
 }

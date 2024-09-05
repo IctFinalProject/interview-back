@@ -281,6 +281,12 @@ public class BbsController {
         return bbsCommentService.updateComment(commentId, request.getContent());
     }
     
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+        bbsCommentService.deleteComment(commentId);
+        return ResponseEntity.ok("댓글이 삭제되었습니다.");
+    }
+    
 
 
 
