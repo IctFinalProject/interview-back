@@ -11,9 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ictedu.bbs.model.entity.Bbs;
+import com.ictedu.bbs.model.entity.BbsComment;
+import com.ictedu.bbs.service.BbsCommentService;
 import com.ictedu.bbs.service.BbsDto;
 import com.ictedu.bbs.service.BbsReportService;
 import com.ictedu.bbs.service.BbsService;
+import com.ictedu.bbs.service.CommentRequestDto;
+import com.ictedu.bbs.service.CommentRequestDto;
 import com.ictedu.bbs.service.ReportRequestDto;
 import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.UserService;
@@ -33,6 +37,9 @@ public class BbsController {
 
     @Autowired
     private BbsService bbsService;
+    
+    @Autowired
+    private BbsCommentService bbsCommentService;
     
     @Autowired
     private UserService userService;
@@ -251,6 +258,29 @@ public class BbsController {
             return ResponseEntity.status(404).body("게시글을 찾을 수 없습니다.");
         }
     }
+    
+
+    // 댓글 목록 조회
+    @GetMapping("/{bbsId}/comments")
+    public List<CommentRequestDto> getComments(@PathVariable Long bbsId) {
+        return bbsCommentService.getCommentsByBbsId(bbsId);
+    }
+
+    // 댓글 생성
+    @PostMapping("/{bbsId}/comments")
+    public BbsComment createComment(@PathVariable Long bbsId, @RequestBody CommentRequestDto request) {
+        Bbs bbs = bbsService.findById(bbsId).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        String changedId = String.valueOf(request.getUserId());
+        User user = userService.findById(changedId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        return bbsCommentService.createComment(bbs, request.getContent(), user);
+    }
+
+    // 댓글 수정
+    @PutMapping("/{commentId}")
+    public BbsComment updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDto request) {
+        return bbsCommentService.updateComment(commentId, request.getContent());
+    }
+    
 
 
 
