@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ictedu.interview.model.entity.Question;
 import com.ictedu.interview.service.InterviewService;
+import com.ictedu.interview.service.QuestionService;
 import com.ictedu.resume.entity.ResumeEntity;
 import com.ictedu.resume.service.ResumeService;
 import com.ictedu.user.model.entity.User;
@@ -33,13 +35,15 @@ public class InterviewController {
     private final ResumeService resumeService;
     private final InterviewService interviewService;
     private final UserRepository userRepository;
+    private final QuestionService questionService;
     
     @Autowired
-    public InterviewController(UserService userService, ResumeService resumeService, InterviewService interviewService, UserRepository userRepository) {
+    public InterviewController(UserService userService, ResumeService resumeService, InterviewService interviewService, UserRepository userRepository, QuestionService questionService) {
         this.userService = userService;
         this.resumeService = resumeService;
         this.interviewService = interviewService;
         this.userRepository = userRepository;
+        this.questionService = questionService;
     }
     
 	@GetMapping("/getmockquestion")
@@ -73,6 +77,25 @@ public class InterviewController {
 	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
 	    }
 	}
-    
-
+	
+    @GetMapping("/getinterviewquestions")
+    public ResponseEntity<?> getInterviewQuestions(@RequestParam List<Long> questionId) {
+        System.out.println("Received question IDs: " + questionId);
+        List<Question> questions = questionService.getQuestionsByIds(questionId);
+        
+        // Question 엔티티를 QuestionDTO로 변환
+        List<QuestionDTO> questionDTOs = questions.stream()
+                .map(question -> new QuestionDTO(
+                    question.getId(),
+                    question.getQuestionText(),
+                    question.getQuestionType(),
+                    question.getScript(),
+                    question.getKeywords(),
+                    question.getCreatedTime(),
+                    question.getUpdatedTime()
+                ))
+                .collect(Collectors.toList());
+        System.out.println("퀘스천DTO: "+questionDTOs);
+        return ResponseEntity.ok(questionDTOs);  // DTO를 반환
+    }
 }
