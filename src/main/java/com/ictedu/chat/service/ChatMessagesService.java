@@ -38,6 +38,7 @@ public class ChatMessagesService {
             messageData.put("username", user != null ? user.getUsername() : "탈퇴한 유저");
             messageData.put("createdTime", chatMessage.getCreatedTime());
             messageData.put("userId", chatMessage.getUser().getId());
+            messageData.put("chatroomId", chatMessage.getChatroom().getId());
             
             return messageData;
         }).collect(Collectors.toList());
