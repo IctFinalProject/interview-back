@@ -47,20 +47,17 @@ public class InterviewController {
     }
     
 	@GetMapping("/getmockquestion")
-	public ResponseEntity<?> getMockQuestions(@RequestParam("userId") String userId){
+	public ResponseEntity<?> getMockQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
 	    try {
 	        Long userIdLong = Long.parseLong(userId); // String -> Long 변환
+	        Long choosedResumeLong = Long.parseLong(choosedResume); // String -> Long 변환
 	        // 변환 후 처리 로직
 	        Optional<User> getUser = userRepository.findById(userIdLong);
 	        User user = getUser.get(); // 값이 반드시 존재할 때 사용 (값이 없으면 예외 발생)
-			List<ResumeEntity> findedUser = resumeService.findResumesByUser(user);
+	        Optional<ResumeEntity> getResume = resumeService.findResumeById(choosedResumeLong);
 			// List<ResumeEntity> 순회하면서 각 ResumeEntity의 User의 password를 출력
-			String selfIntroduction = null;
-			String motivation = null;
-			for (ResumeEntity resume : findedUser) {
-				motivation = resume.getKeywordsMotivation();
-				selfIntroduction = resume.getKeywordsSelfIntroduction();
-			}
+			String selfIntroduction = getResume.get().getKeywordsSelfIntroduction();
+			String motivation = getResume.get().getKeywordsMotivation();
 			List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
 			List<Question> commonQuestions = interviewService.generateQuestions("common", dbKeywords, 3, user);
 			List<Question> resumeQuestions = interviewService.generateQuestions("resume", dbKeywords, 3, user);
