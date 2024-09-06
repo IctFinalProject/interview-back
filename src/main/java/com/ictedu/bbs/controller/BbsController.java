@@ -63,7 +63,7 @@ public class BbsController {
         
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
-            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
+//            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
             Map<String, byte[]> files = bbs.getFiles();  // 파일 정보를 가져오는 부분
             return ResponseEntity.ok().body(bbs);
         } else {
@@ -81,7 +81,7 @@ public class BbsController {
         
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
-            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
+//            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
             return ResponseEntity.ok().body(bbs);
         } else {
             System.out.println("게시글 ID " + id + " 못 찾음"); // 한글 콘솔 체크
@@ -134,7 +134,7 @@ public class BbsController {
         User user = userOptional.get();
         BbsDto bbsDto = new BbsDto(title, content, user);
         Bbs newBbs = bbsService.insertBbs(bbsDto, files);
-        System.out.println("새 게시글 생성됨: " + newBbs); // 한글 콘솔 체크
+//        System.out.println("새 게시글 생성됨: " + newBbs); // 한글 콘솔 체크
 
         return ResponseEntity.ok(newBbs);
     }
@@ -229,20 +229,21 @@ public class BbsController {
         Optional<Bbs> bbsOptional = bbsService.findById(id);
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
-            System.out.println("게시글 찾음: " + bbs.getBbsId() + ", 작성자: " + bbs.getUserId().getId()); // 게시글 정보 출력
+//            System.out.println("게시글 찾음: " + bbs.getBbsId() + ", 작성자: " + bbs.getUserId().getId()); // 게시글 정보 출력
             
             if (!bbs.getUserId().getId().equals(Long.valueOf(userId))) {
                 System.out.println("사용자 ID 불일치: 권한 없음"); // 권한 불일치 시 로그 출력
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this post.");
             }
             
-            bbs.setDeleted(1);  // 소프트 삭제
-            bbs.setDeleted_date(LocalDateTime.now());
-            bbsService.update(bbs);
-            System.out.println("게시글 삭제 완료: " + bbs.getBbsId()); // 삭제 성공 로그
+            // 게시글 소프트 삭제 처리
+            System.out.println("게시글 삭제 처리 중...");
+            bbsService.deleteBbs(id, false);  // 게시글 삭제 (일반 삭제)
+
+            System.out.println("게시글 삭제 완료: " + bbs.getBbsId());
             return ResponseEntity.ok().build();
         } else {
-            System.out.println("게시글 ID 못 찾음: " + id); // 게시글 찾지 못한 경우 로그 출력
+            System.out.println("게시글 ID 못 찾음: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
     }

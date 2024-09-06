@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ictedu.user.model.entity.User;
 
 import jakarta.persistence.CascadeType;
@@ -19,6 +20,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,6 +56,10 @@ public class Bbs {
 	@ManyToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
 	private User userId;
+	
+	@OneToMany(mappedBy = "bbs", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference  // 양방향 참조 방지
+	private List<BbsComment> comments;
 
 	@Column(name = "title", nullable = false, length = 255)
 	private String title;
@@ -106,6 +112,11 @@ public class Bbs {
     @MapKeyColumn(name = "file_name")
     @Column(name = "file_data")
     private Map<String, byte[]> files = new HashMap<>();
+    
+    // 앱솔: 신고 또는 일반 삭제를 구분하기 위한 필드 추가
+    @Column(name = "deleted_reason", nullable = false)
+    @ColumnDefault("0")
+    private Integer deletedReason = 0;  // 기본값 0으로 설정
 
 	// Getter와 Setter 메소드
 	public Long getBbs_id() {
@@ -219,6 +230,14 @@ public class Bbs {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
+	public Integer getDeletedReason() {  // 앱솔: 신고 삭제 여부 반환
+        return deletedReason;
+    }
+
+    public void setDeletedReason(Integer deletedReason) {  // 앱솔: 신고 삭제 여부 설정
+        this.deletedReason = deletedReason;
+    }
 	
 	// 작성자의 username을 반환하는 메서드
     public String getUsername() {

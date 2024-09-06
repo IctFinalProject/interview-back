@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.transaction.Transactional;
 import com.ictedu.bbs.model.entity.Bbs;
+import com.ictedu.bbs.model.entity.BbsComment;
+import com.ictedu.bbs.repository.BbsCommentRepository;
 import com.ictedu.bbs.repository.BbsRepository;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,17 +20,21 @@ import java.util.Optional;
 public class BbsService {
 
     private final BbsRepository bbsRepository;
+    private final BbsCommentRepository commentRepository;  // 앱솔: 댓글 리포지토리 주입
 
     @Autowired
-    public BbsService(BbsRepository bbsRepository) {
+    public BbsService(BbsRepository bbsRepository, BbsCommentRepository commentRepository) {
         this.bbsRepository = bbsRepository;
+        this.commentRepository = commentRepository;  // 앱솔: 주입
     }
+    
+    
 
     public List<Bbs> findAll() {
         return bbsRepository.findAll();
     }
-    
- // 삭제되지 않은 게시글 조회 메서드
+
+    // 삭제되지 않은 게시글 조회 메서드
     public List<Bbs> findAllByDeleted(int deleted) {
         return bbsRepository.findByDeleted(deleted);  // 삭제 여부에 따른 게시글 조회
     }
@@ -42,10 +49,11 @@ public class BbsService {
         if (files != null && !files.isEmpty()) {
             Map<String, byte[]> fileMap = new HashMap<>();
             for (MultipartFile file : files) {
-            	 fileMap.put(file.getOriginalFilename(), file.getBytes());
+                fileMap.put(file.getOriginalFilename(), file.getBytes());
             }
             bbs.setFiles(fileMap);
         }
+        bbs.setDeletedReason(0);  // 앱솔: 기본값 0 설정
         return bbsRepository.save(bbs);
     }
 
@@ -64,40 +72,64 @@ public class BbsService {
                 .build();
     }
 
-    public void deleteById(Long id) {
-        bbsRepository.deleteById(id);
+    public Bbs update(Bbs bbs) {
+        return bbsRepository.save(bbs);  // 게시글 업데이트(삭제 상태 포함)
     }
 
-    public Bbs update(Bbs bbs) {
-    	return bbsRepository.save(bbs);  // 게시글 업데이트(삭제 상태 포함)
-    }
-    /*
-    // 파일 데이터 제공 메서드 추가
-    public byte[] getFile(Long bbsId, int fileIndex) {
-        System.out.println("Fetching file for Bbs ID: " + bbsId + " at index: " + fileIndex);  // 콘솔 로그 추가
-        return bbsRepository.findById(bbsId)
-                .map(bbs -> {
-                    Map<String, byte[]> files = bbs.getFiles();
-                    if (files != null && fileIndex < files.size()) {
-                        return files.get(fileIndex);
-                    } else {
-                        System.out.println("File index out of bounds or files list is null");  // 콘솔 로그 추가
-                        return null;
-                    }
-                })
-                .orElse(null);
-    }
-    */
-    /*
-    public byte[] getFile(Long bbsId, String fileName) {
-        Optional<Bbs> bbsOptional = bbsRepository.findById(bbsId);
-        if (bbsOptional.isPresent()) {
-            Bbs bbs = bbsOptional.get();
-            return bbs.getFiles().get(fileName);
+    @Transactional
+    public void deleteBbs(Long id, boolean isReport) {
+        Bbs bbs = bbsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        System.out.println("테스트1");
+        // 게시글 숨김 처리 로그 추가
+        System.out.println("게시글 삭제 처리: " + bbs.getBbsId());
+        System.out.println("테스트2");
+
+        bbs.setDeleted(1);  // 게시글 숨김 처리
+        System.out.println("테스트3");
+
+        if (isReport) {
+        	   System.out.println("테스트4");
+            bbs.setDeletedReason(1);  // 신고로 인한 삭제
+            System.out.println("테스트5");
+        } else {
+        	   System.out.println("테스트6");
+            bbs.setDeletedReason(0);  // 일반 삭제
+            System.out.println("테스트7");
         }
-        return null;
+        System.out.println("테스트8");
+
+        bbs.setDeleted_date(LocalDateTime.now());
+        System.out.println("테스트9");
+
+        // 댓글 조회 로그 추가
+        List<BbsComment> comments = commentRepository.findByBbs_BbsId(bbs.getBbsId());
+        System.out.println("테스트10");
+        System.out.println("댓글 조회 완료: 댓글 개수 = " + comments.size());
+        System.out.println("테스트11");
+
+        // 댓글 숨김 처리
+        for (BbsComment comment : comments) {
+        	   System.out.println("테스트12");
+            System.out.println("댓글 숨김 처리 시작: " + comment.getCommentId());
+            System.out.println("테스트13");
+            comment.setDeleted(1);  // 댓글 숨김 처리
+            System.out.println("테스트14");
+            commentRepository.save(comment);  // 댓글 저장
+            System.out.println("테스트15");
+            System.out.println("댓글 숨김 처리 완료: " + comment.getCommentId());
+            System.out.println("테스트16");
+        }
+
+        bbsRepository.save(bbs);
+        System.out.println("테스트17");
+        System.out.println("게시글과 댓글 모두 숨김 처리 완료");
+        System.out.println("테스트18");
     }
-    */
+
+
+
+    // 파일 데이터 제공 메서드 추가
     public byte[] getFile(Long bbsId, String fileName) {
         Optional<Bbs> bbsOptional = bbsRepository.findById(bbsId);
         if (bbsOptional.isPresent()) {
@@ -113,11 +145,10 @@ public class BbsService {
         System.out.println("Bbs not found for ID: " + bbsId);
         return null;
     }
+
     public Map<String, byte[]> getFilesByBbsId(Long bbsId) {
         return bbsRepository.findById(bbsId)
             .map(Bbs::getFiles)
             .orElse(new HashMap<>());
     }
-
-    
 }

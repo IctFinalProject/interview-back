@@ -34,6 +34,7 @@ public class BbsCommentService {
                 .content(content)
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .deletedReason(0)  // 앱솔: 기본값 0 설정
                 .build();
         return commentRepository.save(comment);
     }

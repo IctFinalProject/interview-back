@@ -1,5 +1,6 @@
 package com.ictedu.bbs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ictedu.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.ColumnDefault;
 
 @Data
 @Entity
@@ -25,7 +28,9 @@ public class BbsComment {
 
     @ManyToOne
     @JoinColumn(name = "bbs_id", referencedColumnName = "bbs_id", nullable = false)
-    private Bbs bbs;  // Bbs와의 관계 설정
+    @JsonBackReference  // 양방향 참조 방지
+    private Bbs bbs;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -42,9 +47,23 @@ public class BbsComment {
 
     @Column(name = "deleted", nullable = false)
     private int deleted = 0;  // 소프트 삭제를 위한 필드, 기본값은 0 (삭제되지 않음)
-
+    
+ // 앱솔: 신고 또는 일반 삭제를 구분하기 위한 필드 추가
+    @Column(name = "deleted_reason", nullable = false)
+    @ColumnDefault("0")
+    private Integer deletedReason = 0;  // 기본값 0으로 설정
+    
     // 작성자의 username을 반환하는 메서드
     public String getUsername() {
         return user != null ? user.getUsername() : "Anonymous";
     }
+    
+    public Integer getDeletedReason() {  // 앱솔: 신고 삭제 여부 반환
+        return deletedReason;
+    }
+
+    public void setDeletedReason(Integer deletedReason) {  // 앱솔: 신고 삭제 여부 설정
+        this.deletedReason = deletedReason;
+    }
+    
 }
