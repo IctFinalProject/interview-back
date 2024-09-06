@@ -25,7 +25,11 @@ public class BbsReport {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bbs_id", referencedColumnName = "bbs_id", nullable = false)
     private Bbs bbs;
-
+//오류나면 반드시 먼저삭제 위
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", nullable = true)
+    private BbsComment comment;  // 댓글과의 관계 추가
+  //오류나면 반드시 먼저삭제 아래
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;
 

@@ -40,6 +40,9 @@ public class BbsComment {
     @Column(name = "edited_at")
     private LocalDateTime editedAt;
 
+    @Column(name = "deleted", nullable = false)
+    private int deleted = 0;  // 소프트 삭제를 위한 필드, 기본값은 0 (삭제되지 않음)
+
     // 작성자의 username을 반환하는 메서드
     public String getUsername() {
         return user != null ? user.getUsername() : "Anonymous";

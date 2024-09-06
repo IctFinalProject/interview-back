@@ -1,6 +1,7 @@
 package com.ictedu.bbs.service;
 
 import com.ictedu.bbs.model.entity.Bbs;
+import com.ictedu.bbs.model.entity.BbsComment;
 import com.ictedu.bbs.model.entity.BbsReport;
 import com.ictedu.bbs.repository.BbsReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.util.Map;
 @Service
 public class BbsReportService {
 
+    // BbsReportRepository 주입
     private final BbsReportRepository bbsReportRepository;
 
     @Autowired
@@ -19,19 +21,35 @@ public class BbsReportService {
         this.bbsReportRepository = bbsReportRepository;
     }
 
-    public void saveReport(Bbs bbs, String reason, Map<String, Boolean> additionalInfo) {
-        // 추가 정보를 처리하여 문자열로 변환 (예: Map 데이터를 문자열로 변환)
+    // 댓글 신고 처리 메서드
+    public void saveCommentReport(Bbs bbs, BbsComment comment, String reason, Map<String, Boolean> additionalInfo) {
         String additionalInfoString = convertAdditionalInfoToString(additionalInfo);
 
         BbsReport report = BbsReport.builder()
-                .bbs(bbs)  // Bbs 객체와 연결
+                .bbs(bbs)  // 댓글이 속한 게시물 설정
+                .comment(comment)  // 댓글 설정
                 .reason(reason)
-                .additionalInfo(additionalInfoString)  // 변환된 추가 정보 문자열로 저장
-                .reportedAt(LocalDateTime.now())  // 신고된 시간 저장
-                .status("Pending")  // 신고 상태 기본값 설정
+                .additionalInfo(additionalInfoString)
+                .reportedAt(LocalDateTime.now())
+                .status("Pending")
                 .build();
 
-        bbsReportRepository.save(report);
+        bbsReportRepository.save(report);  // 주입된 repository 인스턴스를 통해 save 호출
+    }
+
+    // 게시물 신고 처리 메서드 (추가)
+    public void saveReport(Bbs bbs, String reason, Map<String, Boolean> additionalInfo) {
+        String additionalInfoString = convertAdditionalInfoToString(additionalInfo);
+
+        BbsReport report = BbsReport.builder()
+                .bbs(bbs)  // 게시물 설정
+                .reason(reason)
+                .additionalInfo(additionalInfoString)
+                .reportedAt(LocalDateTime.now())
+                .status("Pending")
+                .build();
+
+        bbsReportRepository.save(report);  // 주입된 repository 인스턴스를 통해 save 호출
     }
 
     // Map<String, Boolean>을 문자열로 변환하는 메소드
@@ -42,7 +60,6 @@ public class BbsReportService {
                 additionalInfoBuilder.append(entry.getKey()).append(", ");
             }
         }
-        // 마지막 쉼표 제거
         if (additionalInfoBuilder.length() > 0) {
             additionalInfoBuilder.setLength(additionalInfoBuilder.length() - 2);
         }

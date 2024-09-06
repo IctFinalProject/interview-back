@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BbsCommentService {
@@ -22,8 +23,10 @@ public class BbsCommentService {
     }
 
     public List<BbsComment> getCommentsByBbsId(Long bbsId) {
-        return commentRepository.findByBbs_BbsId(bbsId);
+        // deleted 값이 0인(삭제되지 않은) 댓글만 조회
+        return commentRepository.findByBbs_BbsIdAndDeleted(bbsId, 0);
     }
+
 
     public BbsComment createComment(Bbs bbs, String content, User user) {
         BbsComment comment = BbsComment.builder()
@@ -46,7 +49,14 @@ public class BbsCommentService {
     public void deleteComment(Long commentId) {
         BbsComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
-        commentRepository.delete(comment);
+        comment.setDeleted(1);  // 소프트 삭제로 변경
+        commentRepository.save(comment);
     }
+
+
+    public Optional<BbsComment> findById(Long commentId) {
+        return commentRepository.findById(commentId);
+    }
+
 
 }
