@@ -205,6 +205,36 @@
 		    <artifactId>open-korean-text</artifactId>
 		    <version>2.3.1</version>
 		</dependency>
+		<!--구글 드라이브 API 의존성-->
+		<dependency>
+		    <groupId>com.google.api-client</groupId>
+		    <artifactId>google-api-client</artifactId>
+		    <version>1.25.0</version> <!-- google-api-services-drive와 호환되는 버전 -->
+		</dependency>
+		<dependency>
+		    <groupId>com.google.auth</groupId>
+		    <artifactId>google-auth-library-oauth2-http</artifactId>
+		    <version>0.18.0</version> <!-- google-api-client 1.25.0과 호환되는 버전 -->
+		    <scope>compile</scope> <!-- 컴파일 스코프로 설정 -->
+		</dependency>
+		<dependency>
+		    <groupId>com.google.http-client</groupId>
+		    <artifactId>google-http-client-gson</artifactId>
+		    <version>1.25.0</version> <!-- google-api-client 1.25.0과 호환되는 버전 -->
+		</dependency>
+		<dependency>
+		    <groupId>com.google.oauth-client</groupId>
+		    <artifactId>google-oauth-client-jetty</artifactId>
+		    <version>1.25.0</version> <!-- google-api-client 1.25.0과 호환되는 버전 -->
+		</dependency>
+		<dependency>
+		    <groupId>com.google.apis</groupId>
+		    <artifactId>google-api-services-drive</artifactId>
+		    <version>v3-rev197-1.25.0</version> <!-- 이 의존성은 유지 -->
+		</dependency>
+
+
+		
 		<!--Mac 용 의존성-->
 		<dependency>
     		<groupId>io.netty</groupId>
@@ -267,14 +297,24 @@
 	        </dependencies>
 	    </dependencyManagement>
 	    <repositories>
-	        <repository>
-	            <id>spring-milestones</id>
-	            <name>Spring Milestones</name>
-	            <url>https://repo.spring.io/milestone</url>
-	            <snapshots>
-	                <enabled>false</enabled>
-	            </snapshots>
-	        </repository>
-	    </repositories>
+		    <repository>
+		        <id>maven-central</id>
+		        <url>https://repo.maven.apache.org/maven2</url>
+		        <releases>
+		            <enabled>true</enabled>
+		        </releases>
+		        <snapshots>
+		            <enabled>false</enabled>
+		        </snapshots>
+		    </repository>
+		    <repository>
+		        <id>spring-milestones</id>
+		        <name>Spring Milestones</name>
+		        <url>https://repo.spring.io/milestone</url>
+		        <snapshots>
+		            <enabled>false</enabled>
+		        </snapshots>
+		    </repository>
+</repositories>
 		
 </project>

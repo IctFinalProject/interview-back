@@ -166,5 +166,73 @@ public class InterviewService {
         String keywordsString = callChatGPTApi(String.format(keywordPrompt, text));
         return Arrays.asList(keywordsString.split(","));
     }
+
+	@Transactional
+	public List<Question> generateRealQuestions(List<String> resumeKeywords, User user) {
+	    List<Question> questions = new ArrayList<>();
+	    
+	    Interview interview = Interview.builder()
+	            .userId(user)
+	            .interviewType("real")
+	            .startTime(LocalDateTime.now())
+	            .endTime(LocalDateTime.now().plusHours(1))
+	            .overallFeedback("실전 면접 피드백")
+	            .createdTime(LocalDateTime.now())
+	            .updatedTime(LocalDateTime.now())
+	            .build();
+	    
+	    Interview savedInterview = interviewRepository.save(interview);
+
+	    // 실전 면접에 적합한 질문 유형들
+	    List<String> questionTypes = Arrays.asList("공통 질문", "이력서 기반 질문", "성향 파악 질문", "상황 질문", "보상 선호 질문", "심층 구조화 질문");
+
+	    for (String type : questionTypes) {
+	        String prompt = createRealPrompt(type, resumeKeywords);
+	        String questionText = callChatGPTApi(prompt);
+	        String script = generateScript(questionText);       
+	        List<String> generatedKeywords = extractKeywords(questionText + " " + script);
+	        String keywordsString = String.join(", ", generatedKeywords);
+	        
+	        Question question = Question.builder()
+	                .questionText(questionText)
+	                .questionType(type)
+	                .script(script)
+	                .keywords(keywordsString)
+	                .createdTime(LocalDateTime.now())
+	                .interviewId(savedInterview)
+	                .build();
+	        
+	        questions.add(question);
+	    }
+
+	    questionRepository.saveAll(questions);
+
+	    return questions;
+	}
+
+	private String createRealPrompt(String type, List<String> resumeKeywords) {
+		 String basePrompt = "다음 정보를 바탕으로 실제 면접에서 물어볼 수 있는 %s 관련 질문을 생성해주세요.\n\n" +
+		            "이력서 키워드: %s\n\n" +
+		            "질문 유형:\n" +
+		            "1. 공통 질문: 지원자의 경험과 역량을 전반적으로 파악할 수 있는 질문\n" +
+		            "2. 이력서 기반 질문: 지원자의 이력서나 자기소개서에 언급된 내용을 깊이 있게 탐색하는 질문\n" +
+		            "3. 성향 파악 질문: 지원자의 성격, 가치관, 업무 스타일을 파악하는 질문\n" +
+		            "4. 상황 질문: 특정 상황에서의 대처 능력을 확인하는 질문\n" +
+		            "5. 보상 선호 질문: 지원자의 동기 부여 요인을 파악하는 질문\n" +
+		            "6. 심층 구조화 질문: 지원자의 경험을 구체적으로 파악하는 STAR 기법 기반의 질문\n\n" +
+		            "주의사항:\n" +
+		            "- 구체적이고 깊이 있는 질문을 만들어주세요.\n" +
+		            "- 지원자의 경험과 역량을 파악할 수 있는 개방형 질문으로 구성해주세요.\n" +
+		            "- 실제 면접관이 물어볼 법한 난이도의 질문을 만들어주세요.\n" +
+		            "- 필요한 경우, 꼬리 질문을 추가하여 더 깊이 있는 답변을 유도할 수 있게 해주세요.\n" +
+		            "- 질문은 '~해주세요', '~말씀해주시겠어요?'와 같은 정중한 표현으로 끝나도록 해주세요.\n\n" +
+		            "질문 예시:\n" +
+		            "1. [공통 질문] \"귀하는 직장 또는 프로젝트에서 몰입하여 성과를 낸 경험이 있나요? 그때 어떤 점에 집중하였으며, 그 경험을 통해 배운 것이 있다면 무엇인가요?\"\n" +
+		            "2. [이력서 기반 질문] \"자소서에서 '솔선수범'이라는 표현을 사용하셨습니다. 구체적으로 어떤 상황에서 솔선수범하셨으며, 그로 인해 팀이나 조직에 어떤 긍정적인 영향을 미쳤는지 설명해 주세요.\"\n" +
+		            "3. [상황 질문] \"프로젝트 진행 중 예상치 못한 어려움이 발생했을 때, 창의성과 실험 정신을 발휘하여 문제를 해결한 사례를 말씀해 주시겠어요?\"\n\n" +
+		            "위의 예시와 같은 형식으로, %s 유형에 맞는 질문을 1개 생성해주세요.";
+
+		    return String.format(basePrompt, type, String.join(", ", resumeKeywords), type);
+		}
 	
 }
