@@ -19,6 +19,7 @@ import java.util.Optional;
 @Service
 public class BbsService {
 
+	@Autowired
     private final BbsRepository bbsRepository;
     private final BbsCommentRepository commentRepository;  // 앱솔: 댓글 리포지토리 주입
 
@@ -28,7 +29,9 @@ public class BbsService {
         this.commentRepository = commentRepository;  // 앱솔: 주입
     }
     
-    
+    public List<Bbs> findAllDeletedPosts(){
+    	return bbsRepository.findByDeleted(1); //'Deleted'값이 1인 게시글을 조회
+    }
 
     public List<Bbs> findAll() {
         return bbsRepository.findAll();

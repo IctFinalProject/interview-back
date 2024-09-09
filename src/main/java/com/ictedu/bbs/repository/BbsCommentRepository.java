@@ -14,4 +14,7 @@ public interface BbsCommentRepository extends JpaRepository<BbsComment, Long> {
 
     // 추가된 메서드: DELETED가 0인 댓글만 조회
     List<BbsComment> findByBbs_BbsIdAndDeleted(Long bbsId, int deleted);
+    
+    //deleted 값이 1인 댓글만 조회하는 메서드
+    List<BbsComment> findByDeleted(int deleted);
 }

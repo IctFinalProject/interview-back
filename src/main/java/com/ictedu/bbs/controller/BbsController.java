@@ -53,7 +53,19 @@ public class BbsController {
         List<Bbs> bbsList = bbsService.findAllByDeleted(0);  // 삭제되지 않은 글만 조회
         return bbsList;
     }
-
+    
+    //삭제된 게시글 목록 조회(deleted = 1인 게시글만)
+    @GetMapping("/deleted")
+    public List<Bbs> getDeletedBbs(){
+    	List<Bbs> deletedBbsList = bbsService.findAllDeletedPosts(); //삭제된 글만 조회
+    	return deletedBbsList;
+    }
+    
+    //삭제된 댓글만 조회
+    @GetMapping("/comments/deleted")
+    public List<BbsComment> getDeletedComments(){
+    	return bbsCommentService.findAllDeletedComments();//삭제된 댓글만 반환
+    }
     
     // 게시글 단건 조회 (GET 요청)(원본)
     @GetMapping("/{id}")

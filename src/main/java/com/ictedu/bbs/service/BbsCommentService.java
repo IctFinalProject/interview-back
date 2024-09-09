@@ -26,7 +26,11 @@ public class BbsCommentService {
         // deleted 값이 0인(삭제되지 않은) 댓글만 조회
         return commentRepository.findByBbs_BbsIdAndDeleted(bbsId, 0);
     }
-
+    
+    //삭제된 댓글만 조회하는 메서드(deleted 값이 1인 댓글만 조회)
+    public List<BbsComment> findAllDeletedComments() {
+    	return commentRepository.findByDeleted(1); //deleted값이 1인 댓글만 조회
+    }
 
     public BbsComment createComment(Bbs bbs, String content, User user) {
         BbsComment comment = BbsComment.builder()
