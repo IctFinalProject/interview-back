@@ -205,36 +205,40 @@
 		    <artifactId>open-korean-text</artifactId>
 		    <version>2.3.1</version>
 		</dependency>
-		<!--구글 드라이브 API 의존성-->
-		<dependency>
-		    <groupId>com.google.api-client</groupId>
-		    <artifactId>google-api-client</artifactId>
-		    <version>1.25.0</version> <!-- google-api-services-drive와 호환되는 버전 -->
-		</dependency>
-		<dependency>
-		    <groupId>com.google.auth</groupId>
-		    <artifactId>google-auth-library-oauth2-http</artifactId>
-		    <version>0.18.0</version> <!-- google-api-client 1.25.0과 호환되는 버전 -->
-		    <scope>compile</scope> <!-- 컴파일 스코프로 설정 -->
-		</dependency>
-		<dependency>
-		    <groupId>com.google.http-client</groupId>
-		    <artifactId>google-http-client-gson</artifactId>
-		    <version>1.25.0</version> <!-- google-api-client 1.25.0과 호환되는 버전 -->
-		</dependency>
-		<dependency>
-		    <groupId>com.google.oauth-client</groupId>
-		    <artifactId>google-oauth-client-jetty</artifactId>
-		    <version>1.25.0</version> <!-- google-api-client 1.25.0과 호환되는 버전 -->
-		</dependency>
-		<dependency>
-		    <groupId>com.google.apis</groupId>
-		    <artifactId>google-api-services-drive</artifactId>
-		    <version>v3-rev197-1.25.0</version> <!-- 이 의존성은 유지 -->
-		</dependency>
-
-
-		
+	    <!-- Google API 클라이언트 의존성 -->
+	    <dependency>
+	        <groupId>com.google.api-client</groupId>
+	        <artifactId>google-api-client</artifactId>
+	        <version>1.31.5</version> <!-- 안정적인 최신 버전 -->
+	    </dependency>
+	    
+	    <!-- Google Auth 라이브러리 -->
+	    <dependency>
+	        <groupId>com.google.auth</groupId>
+	        <artifactId>google-auth-library-oauth2-http</artifactId>
+	        <version>1.1.0</version> <!-- QuotaProjectIdProvider 문제 해결 -->
+	    </dependency>
+	
+	    <!-- Google Cloud Storage 라이브러리 -->
+	    <dependency>
+	        <groupId>com.google.cloud</groupId>
+	        <artifactId>google-cloud-storage</artifactId>
+	        <version>1.113.15</version> <!-- GCS와 연동 -->
+	    </dependency>
+	
+	    <!-- Spring Cloud GCP Starter -->
+	    <dependency>
+	        <groupId>org.springframework.cloud</groupId>
+	        <artifactId>spring-cloud-gcp-starter</artifactId>
+	        <version>1.2.5.RELEASE</version>
+	    </dependency>
+	
+	    <!-- Spring Cloud GCP Storage -->
+	    <dependency>
+	        <groupId>org.springframework.cloud</groupId>
+	        <artifactId>spring-cloud-gcp-storage</artifactId>
+	        <version>1.2.5.RELEASE</version>
+	    </dependency>
 		<!--Mac 용 의존성-->
 		<dependency>
     		<groupId>io.netty</groupId>

@@ -6,6 +6,8 @@ import com.ictedu.resume.entity.ResumeProofreadEntity;
 import com.ictedu.resume.repository.ResumeProofreadRepository;
 import com.ictedu.resume.repository.ResumeRepository;
 import com.ictedu.user.model.entity.User;
+import com.ictedu.user.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,6 +33,9 @@ public class ResumeService {
     
     @Autowired
     private ExtractKeywordsService extractKeywordsService;  // 키워드 추출 서비스
+    
+    @Autowired
+    private UserService userService;
     
     @Transactional
     public ResumeEntity saveResume(MultipartFile file, String title, User user) throws IOException {
