@@ -97,6 +97,7 @@ public class InterviewService {
 
 	    return questions;
 	}
+	
 	private String createPrompt(String type, List<String> keywords) {
 		 String basePrompt = "경험 많은 면접관으로서, %s 면접에 적합한 간결하고 자연스러운 질문을 1개 생성해주세요.\n\n" +
 			        "키워드: %s\n\n" +

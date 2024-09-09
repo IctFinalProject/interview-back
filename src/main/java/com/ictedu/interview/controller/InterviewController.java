@@ -75,6 +75,33 @@ public class InterviewController {
 	    }
 	}
 	
+	@GetMapping("/getrealquestion")
+	public ResponseEntity<?> getRealQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
+	    try {
+	        Long userIdLong = Long.parseLong(userId); // String -> Long 변환
+	        Long choosedResumeLong = Long.parseLong(choosedResume); // String -> Long 변환
+	        // 변환 후 처리 로직
+	        Optional<User> getUser = userRepository.findById(userIdLong);
+	        User user = getUser.get(); // 값이 반드시 존재할 때 사용 (값이 없으면 예외 발생)
+	        Optional<ResumeEntity> getResume = resumeService.findResumeById(choosedResumeLong);
+			// List<ResumeEntity> 순회하면서 각 ResumeEntity의 User의 password를 출력
+			String selfIntroduction = getResume.get().getKeywordsSelfIntroduction();
+			String motivation = getResume.get().getKeywordsMotivation();
+			List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
+			List<Question> resumeQuestions = interviewService.generateRealQuestions(dbKeywords, user);
+
+	        // Map을 사용하여 두 리스트를 하나로 묶어 반환
+	        Map<String, List<Question>> response = new HashMap<>();
+	        response.put("resumeQuestions", resumeQuestions);
+	        System.out.println("실전 끝났어요");
+	        return ResponseEntity.ok(response);
+	    } catch (NumberFormatException e) {
+	        // 변환 실패 시 예외 처리
+	        System.out.println("userId 변환 실패: " + e.getMessage());
+	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
+	    }
+	}
+	
     @GetMapping("/getinterviewquestions")
     public ResponseEntity<?> getInterviewQuestions(@RequestParam List<Long> questionId) {
         System.out.println("Received question IDs: " + questionId);
