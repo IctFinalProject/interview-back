@@ -47,17 +47,17 @@ public class BbsComment {
 
     @Column(name = "deleted", nullable = false)
     private int deleted = 0;  // 소프트 삭제를 위한 필드, 기본값은 0 (삭제되지 않음)
-    
+
  // 앱솔: 신고 또는 일반 삭제를 구분하기 위한 필드 추가
     @Column(name = "deleted_reason", nullable = false)
     @ColumnDefault("0")
     private Integer deletedReason = 0;  // 기본값 0으로 설정
-    
+
     // 작성자의 username을 반환하는 메서드
     public String getUsername() {
         return user != null ? user.getUsername() : "Anonymous";
     }
-    
+
     public Integer getDeletedReason() {  // 앱솔: 신고 삭제 여부 반환
         return deletedReason;
     }
@@ -65,5 +65,5 @@ public class BbsComment {
     public void setDeletedReason(Integer deletedReason) {  // 앱솔: 신고 삭제 여부 설정
         this.deletedReason = deletedReason;
     }
-    
+
 }
