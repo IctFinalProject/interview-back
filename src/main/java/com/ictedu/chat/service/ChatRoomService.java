@@ -58,16 +58,17 @@ public class ChatRoomService {
     	ChatRoom chatRoom = chatRoomRepository.findById(chatroomId)
                 .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
     	
-    	if(chatRoom.getIsTitleEdited() == 0) {
-    		List<Long> userIds = chatRoomUsersRepository.findUserIdsByChatRoomId(chatroomId);
-        	List<User> users = userRepository.findAllById(userIds);
-        	
-        	System.out.println("users.size() : " + users.size());
-        	
-        	if(users.size() == 0) {
-        		chatRoomRepository.deleteById(chatroomId);
-        	}
-        	else {
+    	List<Long> userIds = chatRoomUsersRepository.findUserIdsByChatRoomId(chatroomId);
+    	List<User> users = userRepository.findAllById(userIds);
+    	
+    	if(users.size() == 0) {
+    		chatRoomRepository.deleteById(chatroomId);
+    	}
+    	else {
+    		if(chatRoom.getIsTitleEdited() == 0) {
+            	
+            	System.out.println("users.size() : " + users.size());
+            	
         		String usernames = users.stream()
                         .map(User::getUsername)
                         .collect(Collectors.joining(", "));
@@ -75,10 +76,23 @@ public class ChatRoomService {
             	System.out.println(usernames);
             	
             	chatRoom.setChatRoomTitle(usernames);
-            	chatRoomRepository.save(chatRoom);
+            	chatRoomRepository.save(chatRoom);   	
         	}
     	}
     }
+    
+//    public void deleteChatroom(Long chatroomId, Long userId) {
+//    	ChatRoom chatRoom = chatRoomRepository.findById(chatroomId)
+//                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
+//    	
+//    	List<Long> userIds = chatRoomUsersRepository.findUserIdsByChatRoomId(chatroomId);
+//    	List<User> users = userRepository.findAllById(userIds);
+//    	
+//    	if(users.size() == 0) {
+//    		chatRoomRepository.deleteById(chatroomId);
+//    	}
+//    	
+//    }
     
     public String getChatroomTitle(Long chatRoomId) {
         // 채팅방 ID로 채팅방을 찾음
