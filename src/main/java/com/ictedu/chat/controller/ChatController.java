@@ -66,6 +66,7 @@ public class ChatController {
 		return chatMessagesService.getPastChatting(chatRoomId);
     }
 	
+	//채팅방 나가기 (+ 채팅방 제목 자동 수정)
 	@DeleteMapping("/exitChatroom")
     public void exitChatroom(@RequestParam Long currentChatRoomId, @RequestParam Long userId) {
 		System.out.println("챗챗 테스트");
@@ -75,11 +76,13 @@ public class ChatController {
         chatRoomService.editChatroomTitleExcludeUser(currentChatRoomId, userId);
     }
 	
+	//선택한 채팅방 제목 얻어오기
 	@GetMapping("/getChatroomTitle")
 	public String getChatroomTitle(@RequestParam("id") Long chatRoomId) {
 		return chatRoomService.getChatroomTitle(chatRoomId);
 	}
 	
+	//채팅방 제목 변경하기
 	@PostMapping("/editChatroomTitle")
 	public void editChatroomTitle(@RequestBody Map<String, Object> request) { //@RequestParam Long chatRoomId, @RequestParam String newTitle
 		
@@ -92,6 +95,10 @@ public class ChatController {
 		chatRoomService.updateChatRoomTitle(chatRoomId, newTitle);
 	}
 	
-	
+	//선택한 방에 참가중인 유저 목록 가져오기
+	@GetMapping("/getUsersInChatroom")
+	public List<Map<String, Object>> getUsersInChatroom(@RequestParam("id") Long chatRoomId, @RequestParam Long userId) {
+		return chatRoomUsersService.findUsersByChatroomId(chatRoomId, userId);
+	}
 	
 }
