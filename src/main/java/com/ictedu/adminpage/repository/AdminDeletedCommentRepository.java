@@ -15,4 +15,8 @@ public interface AdminDeletedCommentRepository extends JpaRepository<BbsComment,
 
     // 특정 게시글(bbsId)에 속한 모든 댓글 삭제
     void deleteByBbs_BbsId(Long bbsId);
+    
+    // 삭제된 댓글(즉, deleted가 1인 댓글) 조회
+    List<BbsComment> findByDeleted(int deleted);
+    
 }
