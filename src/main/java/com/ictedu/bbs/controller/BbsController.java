@@ -66,16 +66,21 @@ public class BbsController {
     public List<BbsComment> getDeletedComments(){
     	return bbsCommentService.findAllDeletedComments();//삭제된 댓글만 반환
     }
-    
+    /*
     // 게시글 단건 조회 (GET 요청)(원본)
     @GetMapping("/{id}")
-    public ResponseEntity<Bbs> getBbsById(@PathVariable("id") String id) {
+    public ResponseEntity<Bbs> getBbsById(@PathVariable("id") Long id,@RequestParam(value = "increment", defaultValue = "true") boolean increment) {
         System.out.println("GET 요청: 게시글 ID: " + id); // 한글 콘솔 체크
-        Optional<Bbs> bbsOptional = bbsService.findById(Long.parseLong(id));
+        System.out.println("Received increment value: " + increment);
+        Optional<Bbs> bbsOptional = bbsService.findById(id);
         
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
+            if (increment) {
+                bbsService.incrementHitcount(id); // 조회수 증가
+            }
 //            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
+            
             Map<String, byte[]> files = bbs.getFiles();  // 파일 정보를 가져오는 부분
             return ResponseEntity.ok().body(bbs);
         } else {
@@ -83,7 +88,29 @@ public class BbsController {
             return ResponseEntity.notFound().build();
         }
     }
+	*/
+    @GetMapping("/{id}")
+    public ResponseEntity<Bbs> getBbsById(
+        @PathVariable("id") Long id,
+        @RequestParam Map<String, String> params) {
+        
+        // 쿼리 파라미터 로그
+        System.out.println("Query Params: " + params);
 
+        boolean increment = Boolean.parseBoolean(params.getOrDefault("increment", "true"));
+        System.out.println("Parsed increment value: " + increment);
+
+        Optional<Bbs> bbsOptional = bbsService.findById(id);
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            if (increment) {
+                bbsService.incrementHitcount(id); // 조회수 증가
+            }
+            return ResponseEntity.ok().body(bbs);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     // 게시글 단건 조회 (POST 요청)
     @PostMapping("/search")
     public ResponseEntity<Bbs> getBbsByIdPost(@RequestBody BbsDto bbsDto) {
@@ -188,7 +215,7 @@ public class BbsController {
 //
 //
 //    // 뮤츠 끝
-    
+    //게시글 수정
     @PostMapping("/{id}")
     public ResponseEntity<Bbs> updateBbs(
         @PathVariable("id") Long id,
@@ -294,13 +321,13 @@ public class BbsController {
 
     // 댓글 목록 조회
     @GetMapping("/{bbsId}/comments")
-    public List<BbsComment> getComments(@PathVariable Long bbsId) {
+    public List<BbsComment> getComments(@PathVariable("bbsId") Long bbsId) {
         return bbsCommentService.getCommentsByBbsId(bbsId);
     }
 
     // 댓글 생성
     @PostMapping("/{bbsId}/comments")
-    public BbsComment createComment(@PathVariable Long bbsId, @RequestBody CommentRequestDto request) {
+    public BbsComment createComment(@PathVariable("bbsId") Long bbsId, @RequestBody CommentRequestDto request) {
         Bbs bbs = bbsService.findById(bbsId).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         String changedId = String.valueOf(request.getUserId());
         User user = userService.findById(changedId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -309,12 +336,12 @@ public class BbsController {
 
     // 댓글 수정
     @PutMapping("/comments/{commentId}")
-    public BbsComment updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDto request) {
+    public BbsComment updateComment(@PathVariable("commentId") Long commentId, @RequestBody CommentRequestDto request) {
         return bbsCommentService.updateComment(commentId, request.getContent());
     }
     
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<String> deleteComment(@PathVariable("commentId") Long commentId) {
         bbsCommentService.deleteComment(commentId);
         return ResponseEntity.ok("댓글이 삭제되었습니다.");
     }

@@ -243,5 +243,7 @@ public class Bbs {
     public String getUsername() {
         return userId != null ? userId.getUsername() : "Anonymous";
     }
-
+    public void incrementHitcount() {
+        this.hitCount += 1;
+    }
 }

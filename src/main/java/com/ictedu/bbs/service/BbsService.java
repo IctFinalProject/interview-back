@@ -154,4 +154,9 @@ public class BbsService {
             .map(Bbs::getFiles)
             .orElse(new HashMap<>());
     }
+    public void incrementHitcount(Long id) {
+        Bbs bbs = bbsRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        bbs.incrementHitcount();
+        bbsRepository.save(bbs);  // 변경된 조회수를 저장
+    }
 }
