@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import com.ictedu.user.model.entity.User;
+
 @Data
 @Entity
 @Builder
@@ -29,6 +31,11 @@ public class BbsReport {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", nullable = true)
     private BbsComment comment;  // 댓글과의 관계 추가
+    
+ // 신고자와의 관계 추가
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)  // 신고자 ID
+    private User reporter;
   //오류나면 반드시 먼저삭제 아래
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;

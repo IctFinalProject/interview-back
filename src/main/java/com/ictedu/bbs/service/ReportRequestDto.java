@@ -12,6 +12,7 @@ public class ReportRequestDto {
     private Long commentId;     // 댓글 ID
     private String reason;      // 신고 사유
     private Map<String, Boolean> additionalInfo;  // 추가 정보
+    private String userId;       // 신고자 ID
     
     // 기본 생성자
     public ReportRequestDto() {}

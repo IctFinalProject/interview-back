@@ -289,12 +289,18 @@ public class BbsController {
     
     @PostMapping("/report")
     public ResponseEntity<String> reportPostOrComment(@RequestBody ReportRequestDto request) {
+    	 // 전달된 userId를 로그로 확인
+        System.out.println("Received userId: " + request.getUserId());
+        // 신고자를 찾음
+        User reporter = userService.findById(request.getUserId())
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
         // 게시물 신고 처리
         if (request.getPostId() != null) {
             Optional<Bbs> bbsOptional = bbsService.findById(request.getPostId());
             if (bbsOptional.isPresent()) {
                 Bbs bbs = bbsOptional.get();
-                bbsReportService.saveReport(bbs, request.getReason(), request.getAdditionalInfo());
+                bbsReportService.saveReport(bbs, reporter, request.getReason(), request.getAdditionalInfo());
                 return ResponseEntity.ok("게시글 신고가 접수되었습니다.");
             } else {
                 return ResponseEntity.status(404).body("게시글을 찾을 수 없습니다.");
@@ -306,8 +312,8 @@ public class BbsController {
             Optional<BbsComment> commentOptional = bbsCommentService.findById(request.getCommentId());
             if (commentOptional.isPresent()) {
                 BbsComment comment = commentOptional.get();
-                Bbs bbs = comment.getBbs();  // 댓글이 속한 게시물을 가져옴
-                bbsReportService.saveCommentReport(bbs, comment, request.getReason(), request.getAdditionalInfo());
+                Bbs bbs = comment.getBbs();
+                bbsReportService.saveCommentReport(bbs, comment, reporter, request.getReason(), request.getAdditionalInfo());
                 return ResponseEntity.ok("댓글 신고가 접수되었습니다.");
             } else {
                 return ResponseEntity.status(404).body("댓글을 찾을 수 없습니다.");
@@ -316,6 +322,7 @@ public class BbsController {
 
         return ResponseEntity.status(400).body("신고할 대상이 없습니다.");
     }
+
 
 
 

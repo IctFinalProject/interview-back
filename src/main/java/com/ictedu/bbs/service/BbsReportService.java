@@ -4,6 +4,8 @@ import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.model.entity.BbsComment;
 import com.ictedu.bbs.model.entity.BbsReport;
 import com.ictedu.bbs.repository.BbsReportRepository;
+import com.ictedu.user.model.entity.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +24,13 @@ public class BbsReportService {
     }
 
     // 댓글 신고 처리 메서드
-    public void saveCommentReport(Bbs bbs, BbsComment comment, String reason, Map<String, Boolean> additionalInfo) {
+    public void saveCommentReport(Bbs bbs, BbsComment comment,User reporter, String reason, Map<String, Boolean> additionalInfo) {
         String additionalInfoString = convertAdditionalInfoToString(additionalInfo);
 
         BbsReport report = BbsReport.builder()
                 .bbs(bbs)  // 댓글이 속한 게시물 설정
                 .comment(comment)  // 댓글 설정
+                .reporter(reporter)  // 신고자 정보 추가
                 .reason(reason)
                 .additionalInfo(additionalInfoString)
                 .reportedAt(LocalDateTime.now())
@@ -38,11 +41,12 @@ public class BbsReportService {
     }
 
     // 게시물 신고 처리 메서드 (추가)
-    public void saveReport(Bbs bbs, String reason, Map<String, Boolean> additionalInfo) {
+    public void saveReport(Bbs bbs, User reporter,String reason, Map<String, Boolean> additionalInfo) {
         String additionalInfoString = convertAdditionalInfoToString(additionalInfo);
 
         BbsReport report = BbsReport.builder()
                 .bbs(bbs)  // 게시물 설정
+                .reporter(reporter)  // 신고자 정보 추가
                 .reason(reason)
                 .additionalInfo(additionalInfoString)
                 .reportedAt(LocalDateTime.now())
