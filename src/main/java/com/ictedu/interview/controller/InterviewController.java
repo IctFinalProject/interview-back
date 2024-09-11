@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ictedu.interview.model.entity.Question;
+import com.ictedu.interview.model.entity.VideoEntity;
 import com.ictedu.interview.service.InterviewService;
 import com.ictedu.interview.service.QuestionService;
 import com.ictedu.resume.entity.ResumeEntity;
@@ -121,5 +122,19 @@ public class InterviewController {
                 .collect(Collectors.toList());
         System.out.println("퀘스천DTO: "+questionDTOs);
         return ResponseEntity.ok(questionDTOs);  // DTO를 반환
+    }
+    
+    @GetMapping("/getinterviewresults")
+    public ResponseEntity<?> getInterviewResults(@RequestParam("userId") String userId){
+    	System.out.println("받은 userId: "+userId);
+    	try {
+    		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
+    		List<VideoEntity> response = interviewService.getResultsByIds(userIdLong);
+    		return ResponseEntity.ok(response);
+    	} catch (NumberFormatException e) {
+	        // 변환 실패 시 예외 처리
+	        System.out.println("userId 변환 실패: " + e.getMessage());
+	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
+    	}
     }
 }

@@ -15,8 +15,12 @@ import org.springframework.web.client.RestTemplate;
 
 import com.ictedu.interview.model.entity.Interview;
 import com.ictedu.interview.model.entity.Question;
+import com.ictedu.interview.model.entity.VideoEntity;
 import com.ictedu.interview.repository.InterviewRepository;
 import com.ictedu.interview.repository.QuestionRepository;
+import com.ictedu.interview.repository.VideoAnalysisRepository;
+import com.ictedu.interview.repository.VideoRepository;
+import com.ictedu.interview.repository.VideoSpeechAnalysisRepository;
 import com.ictedu.user.model.entity.User;
 
 import jakarta.transaction.Transactional;
@@ -29,10 +33,16 @@ public class InterviewService {
     
 	private final QuestionRepository questionRepository;
 	private final InterviewRepository interviewRepository;
+	private final VideoRepository videoRepository;
+	private final VideoAnalysisRepository videoAnalysisRepository;
+	private final VideoSpeechAnalysisRepository videoSpeechAnalysisRepository;
 	
-	public InterviewService(QuestionRepository questionRepository, InterviewRepository interviewRepository) {
+	public InterviewService(QuestionRepository questionRepository, InterviewRepository interviewRepository, VideoRepository videoRepository, VideoAnalysisRepository videoAnalysisRepository, VideoSpeechAnalysisRepository videoSpeechAnalysisRepository) {
 		this.questionRepository = questionRepository;
 		this.interviewRepository = interviewRepository;
+		this.videoRepository = videoRepository;
+		this.videoAnalysisRepository = videoAnalysisRepository;
+		this.videoSpeechAnalysisRepository = videoSpeechAnalysisRepository;
 	}
 
 	@Value("${interview.api.key}")
@@ -235,5 +245,23 @@ public class InterviewService {
 
 		    return String.format(basePrompt, type, String.join(", ", resumeKeywords), type);
 		}
+
+	@Transactional
+	public List<VideoEntity> getResultsByIds(Long userIdLong) {
+		List<VideoEntity> videos = videoRepository.findAllByUserId(userIdLong);
+		return videos;
+	}
+
+    @Transactional
+    public void deleteVideoById(Long videoId) {
+        // VideoSpeechAnalysis 삭제
+        videoSpeechAnalysisRepository.deleteByVideoId(videoId);
+
+        // VideoAnalysis 삭제
+        videoAnalysisRepository.deleteByVideoId(videoId);
+
+        // VideoEntity 삭제
+        videoRepository.deleteById(videoId);
+    }
 	
 }
