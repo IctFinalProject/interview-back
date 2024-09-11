@@ -1,20 +1,15 @@
 package com.ictedu.chat.entity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.ictedu.user.model.entity.User;
-
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -52,5 +47,8 @@ public class ChatRoom {
     
     @Column(name = "last_message", nullable = true)
     private String lastMessage;
+    
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
 
 }

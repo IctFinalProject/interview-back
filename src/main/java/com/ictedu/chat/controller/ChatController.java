@@ -101,4 +101,9 @@ public class ChatController {
 		return chatRoomUsersService.findUsersByChatroomId(chatRoomId, userId);
 	}
 	
+	@GetMapping("/getUserIdsForChatAlarm")
+	public List<Long> getUserIdsForChatAlarm(@RequestParam("id") Long chatroomId, @RequestParam Long userId){
+		return chatRoomUsersService.findUsersForChatAlarm(chatroomId, userId);
+	}
+	
 }

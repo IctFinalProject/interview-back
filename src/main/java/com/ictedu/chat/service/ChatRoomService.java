@@ -1,5 +1,6 @@
 package com.ictedu.chat.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class ChatRoomService {
         ChatRoom chatRoom = ChatRoom.builder()
                                     .chatRoomTitle(usernames)  // 기본 이름, 필요시 수정 가능
                                     .isTitleEdited(0)
+                                    .updatedTime(LocalDateTime.now())
                                     .build();
         
         chatRoomRepository.save(chatRoom);
