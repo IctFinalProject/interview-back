@@ -23,7 +23,8 @@ public class ChatRoomDTO {
     private Integer isTitleEdited;
     private String lastMessage;
     private LocalDateTime createdTime;  // 필요한 경우 LocalDateTime으로 변경 가능
-    private LocalDateTime deletedTime;
+    private LocalDateTime updatedTime;
+    
 
     public ChatRoom toEntity() {
         return ChatRoom.builder()
@@ -32,6 +33,7 @@ public class ChatRoomDTO {
                        .isTitleEdited(isTitleEdited)
                        .lastMessage(lastMessage)
                        .createdTime(createdTime)
+                       .updatedTime(createdTime)
                        .build();
     }
     
@@ -42,6 +44,7 @@ public class ChatRoomDTO {
                           .isTitleEdited(chatRoom.getIsTitleEdited())
                           .lastMessage(chatRoom.getLastMessage())
                           .createdTime(chatRoom.getCreatedTime())
+                          .updatedTime(chatRoom.getUpdatedTime())
                           .build();
     }
 
