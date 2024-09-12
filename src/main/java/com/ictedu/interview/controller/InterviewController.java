@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ictedu.interview.model.dto.QuestionDTO;
+import com.ictedu.interview.model.dto.VideoDetailsDTO;
 import com.ictedu.interview.model.entity.Question;
 import com.ictedu.interview.model.entity.VideoEntity;
 import com.ictedu.interview.service.InterviewService;
@@ -137,5 +139,31 @@ public class InterviewController {
 	        System.out.println("userId 변환 실패: " + e.getMessage());
 	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
     	}
+    }
+    
+    
+    @GetMapping("/fetchinterviewresult")
+    public ResponseEntity<?> fetchInterviewResults(@RequestParam("videoId") String videoId) {
+        System.out.println("받은 videoId: " + videoId);
+        try {
+            Long videoIdLong = Long.parseLong(videoId); // String -> Long 변환
+            VideoDetailsDTO response = interviewService.getVideoById(videoIdLong);
+            
+            if (response == null) {
+                System.out.println("해당 비디오가 존재하지 않습니다.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 비디오가 존재하지 않습니다.");
+            }
+            
+            System.out.println("비디오 반환: " + response);
+            return ResponseEntity.ok(response);  // DTO를 리턴
+        } catch (NumberFormatException e) {
+            // videoId가 Long으로 변환되지 못했을 때
+            System.out.println("videoId 변환 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body("videoId 형식이 일치하지 않습니다!");
+        } catch (Exception e) {
+            // 그 외 발생하는 모든 예외 처리
+            System.out.println("서버 내부 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버에서 처리 중 오류가 발생했습니다.");
+        }
     }
 }

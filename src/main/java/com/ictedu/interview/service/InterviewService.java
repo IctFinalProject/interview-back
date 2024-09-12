@@ -13,9 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.ictedu.interview.model.dto.VideoDetailsDTO;
+import com.ictedu.interview.model.entity.ClaudeAnalysis;
 import com.ictedu.interview.model.entity.Interview;
 import com.ictedu.interview.model.entity.Question;
+import com.ictedu.interview.model.entity.VideoAnalysis;
 import com.ictedu.interview.model.entity.VideoEntity;
+import com.ictedu.interview.model.entity.VideoSpeechAnalysis;
 import com.ictedu.interview.repository.ClaudeAnalysisRepository;
 import com.ictedu.interview.repository.InterviewRepository;
 import com.ictedu.interview.repository.QuestionRepository;
@@ -272,5 +276,20 @@ public class InterviewService {
     	    // VideoEntity 삭제
     	    videoRepository.delete(video);
 	
+    }
+
+    public VideoDetailsDTO getVideoById(Long videoIdLong) {
+        List<VideoEntity> videos = videoRepository.findAllById(videoIdLong);
+        List<VideoAnalysis> videoAnalyses = videoAnalysisRepository.findAllByVideoId(videoIdLong);
+        List<VideoSpeechAnalysis> videoSpeechAnalyses = videoSpeechAnalysisRepository.findAllByVideoId(videoIdLong);
+        List<ClaudeAnalysis> claudeAnalyses = claudeAnalysisRepository.findAllByVideoId(videoIdLong);
+
+        VideoDetailsDTO videoDetailsDTO = new VideoDetailsDTO();
+        videoDetailsDTO.setVideos(videos);
+        videoDetailsDTO.setVideoAnalyses(videoAnalyses);
+        videoDetailsDTO.setVideoSpeechAnalyses(videoSpeechAnalyses);
+        videoDetailsDTO.setClaudeAnalyses(claudeAnalyses);
+
+        return videoDetailsDTO;
     }
 }

@@ -11,5 +11,7 @@ import com.ictedu.interview.model.entity.VideoEntity;
 public interface VideoRepository extends JpaRepository<VideoEntity, Long> {
 
 	List<VideoEntity> findAllByUserId(Long userIdLong);
+
+	List<VideoEntity> findAllById(Long videoIdLong);
 	
 }
