@@ -65,6 +65,7 @@ public class AdminReportedController {
 		response.put("reason", bbsReport.getReason());
 		response.put("status", bbsReport.getStatus());
 		response.put("reportedAt", bbsReport.getReportedAt().toString());
+		response.put("createdAt", bbsReport.getBbsCreatedAt().toString());
 		response.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
 
 		return ResponseEntity.ok(response);
@@ -98,9 +99,13 @@ public class AdminReportedController {
 			map.put("commentContent", bbsReport.getComment().getContent());
 			map.put("username", bbsReport.getComment().getUsername());
 			map.put("reason", bbsReport.getReason());
+			map.put("title",bbsReport.getBbsTitle());
+			map.put("bbsId", bbsReport.getBbsId());
 			map.put("status", bbsReport.getStatus());
+			map.put("createdAt",bbsReport.getBbsCreatedAt());
 			map.put("reportedAt", bbsReport.getReportedAt().toString());
 			map.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
+			map.put("commentId",bbsReport.getCommentId());
 			return map;
 		}).collect(Collectors.toList());
 
@@ -108,11 +113,11 @@ public class AdminReportedController {
 	}
 
 	// 댓글을 영구 삭제하는 API 추가
-	@DeleteMapping("/deletecomment/{reportId}")
-	public ResponseEntity<Void> deleteCommentPermanently(@PathVariable Long reportId) {
+	@DeleteMapping("/deletecomment/{commentId}")
+	public ResponseEntity<Void> deleteCommentPermanently(@PathVariable Long commentId) {
 		try {
 			// 서비스 메서드를 호출하여 댓글을 영구 삭제
-			adminReportedService.deleteCommentPermanently(reportId);
+			adminReportedService.deleteCommentPermanently(commentId);
 			return ResponseEntity.ok().build(); // 성공적으로 삭제되었음을 응답
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(404).body(null); // 삭제하려는 신고번호가 존재하지 않을 경우 404 응답
@@ -134,6 +139,21 @@ public class AdminReportedController {
 			return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
 		}
 	}
+	
+	// 게시글 복구 API 추가 (신고 기록 삭제)
+	@PutMapping("/restorepost/{reportId}")
+	public ResponseEntity<Void> restoreReportedPost(@PathVariable Long reportId) {
+	    try {
+	        // 서비스 메서드를 호출하여 신고된 게시글 복구 (신고 기록만 삭제)
+	        adminReportedService.restoreReportedPost(reportId);
+	        return ResponseEntity.ok().build(); // 성공적으로 복구되었음을 응답
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
+	    } catch (Exception e) {
+	        return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
+	    }
+	}
+	
 }
 
 

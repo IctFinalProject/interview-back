@@ -31,12 +31,30 @@ public class BbsReport {
     @JsonBackReference
     private Bbs bbs;
 
+ // 게시글 등록 날짜 가져오는 메서드
+    public LocalDateTime getBbsCreatedAt() {
+        return this.bbs != null ? this.bbs.getCreatedAt() : null;
+    }
+ // 게시글 번호 가져오는 메서드
+    public Long getBbsId() {
+        return this.bbs != null ? this.bbs.getBbsId() : null;
+    }
+
+    // 게시글 제목 가져오는 메서드
+    public String getBbsTitle() {
+        return this.bbs != null ? this.bbs.getTitle() : null;
+    }
+    
     // 댓글과의 연관 관계
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)  
+    @ManyToOne(fetch = FetchType.LAZY)  
     @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", nullable = true)
     @JsonBackReference 
     private BbsComment comment;
     
+    //commentId 받아옴
+    public Long getCommentId() {
+        return this.comment != null ? this.comment.getCommentId() : null;
+    }
     // 신고자와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)  // 신고자 ID

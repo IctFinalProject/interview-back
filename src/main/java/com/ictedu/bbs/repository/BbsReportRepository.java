@@ -1,9 +1,11 @@
 package com.ictedu.bbs.repository;
 
-import com.ictedu.bbs.model.entity.BbsReport;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.ictedu.bbs.model.entity.BbsReport;
+import java.util.List;
 
-@Repository
 public interface BbsReportRepository extends JpaRepository<BbsReport, Long> {
+    
+    // 댓글에 해당하는 모든 신고 기록 삭제
+    void deleteByComment_CommentId(Long commentId);
 }
