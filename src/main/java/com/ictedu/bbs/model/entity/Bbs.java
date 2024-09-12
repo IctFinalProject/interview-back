@@ -78,6 +78,12 @@ public class Bbs {
 	@ColumnDefault("0")
 	private Long hitCount = 0L;
 
+	
+	@Column(name = "likes", nullable = false)
+    @ColumnDefault("0")
+    private Long likes = 0L;
+	
+	
 	@Column(name = "active", nullable = false)
 	@ColumnDefault("1")
 	private Integer active = 1;
@@ -166,7 +172,15 @@ public class Bbs {
 	public void setHitCount(Long hitCount) {
 		this.hitCount = hitCount;
 	}
+	
+	public Long getLikes() {
+		return likes;
+	}
 
+	public void setLikes(Long likes) {
+		this.likes = likes;
+	}
+	
 	public Integer getActive() {
 		return active;
 	}

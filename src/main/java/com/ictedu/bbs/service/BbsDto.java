@@ -32,6 +32,7 @@ public class BbsDto {
 	private String content;
 	private LocalDateTime createdAt; // LocalDate를 LocalDateTime으로 변경
 	private Long hitCount;
+	private Long likes;
 	private Integer active;
 	private Integer inactive;
 	private Integer reported;
@@ -52,6 +53,7 @@ public class BbsDto {
 				.content(content)
 				.createdAt(createdAt)
 				.hitCount(hitCount)
+				.likes(likes)
 				.active(active)
 				.inactive(inactive)
 				.reported(reported)
@@ -72,6 +74,7 @@ public class BbsDto {
 				.content(bbs.getContent())
 				.createdAt(bbs.getCreatedAt())
 				.hitCount(bbs.getHitCount())
+				.likes(bbs.getLikes())
 				.active(bbs.getActive())
 				.inactive(bbs.getInactive())
 				.reported(bbs.getReported())

@@ -92,8 +92,8 @@ public class BbsController {
     @GetMapping("/{id}")
     public ResponseEntity<Bbs> getBbsById(
         @PathVariable("id") Long id,
-        @RequestParam Map<String, String> params) {
-        
+        @RequestParam Map<String, String> params,
+    	@RequestParam(value = "likeToggle", required = false) Boolean likeToggle){
         // 쿼리 파라미터 로그
         System.out.println("Query Params: " + params);
 
@@ -106,9 +106,18 @@ public class BbsController {
             if (increment) {
                 bbsService.incrementHitcount(id); // 조회수 증가
             }
+            
+         // 좋아요 토글
+            if (likeToggle != null) {
+                if (likeToggle) {
+                    bbsService.incrementLikes(id);  // 좋아요 추가
+                } else {
+                    bbsService.decrementLikes(id);  // 좋아요 취소
+                }
+            }
             return ResponseEntity.ok().body(bbs);
         } else {
-            return ResponseEntity.notFound().build();
+        	 return ResponseEntity.notFound().build();
         }
     }
     // 게시글 단건 조회 (POST 요청)
