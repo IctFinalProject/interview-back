@@ -51,6 +51,9 @@ public class Alarm {
 	@Column(name = "bbs_id")
     private Long bbsId; // 게시판 id (게시판 알림일 경우)
 	
+	@Column(name = "content_id")
+    private Long contentId; //게시판의 경우 댓글 id, 채팅의 경우 채팅메세지의 id
+	
 	@ColumnDefault("0")
 	@Column(name = "is_read")
     private Integer isRead;
@@ -58,9 +61,6 @@ public class Alarm {
 	@ColumnDefault("0")
 	@Column(name = "is_disabled")
     private Integer isDisabled;
-	
-	@Column(name = "metadata")
-    private String metadata; //뭔가 나중에 추가빼먹은 내용 집어넣기 용
 	
     @ColumnDefault("SYSDATE")
     @CreationTimestamp

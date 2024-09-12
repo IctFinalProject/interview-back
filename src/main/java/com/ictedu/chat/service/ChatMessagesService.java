@@ -11,6 +11,7 @@ import com.ictedu.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,11 @@ public class ChatMessagesService {
     public List<Map<String, Object>> getPastChatting(Long chatRoomId) {
         List<ChatMessages> chatMessages = chatMessagesRepository.findByChatroomIdAndIsDeleted(chatRoomId, 0);
 
-        return chatMessages.stream().map(chatMessage -> {
+        return chatMessages
+        		.stream()
+        		.sorted(Comparator.comparing(ChatMessages::getCreatedTime))
+        		.map(chatMessage -> {
+        			
             User user = userRepository.findById(chatMessage.getUser().getId()).orElse(null);
             //String username = user.getUsername();
             

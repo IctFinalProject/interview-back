@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ictedu.chat.dto.ChatRoomDTO;
 import com.ictedu.chat.entity.ChatRoom;
 import com.ictedu.chat.entity.ChatRoomUsers;
+import com.ictedu.chat.repository.ChatMessagesRepository;
 import com.ictedu.chat.repository.ChatRoomRepository;
 import com.ictedu.chat.repository.ChatRoomUsersRepository;
 import com.ictedu.user.model.entity.User;
@@ -23,6 +24,7 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomUsersRepository chatRoomUsersRepository;
+    private final ChatMessagesRepository chatMessagesRepository;
     private final UserRepository userRepository;
     
     @Transactional
@@ -64,7 +66,8 @@ public class ChatRoomService {
     	List<User> users = userRepository.findAllById(userIds);
     	
     	if(users.size() == 0) {
-    		chatRoomRepository.deleteById(chatroomId);
+    		//chatMessagesRepository.deleteByChatRoomId(chatroomId);
+//    		chatRoomRepository.deleteById(chatroomId);
     	}
     	else {
     		if(chatRoom.getIsTitleEdited() == 0) {
