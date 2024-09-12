@@ -107,7 +107,7 @@ public class BbsController {
                 bbsService.incrementHitcount(id); // 조회수 증가
             }
             
-         // 좋아요 토글
+         // 좋아요 토글이요
             if (likeToggle != null) {
                 if (likeToggle) {
                     bbsService.incrementLikes(id);  // 좋아요 추가

@@ -44,7 +44,7 @@ public class BbsDto {
 	private List<FileBbsDto> files;
 	
 	
-	//DTO를 ENTITY로 변환하는 메소드
+	//DTO를 ENTITY로 변환하는 메소드(좋아요 추가)
 	public Bbs toEntity() {
 		return Bbs.builder()
 				.bbsId(id)

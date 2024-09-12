@@ -78,7 +78,7 @@ public class Bbs {
 	@ColumnDefault("0")
 	private Long hitCount = 0L;
 
-	
+	//좋아요 칼럼
 	@Column(name = "likes", nullable = false)
     @ColumnDefault("0")
     private Long likes = 0L;
