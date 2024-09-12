@@ -25,6 +25,7 @@ public class AdminDeletedController {
 		List<Bbs> deletedPosts = adminDeletedPostService.getDeletedPosts();
 		return ResponseEntity.ok(deletedPosts);
 	}
+	
 	// 특정 삭제된 게시글과 댓글을 함께 조회하는 엔드포인트
 	@GetMapping("/deleted/{bbsId}/with-comments")
 	public ResponseEntity<Map<String, Object>> getDeletedPostWithComments(@PathVariable Long bbsId) {

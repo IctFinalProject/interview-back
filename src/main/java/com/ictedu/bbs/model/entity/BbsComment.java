@@ -1,6 +1,7 @@
 package com.ictedu.bbs.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ictedu.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -36,6 +38,11 @@ public class BbsComment {
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
 	private User user;  // 작성자
 
+	@OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<BbsReport> reports;
+	
+	
 	@Column(name = "content", nullable = false, length = 1000)
 	private String content;
 
