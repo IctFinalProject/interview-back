@@ -172,7 +172,7 @@ public class BbsService {
 	   
 		
 	}
-	//좋아요 감소
+	
 	public void decrementLikes(Long bbsId) {
 		// BbsRepository 또는 LikeRepository에서 좋아요 취소 로직 구현
 	    Bbs bbs = bbsRepository.findById(bbsId).orElseThrow();
