@@ -116,19 +116,12 @@ public class AdminDeletedPostService {
 	        System.out.println("해당 댓글을 찾을 수 없습니다.");
 	    }
 	}
-
-	// 삭제된 댓글 조회 (게시글 제목 포함)
+	//댓글 조회
 	public List<BbsComment> getDeletedComments() {
 	    List<BbsComment> comments = adminDeletedCommentRepository.findByDeleted(1); // deleted가 1인 댓글 조회
 
-	    // 댓글과 연결된 게시글 제목 설정
-	    comments.forEach(comment -> {
-	        if (comment.getBbs() != null) {
-	            String postTitle = comment.getBbs().getTitle();  // 게시글 제목 가져오기
-	            comment.getBbs().setTitle(postTitle);  // 댓글 객체에 게시글 제목 저장
-	        }
-	    });
-
+	    // 댓글과 연결된 게시글 제목은 이미 댓글 객체 내 Bbs 객체에서 가져올 수 있음
 	    return comments;
 	}
+
 }

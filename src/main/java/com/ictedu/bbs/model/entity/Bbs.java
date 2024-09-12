@@ -49,25 +49,30 @@ public class Bbs {
 
 	@Id
 	@SequenceGenerator(name="seq_bbs",sequenceName = "seq_bbs",allocationSize = 1,initialValue 	= 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_bbs")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_bbs")
 	@Column(name = "bbs_id", nullable = false)
 	private Long bbsId;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
 	private User userId;
-	
-	@OneToMany(mappedBy = "bbs", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JsonManagedReference  // 양방향 참조 방지
+
+	@OneToMany(mappedBy = "bbs", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+	@JsonManagedReference
 	private List<BbsComment> comments;
+
+	
+	@OneToMany(mappedBy = "bbs", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<BbsReport> reports;
 
 	@Column(name = "title", nullable = false, length = 255)
 	private String title;
 
 	@Column(name = "content", nullable = false, length = 2000)
 	private String content;
-	
-// 아래가 바꾼거 (날짜 -> 날짜+시간) 
+
+	// 아래가 바꾼거 (날짜 -> 날짜+시간) 
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "createdAt", nullable = false, updatable = false)
 	@CreationTimestamp
@@ -114,15 +119,15 @@ public class Bbs {
 
 	@ElementCollection
 	@Lob
-    @CollectionTable(name = "BBS_FILE", joinColumns = @JoinColumn(name = "bbs_id"))
-    @MapKeyColumn(name = "file_name")
-    @Column(name = "file_data")
-    private Map<String, byte[]> files = new HashMap<>();
-    
-    // 앱솔: 신고 또는 일반 삭제를 구분하기 위한 필드 추가
-    @Column(name = "deleted_reason", nullable = false)
-    @ColumnDefault("0")
-    private Integer deletedReason = 0;  // 기본값 0으로 설정
+	@CollectionTable(name = "BBS_FILE", joinColumns = @JoinColumn(name = "bbs_id"))
+	@MapKeyColumn(name = "file_name")
+	@Column(name = "file_data")
+	private Map<String, byte[]> files = new HashMap<>();
+
+	// 앱솔: 신고 또는 일반 삭제를 구분하기 위한 필드 추가
+	@Column(name = "deleted_reason", nullable = false)
+	@ColumnDefault("0")
+	private Integer deletedReason = 0;  // 기본값 0으로 설정
 
 	// Getter와 Setter 메소드
 	public Long getBbs_id() {
@@ -156,13 +161,13 @@ public class Bbs {
 	public void setContent(String content) {
 		this.content = content;
 	}
-// 아래 두개 바꾼거임 (날짜 -> 날짜 +시간) 
+	// 아래 두개 바꾼거임 (날짜 -> 날짜 +시간) 
 	public LocalDateTime getCreatedAt() {
-	    return createdAt;
+		return createdAt;
 	}
 
 	public void setCreatedAt(LocalDateTime createdAt) {
-	    this.createdAt = createdAt;
+		this.createdAt = createdAt;
 	}
 
 	public Long getHitCount() {
@@ -244,20 +249,20 @@ public class Bbs {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	public Integer getDeletedReason() {  // 앱솔: 신고 삭제 여부 반환
-        return deletedReason;
-    }
 
-    public void setDeletedReason(Integer deletedReason) {  // 앱솔: 신고 삭제 여부 설정
-        this.deletedReason = deletedReason;
-    }
-	
+	public Integer getDeletedReason() {  // 앱솔: 신고 삭제 여부 반환
+		return deletedReason;
+	}
+
+	public void setDeletedReason(Integer deletedReason) {  // 앱솔: 신고 삭제 여부 설정
+		this.deletedReason = deletedReason;
+	}
+
 	// 작성자의 username을 반환하는 메서드
-    public String getUsername() {
-        return userId != null ? userId.getUsername() : "Anonymous";
-    }
-    public void incrementHitcount() {
-        this.hitCount += 1;
-    }
+	public String getUsername() {
+		return userId != null ? userId.getUsername() : "Anonymous";
+	}
+	public void incrementHitcount() {
+		this.hitCount += 1;
+	}
 }

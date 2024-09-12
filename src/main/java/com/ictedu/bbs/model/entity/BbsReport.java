@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ictedu.user.model.entity.User;
 
 @Data
@@ -24,34 +25,44 @@ public class BbsReport {
     @Column(name = "report_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 게시글과의 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY)  
     @JoinColumn(name = "bbs_id", referencedColumnName = "bbs_id", nullable = false)
+    @JsonBackReference
     private Bbs bbs;
-//오류나면 반드시 먼저삭제 위
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    // 댓글과의 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)  
     @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", nullable = true)
-    private BbsComment comment;  // 댓글과의 관계 추가
+    @JsonBackReference 
+    private BbsComment comment;
     
- // 신고자와의 관계 추가
+    // 신고자와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)  // 신고자 ID
     private User reporter;
-  //오류나면 반드시 먼저삭제 아래
+    
+    // 신고 사유
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;
 
+    // 추가 정보
     @Column(name = "additional_info", length = 1000)
     private String additionalInfo;
 
+    // 신고 날짜
     @Column(name = "reported_at", nullable = false, updatable = false)
     private LocalDateTime reportedAt;
 
+    // 처리 시간
     @Column(name = "proceeded_time", nullable = true)  // nullable = true 설정
     private LocalDateTime proceededTime;
 
+    // 신고 상태
     @Column(name = "status", nullable = false, length = 10)
     private String status;
 
+    // 신고 생성 시 기본값 설정
     @PrePersist
     protected void onCreate() {
         this.reportedAt = LocalDateTime.now();  // 신고된 날짜와 시간 기본값
