@@ -112,7 +112,7 @@ public class BbsService {
         System.out.println("댓글 조회 완료: 댓글 개수 = " + comments.size());
         System.out.println("테스트11");
 
-        // 댓글 숨김 처리
+        // 댓글 숨김처리
         for (BbsComment comment : comments) {
         	   System.out.println("테스트12");
             System.out.println("댓글 숨김 처리 시작: " + comment.getCommentId());
