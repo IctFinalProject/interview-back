@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ictedu.interview.model.dto.QuestionDTO;
 import com.ictedu.interview.model.entity.Question;
 import com.ictedu.interview.model.entity.VideoEntity;
 import com.ictedu.interview.service.InterviewService;

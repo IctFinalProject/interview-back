@@ -1,4 +1,4 @@
-package com.ictedu.interview.controller;
+package com.ictedu.interview.model.dto;
 
 import java.time.LocalDateTime;
 

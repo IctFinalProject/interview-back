@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -84,5 +85,19 @@ public class VideoUploadController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error processing video: " + e.getMessage()));
         }
+    }
+    @PostMapping("/api/video-analysis/result")
+    public ResponseEntity<String> receiveAnalysisComplete(@RequestBody Map<String, Object> payload) {
+        Integer videoId = (Integer) payload.get("videoId");
+        String message = (String) payload.get("message");
+
+        if (videoId == null || message == null) {
+            return ResponseEntity.badRequest().body("Invalid payload");
+        }
+
+        // 여기서 분석 완료 처리 로직을 구현합니다.
+        // 예: 데이터베이스에서 해당 videoId의 상태를 업데이트
+
+        return ResponseEntity.ok("Analysis complete message received successfully");
     }
 }

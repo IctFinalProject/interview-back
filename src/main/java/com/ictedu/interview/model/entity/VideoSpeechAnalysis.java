@@ -22,8 +22,9 @@ public class VideoSpeechAnalysis {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_video_speech_analysis_id")
     private Long id;
 
-    @Column(name = "video_id")
-    private Long videoId;
+	@ManyToOne
+	@JoinColumn(name = "video_id", referencedColumnName = "id", nullable = false)
+	private VideoEntity video;
 
     @Lob
     @Column(columnDefinition = "CLOB")

@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import com.ictedu.interview.model.entity.Interview;
 import com.ictedu.interview.model.entity.Question;
 import com.ictedu.interview.model.entity.VideoEntity;
+import com.ictedu.interview.repository.ClaudeAnalysisRepository;
 import com.ictedu.interview.repository.InterviewRepository;
 import com.ictedu.interview.repository.QuestionRepository;
 import com.ictedu.interview.repository.VideoAnalysisRepository;
@@ -36,13 +37,15 @@ public class InterviewService {
 	private final VideoRepository videoRepository;
 	private final VideoAnalysisRepository videoAnalysisRepository;
 	private final VideoSpeechAnalysisRepository videoSpeechAnalysisRepository;
+	private final ClaudeAnalysisRepository claudeAnalysisRepository;
 	
-	public InterviewService(QuestionRepository questionRepository, InterviewRepository interviewRepository, VideoRepository videoRepository, VideoAnalysisRepository videoAnalysisRepository, VideoSpeechAnalysisRepository videoSpeechAnalysisRepository) {
+	public InterviewService(QuestionRepository questionRepository, InterviewRepository interviewRepository, VideoRepository videoRepository, VideoAnalysisRepository videoAnalysisRepository, VideoSpeechAnalysisRepository videoSpeechAnalysisRepository, ClaudeAnalysisRepository claudeAnalysisRepository) {
 		this.questionRepository = questionRepository;
 		this.interviewRepository = interviewRepository;
 		this.videoRepository = videoRepository;
 		this.videoAnalysisRepository = videoAnalysisRepository;
 		this.videoSpeechAnalysisRepository = videoSpeechAnalysisRepository;
+		this.claudeAnalysisRepository = claudeAnalysisRepository;
 	}
 
 	@Value("${interview.api.key}")
@@ -109,10 +112,10 @@ public class InterviewService {
 	}
 	
 	private String createPrompt(String type, List<String> keywords) {
-		 String basePrompt = "경험 많은 면접관으로서, %s 면접에 적합한 간결하고 자연스러운 질문을 1개 생성해주세요.\n\n" +
+		 String basePrompt = "당신은 경험 많은 인사면접관으로서, %s 면접에 적합한 간결하고 자연스러운 질문을 1개 생성해주세요.\n\n" +
 			        "키워드: %s\n\n" +
 			        "주의사항:\n" +
-			        "- 실제 대화처럼 자연스럽고 간결한 질문을 만들어주세요.\n" +
+			        "- 이력서 키워드 기반으로 간결한 질문을 만들어주세요.\n" +
 			        "- 지원자의 경험과 역량을 파악할 수 있는 개방형 질문으로 구성해주세요.\n" +
 			        "- 존댓말을 사용하고, 질문의 길이는 이전보다 2/3 정도로 줄여주세요.";
 
@@ -154,12 +157,12 @@ public class InterviewService {
     }
     */
 	private String generateScript(String questionText) {
-		 String scriptPrompt = "당신은 면접 지원자입니다. 다음 질문에 대해 자연스럽고 설득력 있는 답변을 해주세요:\n\n" +
+		 String scriptPrompt = "당신은 경험 많은 면접 지원자입니다. 다음 질문에 대해 자연스럽고 설득력 있는 답변을 해주세요:\n\n" +
 			        "질문: %s\n\n" +
 			        "답변 작성 가이드라인:\n" +
-			        "1. 구체적인 경험이나 상황을 예로 들어 설명하세요.\n" +
-			        "2. 답변은 약 50초 분량으로, 간결하면서도 충분한 정보를 담아주세요.\n" +
-			        "3. 자연스러운 대화체로 답변하되, 전문성과 열정이 느껴지도록 해주세요.\n" +
+			        "1. 본인 이력서 키워드를 기반으로 하여 구체적인 내용과 논리적인 설명, 예시 등을 추가하여 답변의 깊이를 더해야 합니다.\n" +
+			        "2. 답변은 약 35초 분량으로, 간결하면서도 충분한 정보를 담아주세요.\n" +
+			        "3. 전문적인 용어를 사용하고 창의성과 문제 해결 능력을 보여지도록 해주세요.\n" +
 			        //"4. 가능하다면 STAR(상황-과제-행동-결과) 방식을 활용해 구조화된 답변을 제시하세요.\n" +
 			        "4. 답변의 끝에는 질문과 연관된 추가적인 정보나 강점을 간단히 언급해 주세요.";
 
@@ -238,9 +241,9 @@ public class InterviewService {
 		            "- 필요한 경우, 꼬리 질문을 추가하여 더 깊이 있는 답변을 유도할 수 있게 해주세요.\n" +
 		            "- 질문은 '~해주세요', '~말씀해주시겠어요?'와 같은 정중한 표현으로 끝나도록 해주세요.\n\n" +
 		            "질문 예시:\n" +
-		            "1. [공통 질문] \"귀하는 직장 또는 프로젝트에서 몰입하여 성과를 낸 경험이 있나요? 그때 어떤 점에 집중하였으며, 그 경험을 통해 배운 것이 있다면 무엇인가요?\"\n" +
-		            "2. [이력서 기반 질문] \"자소서에서 '솔선수범'이라는 표현을 사용하셨습니다. 구체적으로 어떤 상황에서 솔선수범하셨으며, 그로 인해 팀이나 조직에 어떤 긍정적인 영향을 미쳤는지 설명해 주세요.\"\n" +
-		            "3. [상황 질문] \"프로젝트 진행 중 예상치 못한 어려움이 발생했을 때, 창의성과 실험 정신을 발휘하여 문제를 해결한 사례를 말씀해 주시겠어요?\"\n\n" +
+		            "1. 직장 또는 프로젝트에서 몰입하여 성과를 낸 경험이 있나요? 그때 어떤 점에 집중하였으며, 그 경험을 통해 배운 것이 있다면 무엇인가요?\n" +
+		            "2. 자소서에서 '솔선수범'이라는 표현을 사용하셨습니다. 구체적으로 어떤 상황에서 솔선수범하셨으며, 그로 인해 팀이나 조직에 어떤 긍정적인 영향을 미쳤는지 설명해 주세요.\n" +
+		            "3. 프로젝트 진행 중 예상치 못한 어려움이 발생했을 때, 창의성과 실험 정신을 발휘하여 문제를 해결한 사례를 말씀해 주시겠어요?\n\n" +
 		            "위의 예시와 같은 형식으로, %s 유형에 맞는 질문을 1개 생성해주세요.";
 
 		    return String.format(basePrompt, type, String.join(", ", resumeKeywords), type);
@@ -254,14 +257,20 @@ public class InterviewService {
 
     @Transactional
     public void deleteVideoById(Long videoId) {
-        // VideoSpeechAnalysis 삭제
-        videoSpeechAnalysisRepository.deleteByVideoId(videoId);
+    	VideoEntity video = videoRepository.findById(videoId)
+    	        .orElseThrow(() -> new RuntimeException("Video not found"));
 
-        // VideoAnalysis 삭제
-        videoAnalysisRepository.deleteByVideoId(videoId);
+    	    // ClaudeAnalysis 삭제 (만약 존재한다면)
+    	    claudeAnalysisRepository.deleteByVideo(video);
 
-        // VideoEntity 삭제
-        videoRepository.deleteById(videoId);
-    }
+    	    // VideoSpeechAnalysis 삭제
+    	    videoSpeechAnalysisRepository.deleteByVideo(video);
+
+    	    // VideoAnalysis 삭제
+    	    videoAnalysisRepository.deleteByVideo(video);
+
+    	    // VideoEntity 삭제
+    	    videoRepository.delete(video);
 	
+    }
 }

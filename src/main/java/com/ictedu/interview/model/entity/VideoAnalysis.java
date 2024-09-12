@@ -29,29 +29,34 @@ public class VideoAnalysis {
     @Column(name = "analyzed_file_path")
     private String analyzedFilePath;
 
-    @Column(name = "head_score")
+    @Column(name = "head_score", nullable = true)
     private Double headScore;
 
-    @Column(name = "eye_score")
+    @Column(name = "eye_score", nullable = true)
     private Double eyeScore;
 
-    @Column(name = "smile_score")
-    private Double smileScore;
-
-    @Column(name = "hand_score")
-    private Double handScore;
-
-    @Column(name = "pose_score")
+    @Column(name = "pose_score", nullable = true)
     private Double poseScore;
 
     @Column(name = "avg_score")
     private Double avgScore;
+    
+    // 오디오 분석 결과 필드 추가
+    @Column(name = "audio_pitch")
+    private Double audioPitch;
+
+    @Column(name = "audio_tempo")
+    private Double audioTempo;
+
+    @Column(name = "audio_volume")
+    private Double audioVolume;
+
+    @Column(name = "audio_spectral_centroid")
+    private Double audioSpectralCentroid;
 
     @ColumnDefault("SYSDATE")
     @CreationTimestamp
     @Column(name = "analysis_date", nullable = false, updatable = false)
     private LocalDateTime analysisDate;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }
