@@ -70,9 +70,10 @@ public class AlarmController {
 	
 	// 채팅방 들어갔을때 알람 isRead 1 설정하기
 	@PostMapping("/readChatAlarmInChatroom")
-    public ResponseEntity<String> readChatAlarmInChatroom(@RequestBody Map<String, Object> request) {
-		Long userId = ((Number) request.get("userId")).longValue();
-		Long chatroomId = ((Number) request.get("chatroomId")).longValue();
+    public ResponseEntity<String> readChatAlarmInChatroom(@RequestBody Map<String, Long> request) {
+		System.out.println();
+		Long userId =  request.get("userId");
+		Long chatroomId = request.get("chatroomId");
         
         try {
             alarmService.readChatAlarm(userId, chatroomId);
