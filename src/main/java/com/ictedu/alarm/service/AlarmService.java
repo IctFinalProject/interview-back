@@ -17,7 +17,7 @@ public class AlarmService {
 	private AlarmRepository alarmRepository;
 
 	public List<Alarm> findByUserId(Long userId) {
-		return alarmRepository.findByReceiverIdAndIsDisabledAndIsReadOrderByCreatedTimeDesc(userId, 0, 0);
+		return alarmRepository.findByReceiverIdAndIsDisabledOrderByCreatedTimeDesc(userId, 0);
 	}
 	
 	public List<Alarm> findChatAlarmByUserId(Long userId) {

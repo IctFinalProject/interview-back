@@ -13,7 +13,8 @@ import jakarta.transaction.Transactional;
 
 @Repository
 public interface AlarmRepository extends JpaRepository<Alarm, Long>{
-	List<Alarm> findByReceiverIdAndIsDisabledAndIsReadOrderByCreatedTimeDesc(Long receiverId, Integer isDisabled, Integer isRead);
+	
+	List<Alarm> findByReceiverIdAndIsDisabledOrderByCreatedTimeDesc(Long receiverId, Integer isDisabled);
 	
 	@Query("SELECT a FROM Alarm a WHERE a.receiverId = :userId AND a.isRead = 0 AND a.type = 'chat'")
 	List<Alarm> findChatAlarmByReceiverIdAndIsRead(Long userId);
