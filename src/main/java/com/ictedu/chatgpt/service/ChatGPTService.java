@@ -75,43 +75,56 @@ public class ChatGPTService {
     private String buildPrompt(List<String> jobList) {
         StringBuilder promptBuilder = new StringBuilder();
 
+        // 직업 목록 제시
         promptBuilder.append("다음은 내가 수집한 직업들입니다:\n");
         promptBuilder.append(String.join(", ", jobList));
-        promptBuilder.append("\n\n1. 위에 나열된 직업들을 확인할 수 있지? 매우 다양해.");
 
-        promptBuilder.append("\n\n2. 직업 이름이 부적절하거나, 두 단어 이상으로 잘못 나뉘어져 있는 경우 그런 직업 이름을 제외하고 다른 직업을 추천해줘.");
-        promptBuilder.append("\n   예를 들어, '애널리스트'를 '애널'과 '리스트'로 나누어 표현하는 것은 부적절해. 이런 잘못된 직업 이름이 있다면 다른 직업을 추천해줘.");
+        // 직업 이름의 부적절한 나눔과 수정 요구
+        promptBuilder.append("\n\n1. '애널리스트'를 '애널'과 '리스트'로 나누는 것과 같은 부적절한 직업 이름이 있다면 수정하고 올바른 직업을 추천해줘.");
 
-        promptBuilder.append("\n\n3. 다음 조건에 해당하는 직업들도 제외해줘: '중졸 이하', '고졸', '대졸', '대학원졸', '계열무관', '인문', '사회', '교육', '공학', '자연', '의학', '예체능'이라는 단어가 포함된 직업.");
+        // 특정 조건에 맞는 직업 제외
+        promptBuilder.append("\n\n2. 다음 조건에 해당하는 직업들을 제외해줘: '중졸 이하', '고졸', '대졸', '대학원졸', '계열무관', '인문', '사회', '교육', '공학', '자연', '의학', '예체능'이라는 단어가 포함된 직업.");
 
-        promptBuilder.append("\n\n4. 국내에서 근무할 수 있는 직업만 추천해줘.");
+        // 국내 근무 가능 직업 추천
+        promptBuilder.append("\n\n3. 국내에서 근무할 수 있는 직업만 추천해줘. 외국 직업은 제외해줘.");
 
-        promptBuilder.append("\n\n5. 총 5개의 직업을 선정해줘.");
+        // 직업 4개 선정
+        promptBuilder.append("\n\n4. 총 4개의 직업을 선정해줘.");
 
-        promptBuilder.append("\n\n6. 선정된 5개 직업에 종사하는 사람들이 근무할 만한 국내 회사를 각 직업당 4개씩 추천해줘. 모든 직업에 대해 반드시 국내 기업을 추천해줘. 외국 기업은 제외해줘.");
-
-        promptBuilder.append("\n\n7. 총 추천 회사 수는 20개를 넘지 않도록 해줘.");
+        // 각 직업에 대한 국내 회사 4곳 추천
+        promptBuilder.append("\n\n5. 선정된 직업당 국내 기업 4개씩 추천해줘. 외국 기업은 제외해줘.");
 
         
+        // 회사 이름 중복 검사 및 특정 패턴 방지
+        promptBuilder.append("\n\n6. 회사 이름의 뒤쪽에 같은 단어가 반복되지 않도록 해줘. 예를 들어, '병원', '사무소'처럼 특정 단어로 끝나는 회사가 여러 개 있다면, 그 단어가 계속 반복되지 않도록 다른 회사를 추천해줘.");
+        promptBuilder.append("\n   예를 들어, '서울병원', '강남병원', '한강병원'처럼 '병원'으로 끝나는 회사는 1개만 추천해줘.");
 
-        // 추가된 직업 전망에 대한 정보 요청
-        promptBuilder.append("\n\n9. 추천된 각 직업에 대한 간단한 전망도 제공해줘.");
+        // 총 회사 수 16개로 제한
+        promptBuilder.append("\n\n7. 총 추천 회사 수는 16개를 넘지 않도록 해줘.");
 
-        promptBuilder.append("\n\n위의 조건들을 충족하는지 한 번 더 확실히 확인해줘.");
+        // 각 직업에 대한 전망 요청
+        promptBuilder.append("\n\n8. 추천된 각 직업에 대한 간단한 전망을 제공해줘.");
 
-        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘. 다시 한번 강조한다 아래 양식 외에 다른말이 나와서는 절대안돼!.");
-        
-        promptBuilder.append("\n\n<필수>\n이제부터는 내가 설명한 내용을 바탕으로 답변해줘. 답변은 아래의 양식에 맞추어 한국어로 작성해줘. 다시 한번 강조한다 아래 양식 외에 다른말이 나와서는 절대안돼!.");
+        // 조건 충족 여부 확인
+        promptBuilder.append("\n\n9. 위의 조건들을 충족하는지 한 번 더 확실히 확인해줘.");
 
-        promptBuilder.append("\n\n추천드리는 직업은 다음과 같습니다:\n");
-        promptBuilder.append("\n직업 이름 5개:\n");
+        // 양식 고지
+        promptBuilder.append("\n\n<필수>\n너는 아래 양식에 맞춰서만 답변해야 해. 절대 양식을 벗어난 설명을 덧붙이거나 사족을 달지 말고, 반드시 아래 양식에만 맞춰서 답변해.");
+        promptBuilder.append("\n추가 설명, 이유 또는 부가적인 조건에 대해 이야기하지 마. 네 답변은 오직 직업 이름, 회사 이름, 직업 전망에만 집중해야 해.");
+        promptBuilder.append("\n절대 '이러한 조건에 맞춰 대답했다'는 식의 추가적인 설명을 하지 말고, 예시 양식 외에는 어떤 말도 하지 말아줘.");
 
-        promptBuilder.append("\n각 직업에 대한 회사 추천 목록 및 직업 전망:\n");
 
-        for (int i = 0; i < jobList.size(); i++) {
+        // 답변 양식 예시 제공
+        promptBuilder.append("\n추천드리는 직업은 다음과 같습니다:\n\n");
+        promptBuilder.append("직업 이름 4개:\n");
+
+        // 각 직업과 회사 추천 목록 및 직업 전망 양식
+        for (int i = 0; i < 4; i++) {
             promptBuilder.append("\n").append(i + 1).append(". 직업 이름: [회사 이름 1], [회사 이름 2], [회사 이름 3], [회사 이름 4]");
             promptBuilder.append("\n   간단한 전망: [직업 전망]");
         }
+        
+        promptBuilder.append("\n\n<주의> 절대 추가적인 설명이나 사족을 붙이지 말고, 오직 위의 형식으로만 답변해.");
 
         return promptBuilder.toString();
     }
