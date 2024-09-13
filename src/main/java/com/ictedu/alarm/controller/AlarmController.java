@@ -1,4 +1,4 @@
-package com.ictedu.alarm;
+package com.ictedu.alarm.controller;
 
 import java.util.List;
 import java.util.Map;

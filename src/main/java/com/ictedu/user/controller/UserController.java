@@ -165,7 +165,7 @@ public class UserController {
 
             result.add(userMap);
         }
-        System.out.println("결과 출력!");
+        // System.out.println("결과 출력!");
         return result;
     }
     
