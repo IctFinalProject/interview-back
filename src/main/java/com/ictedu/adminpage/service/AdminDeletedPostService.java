@@ -2,6 +2,8 @@ package com.ictedu.adminpage.service;
 
 import com.ictedu.adminpage.repository.AdminDeletedCommentRepository;
 import com.ictedu.adminpage.repository.AdminDeletedPostRepository;
+import com.ictedu.bbs.dto.BbsCommentDTO;
+import com.ictedu.bbs.dto.BbsDTO;
 import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.model.entity.BbsComment;
 
@@ -14,114 +16,121 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminDeletedPostService {
 
-	@Autowired
-	private AdminDeletedPostRepository adminDeletedPostRepository;
+    @Autowired
+    private AdminDeletedPostRepository adminDeletedPostRepository;
 
-	@Autowired
-	private AdminDeletedCommentRepository adminDeletedCommentRepository;  // 댓글 저장을 위한 리포지토리
+    @Autowired
+    private AdminDeletedCommentRepository adminDeletedCommentRepository;
 
-	// 삭제된 게시글을 조회
-	public List<Bbs> getDeletedPosts() {
-		return adminDeletedPostRepository.findByDeleted(1);  // 삭제된 게시글(1)만 조회
-	}
+    // 삭제된 게시글을 조회할 때 DTO로 변환해서 반환
+    public List<BbsDTO> getDeletedPosts() {
+        List<Bbs> posts = adminDeletedPostRepository.findByDeleted(1);
+        return posts.stream()
+                .map(this::convertToBbsDTO)
+                .collect(Collectors.toList());
+    }
 
-	// 특정 게시글과 관련 댓글을 조회
-	public Map<String, Object> getPostWithComments(Long bbsId) {
-		Optional<Bbs> post = adminDeletedPostRepository.findById(bbsId);
+    // 특정 게시글과 관련 댓글을 조회할 때 DTO로 변환해서 반환
+    public Map<String, Object> getPostWithComments(Long bbsId) {
+        Optional<Bbs> post = adminDeletedPostRepository.findById(bbsId);
 
-		if (post.isPresent()) {
-			List<BbsComment> comments = adminDeletedCommentRepository.findByBbsAndDeleted(post.get(), 1);
-			Map<String, Object> result = new HashMap<>();
-			result.put("post", post.get());
-			result.put("comments", comments);
-			return result;
-		}
+        return post.map(b -> {
+            List<BbsComment> comments = adminDeletedCommentRepository.findByBbsAndDeleted(b, 1);
+            Map<String, Object> result = new HashMap<>();
+            result.put("post", convertToBbsDTO(b));  // 게시글을 DTO로 변환
+            result.put("comments", comments.stream()
+                    .map(this::convertToBbsCommentDTO)
+                    .collect(Collectors.toList()));
+            return result;
+        }).orElse(null); // 존재하지 않을 경우 null 반환 또는 예외 처리
+    }
 
-		return null; // 혹은 적절한 예외 처리
-	}
+    // 특정 게시글을 영구 삭제
+    @Transactional
+    public void deletePostPermanently(Long bbsId) {
+        adminDeletedCommentRepository.deleteByBbs_BbsId(bbsId);
+        adminDeletedPostRepository.deleteById(bbsId);
+    }
 
-	// 특정 게시글을 영구 삭제
-	@Transactional //트랜잭션을 보장
-	public void deletePostPermanently(Long bbsId) {
-		adminDeletedCommentRepository.deleteByBbs_BbsId(bbsId);
-		adminDeletedPostRepository.deleteById(bbsId);
-	}
-	
-	@Transactional
-	public void deleteCommentPermanently(Long commentId) {
-	    Optional<BbsComment> comment = adminDeletedCommentRepository.findById(commentId);
+    @Transactional
+    public void deleteCommentPermanently(Long commentId) {
+        adminDeletedCommentRepository.findById(commentId).ifPresent(adminDeletedCommentRepository::delete);
+    }
 
-	    if (comment.isPresent()) {
-	        adminDeletedCommentRepository.deleteById(commentId); // 댓글 영구 삭제
-	    }
-	}
+    // 게시글과 관련 댓글 복구
+    @Transactional
+    public void restorePost(Long bbsId) {
+        Optional<Bbs> post = adminDeletedPostRepository.findById(bbsId);
 
-	
-	// 삭제된 게시글을 복구
-	@Transactional
-	public void restorePost(Long bbsId) {
-		Optional<Bbs> post = adminDeletedPostRepository.findById(bbsId);
+        post.ifPresent(bbs -> {
+            if (bbs.getDeletedReason() == 0) {
+                bbs.setDeleted(0);
+                adminDeletedPostRepository.save(bbs);
 
-		if (post.isPresent()) {
-			Bbs bbs = post.get();
+                // 게시글과 연결된 댓글 복구
+                List<BbsComment> comments = adminDeletedCommentRepository.findByBbsAndDeleted(bbs, 1);
+                comments.forEach(comment -> {
+                    if (comment.getDeletedReason() == 0) {
+                        comment.setDeleted(0);
+                        adminDeletedCommentRepository.save(comment);
+                    }
+                });
+            } else {
+                throw new IllegalStateException("신고로 삭제된 게시글은 복구할 수 없습니다.");
+            }
+        });
+    }
 
-			//게시글 복구: deleted_reason 값이 0일 때만 복구
-			if (bbs.getDeletedReason() == 0) {  
-				bbs.setDeleted(0);  // 삭제 상태 복구
-				adminDeletedPostRepository.save(bbs);
+    @Transactional
+    public void restoreComment(Long commentId) {
+        adminDeletedCommentRepository.findById(commentId).ifPresent(comment -> {
+            Bbs associatedPost = comment.getBbs();
+            if (associatedPost.getDeleted() == 1) {
+                throw new IllegalStateException("게시글이 삭제되어 댓글을 복구할 수 없습니다.");
+            }
+            if (comment.getDeletedReason() == 0) {
+                comment.setDeleted(0);
+                adminDeletedCommentRepository.save(comment);
+            } else {
+                throw new IllegalStateException("신고로 삭제된 댓글은 복구할 수 없습니다.");
+            }
+        });
+    }
 
-				//게시글과 연결된 댓글도 함께 복구
-				List<BbsComment> comments = adminDeletedCommentRepository.findByBbsAndDeleted(bbs, 1);
-				for(BbsComment comment : comments) {
-					if(comment.getDeletedReason() ==0) { //댓글도 deleted_reason값이 0일 때만 복구
-						comment.setDeleted(0); //삭제 상태 복구
-						adminDeletedCommentRepository.save(comment);
-					}
-				}
-			} else {
-				// 신고로 삭제된 경우에는 복구하지 않음
-				System.out.println("신고로 삭제된 게시글은 복구할 수 없습니다.");
-			}
-		} else {
-			System.out.println("해당 게시글을 찾을 수 없습니다.");
-		}
-	}
+    // 삭제된 댓글 조회할 때 DTO로 변환하여 반환
+    public List<BbsCommentDTO> getDeletedComments() {
+        List<BbsComment> comments = adminDeletedCommentRepository.findByDeleted(1);
+        return comments.stream()
+                .map(this::convertToBbsCommentDTO)
+                .collect(Collectors.toList());
+    }
 
-	@Transactional
-	public void restoreComment(Long commentId) {
-	    Optional<BbsComment> optionalComment = adminDeletedCommentRepository.findById(commentId);
+    // 엔티티 -> BbsDTO 변환 메서드
+    private BbsDTO convertToBbsDTO(Bbs bbs) {
+        return BbsDTO.builder()
+                .bbsId(bbs.getBbsId())
+                .title(bbs.getTitle())
+                .content(bbs.getContent())
+                .username(bbs.getUserId() != null ? bbs.getUserId().getUsername() : "Unknown") // 작성자 이름 매핑
+                .createdAt(bbs.getCreatedAt())
+                .deletedAt(bbs.getDeleted_date())
+                .build();
+    }
 
-	    if (optionalComment.isPresent()) {
-	        BbsComment bbsComment = optionalComment.get();
-
-	        // 게시글이 삭제된 경우 댓글 복구 불가
-	        Bbs associatedPost = bbsComment.getBbs();
-	        if (associatedPost.getDeleted() == 1) {
-	            System.out.println("게시글이 삭제되어 댓글을 복구할 수 없습니다.");
-	            return;
-	        }
-
-	        // 댓글 복구: deleted_reason 값이 0일 때만 복구
-	        if (bbsComment.getDeletedReason() == 0) {
-	            bbsComment.setDeleted(0);  // 댓글의 deleted 값을 0으로 설정
-	            adminDeletedCommentRepository.save(bbsComment);  // 댓글 저장
-	        } else {
-	            System.out.println("신고로 인해 삭제된 댓글은 복구할 수 없습니다.");
-	        }
-	    } else {
-	        System.out.println("해당 댓글을 찾을 수 없습니다.");
-	    }
-	}
-	//댓글 조회
-	public List<BbsComment> getDeletedComments() {
-	    List<BbsComment> comments = adminDeletedCommentRepository.findByDeleted(1); // deleted가 1인 댓글 조회
-
-	    // 댓글과 연결된 게시글 제목은 이미 댓글 객체 내 Bbs 객체에서 가져올 수 있음
-	    return comments;
-	}
-
+    // 엔티티 -> BbsCommentDTO 변환 메서드
+    private BbsCommentDTO convertToBbsCommentDTO(BbsComment comment) {
+        return BbsCommentDTO.builder()
+                .commentId(comment.getCommentId())
+                .content(comment.getContent())
+                .username(comment.getUsername())
+                .bbsTitle(comment.getBbs().getTitle())
+                .createdAt(comment.getCreatedAt())
+                .deletedAt(comment.getDeletedAt())
+                .build();
+    }
 }
