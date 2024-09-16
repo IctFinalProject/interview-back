@@ -24,7 +24,7 @@ public class BbsReportService {
     }
 
     // 댓글 신고 처리 메서드
-    public void saveCommentReport(Bbs bbs, BbsComment comment,User reporter, String reason, Map<String, Boolean> additionalInfo) {
+    public void saveCommentReport(Bbs bbs, BbsComment comment, User reporter, String reason, Map<String, Boolean> additionalInfo) {
         String additionalInfoString = convertAdditionalInfoToString(additionalInfo);
 
         BbsReport report = BbsReport.builder()
@@ -34,14 +34,14 @@ public class BbsReportService {
                 .reason(reason)
                 .additionalInfo(additionalInfoString)
                 .reportedAt(LocalDateTime.now())
-                .status("Pending")
+                .status(BbsReport.Status.PENDING)  // Enum 상수 사용
                 .build();
 
         bbsReportRepository.save(report);  // 주입된 repository 인스턴스를 통해 save 호출
     }
 
     // 게시물 신고 처리 메서드 (추가)
-    public void saveReport(Bbs bbs, User reporter,String reason, Map<String, Boolean> additionalInfo) {
+    public void saveReport(Bbs bbs, User reporter, String reason, Map<String, Boolean> additionalInfo) {
         String additionalInfoString = convertAdditionalInfoToString(additionalInfo);
 
         BbsReport report = BbsReport.builder()
@@ -50,7 +50,7 @@ public class BbsReportService {
                 .reason(reason)
                 .additionalInfo(additionalInfoString)
                 .reportedAt(LocalDateTime.now())
-                .status("Pending")
+                .status(BbsReport.Status.PENDING)  // Enum 상수 사용
                 .build();
 
         bbsReportRepository.save(report);  // 주입된 repository 인스턴스를 통해 save 호출

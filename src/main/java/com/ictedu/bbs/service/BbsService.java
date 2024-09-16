@@ -56,7 +56,8 @@ public class BbsService {
             }
             bbs.setFiles(fileMap);
         }
-        bbs.setDeletedReason(0);  // 앱솔: 기본값 0 설정
+        bbs.setDeletedReason(0);// 앱솔: 기본값 0 설정
+        bbs.setStatus("VISIBLE"); //기본값으로 status를 VISIBLE로 설정
         return bbsRepository.save(bbs);
     }
 
@@ -72,6 +73,7 @@ public class BbsService {
                 .deleted(0)
                 .edited(0)
                 .type("normal")
+                .status("VISIBLE") // 기본값으로 VISIBLE 상태 설정
                 .userId(bbsDto.getUserId())
                 .build();
     }

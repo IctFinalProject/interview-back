@@ -9,11 +9,17 @@ import java.util.List;
 @Repository
 public interface BbsCommentRepository extends JpaRepository<BbsComment, Long> {
 
-    // 기존 메서드 (필요시 유지)
-    List<BbsComment> findByBbs_BbsId(Long bbsId);
-
-    // 추가된 메서드: DELETED가 0인 댓글만 조회
+    // 특정 게시글의 삭제되지 않은 댓글만 조회 (deleted가 0인 경우)
     List<BbsComment> findByBbs_BbsIdAndDeleted(Long bbsId, int deleted);
 
-	List<BbsComment> findByDeleted(int i);
+    // 특정 게시글의 삭제되지 않았고 상태가 VISIBLE인 댓글만 조회
+    List<BbsComment> findByBbs_BbsIdAndDeletedAndStatus(Long bbsId, int deleted, String status);
+
+    // 삭제된 댓글 조회
+    List<BbsComment> findByDeleted(int deleted);
+
+    // 상태가 특정 값인 댓글 조회 (ex: VISIBLE, HIDDEN 등)
+    List<BbsComment> findByStatus(String status);
+    
+    List<BbsComment> findByBbs_BbsId(Long bbsId);
 }
