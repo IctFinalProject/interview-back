@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ictedu.adminpage.service.AdminReportedService;
 import com.ictedu.bbs.model.entity.BbsReport;
 
@@ -78,15 +80,13 @@ public class AdminReportedController {
             adminReportedService.deletePostPermanently(reportId);
             return ResponseEntity.ok().build(); // 성공적으로 삭제되었음을 응답
         } catch (IllegalArgumentException e) {
-            // 삭제하려는 신고번호가 존재하지 않을 경우 404 응답
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.status(404).body(null); // 삭제하려는 신고번호가 존재하지 않을 경우 404 응답
         } catch (Exception e) {
-            // 그 외 다른 오류 발생 시 500 응답
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
         }
     }
 
-    // 신고된 댓글 목록 조회 API 추가
+    // 신고된 댓글 목록 조회 API
     @GetMapping("/reportedcomments")
     public ResponseEntity<List<Map<String, Object>>> getAllReportedComments() {
         List<BbsReport> reportedComments = adminReportedService.getAllReportedComments();
@@ -111,96 +111,25 @@ public class AdminReportedController {
         return ResponseEntity.ok(response);
     }
 
-    // 댓글을 영구 삭제하는 API 추가
+    // 댓글을 영구 삭제하는 API
     @DeleteMapping("/deletecomment/{commentId}")
     public ResponseEntity<Void> deleteCommentPermanently(@PathVariable Long commentId) {
         try {
-            // 서비스 메서드를 호출하여 댓글을 영구 삭제
             adminReportedService.deleteCommentPermanently(commentId);
             return ResponseEntity.ok().build(); // 성공적으로 삭제되었음을 응답
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 삭제하려는 신고번호가 존재하지 않을 경우 404 응답
+            return ResponseEntity.status(404).body(null); // 삭제하려는 댓글이 존재하지 않을 경우 404 응답
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
         }
     }
 
-    // 댓글 복구 API 추가 (신고 기록 삭제)
-    @PutMapping("/restorecomment/{reportId}")
-    public ResponseEntity<Void> restoreReportedComment(@PathVariable Long reportId) {
+    // 게시글 상태 업데이트 API (신고 기록에 따라 상태 변경)
+    @PutMapping("/updatestatus/{reportId}/{status}")
+    public ResponseEntity<Void> updateReportStatus(@PathVariable Long reportId, @PathVariable String status) {
         try {
-            // 서비스 메서드를 호출하여 신고된 댓글 복구 (신고 기록만 삭제)
-            adminReportedService.restoreReportedComment(reportId);
-            return ResponseEntity.ok().build(); // 성공적으로 복구되었음을 응답
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
-        }
-    }
-
-    // 게시글 복구 API 추가 (신고 기록 삭제)
-    @PutMapping("/restorepost/{reportId}")
-    public ResponseEntity<Void> restoreReportedPost(@PathVariable Long reportId) {
-        try {
-            // 서비스 메서드를 호출하여 신고된 게시글 복구 (신고 기록만 삭제)
-            adminReportedService.restoreReportedPost(reportId);
-            return ResponseEntity.ok().build(); // 성공적으로 복구되었음을 응답
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
-        }
-    }
-
-    // 게시글 숨김 처리 API 추가 (status를 HIDDEN으로 설정)
-    @PutMapping("/hidepost/{reportId}")
-    public ResponseEntity<Void> hideReportedPost(@PathVariable Long reportId) {
-        try {
-            // 서비스 메서드를 호출하여 게시글 숨김 처리
-            adminReportedService.hideReportedPost(reportId);
-            return ResponseEntity.ok().build(); // 성공적으로 숨김 처리되었음을 응답
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
-        }
-    }
-
-    // 댓글 숨김 처리 API 추가 (status를 HIDDEN으로 설정)
-    @PutMapping("/hidecomment/{reportId}")
-    public ResponseEntity<Void> hideReportedComment(@PathVariable Long reportId) {
-        try {
-            // 서비스 메서드를 호출하여 댓글 숨김 처리
-            adminReportedService.hideReportedComment(reportId);
-            return ResponseEntity.ok().build(); // 성공적으로 숨김 처리되었음을 응답
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
-        }
-    }
-
-    // 게시글 상태 업데이트 API (status 변경)
-    @PutMapping("/updatepoststatus/{reportId}/{status}")
-    public ResponseEntity<Void> updatePostStatus(@PathVariable Long reportId, @PathVariable String status) {
-        try {
-            // 서비스 메서드를 호출하여 게시글 상태를 업데이트
-            adminReportedService.updatePostStatus(reportId, status);
-            return ResponseEntity.ok().build(); // 성공적으로 상태가 업데이트되었음을 응답
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
-        }
-    }
-
-    // 댓글 상태 업데이트 API (status 변경)
-    @PutMapping("/updatecommentstatus/{reportId}/{status}")
-    public ResponseEntity<Void> updateCommentStatus(@PathVariable Long reportId, @PathVariable String status) {
-        try {
-            // 서비스 메서드를 호출하여 댓글 상태를 업데이트
-            adminReportedService.updateCommentStatus(reportId, status);
+            // 서비스 메서드를 호출하여 신고 상태를 업데이트
+            adminReportedService.updateReportStatus(reportId, status);
             return ResponseEntity.ok().build(); // 성공적으로 상태가 업데이트되었음을 응답
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
