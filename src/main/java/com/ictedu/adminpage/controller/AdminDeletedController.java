@@ -1,8 +1,10 @@
 package com.ictedu.adminpage.controller;
 
-import com.ictedu.bbs.dto.BbsDTO;
-import com.ictedu.bbs.dto.BbsCommentDTO;
+
 import com.ictedu.adminpage.service.AdminDeletedPostService;
+import com.ictedu.bbs.service.BbsCommentDTO;
+import com.ictedu.bbs.service.BbsDto;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class AdminDeletedController {
 
     // 모든 삭제된 게시글 조회 엔드포인트 (BbsDTO 사용)
     @GetMapping("/deletedposts")
-    public ResponseEntity<List<BbsDTO>> getDeletedPosts() {
-        List<BbsDTO> deletedPosts = adminDeletedPostService.getDeletedPosts();  // DTO 사용
+    public ResponseEntity<List<BbsDto>> getDeletedPosts() {
+        List<BbsDto> deletedPosts = adminDeletedPostService.getDeletedPosts();  // DTO 사용
         return ResponseEntity.ok(deletedPosts);
     }
 

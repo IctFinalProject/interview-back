@@ -26,11 +26,9 @@ import com.ictedu.user.service.UserService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/bbs")
@@ -68,14 +66,34 @@ public class BbsController {
     public List<BbsComment> getDeletedComments(){
     	return bbsCommentService.findAllDeletedComments();//삭제된 댓글만 반환
     }
-    
-
-
+    /*
+    // 게시글 단건 조회 (GET 요청)(원본)
+    @GetMapping("/{id}")
+    public ResponseEntity<Bbs> getBbsById(@PathVariable("id") Long id,@RequestParam(value = "increment", defaultValue = "true") boolean increment) {
+        System.out.println("GET 요청: 게시글 ID: " + id); // 한글 콘솔 체크
+        System.out.println("Received increment value: " + increment);
+        Optional<Bbs> bbsOptional = bbsService.findById(id);
+        
+        if (bbsOptional.isPresent()) {
+            Bbs bbs = bbsOptional.get();
+            if (increment) {
+                bbsService.incrementHitcount(id); // 조회수 증가
+            }
+//            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
+            
+            Map<String, byte[]> files = bbs.getFiles();  // 파일 정보를 가져오는 부분
+            return ResponseEntity.ok().body(bbs);
+        } else {
+            System.out.println("게시글 ID " + id + " 못 찾음"); // 한글 콘솔 체크
+            return ResponseEntity.notFound().build();
+        }
+    }
+	*/
     @GetMapping("/{id}")
     public ResponseEntity<Bbs> getBbsById(
         @PathVariable("id") Long id,
         @RequestParam Map<String, String> params,
-    	@RequestParam(value = "userId", required = false) Long userId){
+    	@RequestParam(value = "likeToggle", required = false) Boolean likeToggle){
         // 쿼리 파라미터 로그
         System.out.println("Query Params: " + params);
 
@@ -89,42 +107,28 @@ public class BbsController {
                 bbsService.incrementHitcount(id); // 조회수 증가
             }
             
+         // 좋아요토글
+            if (likeToggle != null) {
+                if (likeToggle) {
+                    bbsService.incrementLikes(id);  // 좋아요 추가
+                } else {
+                    bbsService.decrementLikes(id);  // 좋아요 취소
+                }
+            }
             return ResponseEntity.ok().body(bbs);
         } else {
         	 return ResponseEntity.notFound().build();
         }
     }
-    /*
-    @PostMapping("/{id}/like")
-    public ResponseEntity<Map<String, Object>> toggleLike(
-    	@PathVariable("id") Long bbsId,
-        @RequestParam("userId") Long userId,
-        @RequestParam("likeToggle") Boolean likeToggle) {
-
-    	 bbsService.toggleLike(bbsId, userId, likeToggle);
-    	 Bbs bbs = bbsService.getBbsById(bbsId);
-    	 // 사용자 좋아요 상태 확인
-    	 boolean userLiked = bbsService.getUserLikes(userId).contains(bbsId);
-    	 
-    	 // 응답 생성
-    	 Map<String, Object> response = new HashMap<>();
-    	 //response.put("userLiked", userLiked);
-    	 response.put("userLiked", bbsService.getUserLikes(userId).contains(bbsId));
-    	 response.put("likes", bbs.getLikes());
-         return ResponseEntity.ok(response);
-        
-    }
-    */
     // 게시글 단건 조회 (POST 요청)
     @PostMapping("/search")
     public ResponseEntity<Bbs> getBbsByIdPost(@RequestBody BbsDto bbsDto) {
-        Long id = bbsDto.getId();
+        Long id = bbsDto.getBbsId();  // bbsDto 인스턴스를 통해 호출
         System.out.println("POST 요청: 게시글 ID: " + id); // 한글 콘솔 체크
         Optional<Bbs> bbsOptional = bbsService.findById(id);
         
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
-//            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
             return ResponseEntity.ok().body(bbs);
         } else {
             System.out.println("게시글 ID " + id + " 못 찾음"); // 한글 콘솔 체크

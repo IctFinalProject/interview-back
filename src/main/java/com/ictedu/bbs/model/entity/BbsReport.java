@@ -31,31 +31,11 @@ public class BbsReport {
     @JsonBackReference
     private Bbs bbs;
 
-    // 게시글 등록 날짜 가져오는 메서드
-    public LocalDateTime getBbsCreatedAt() {
-        return this.bbs != null ? this.bbs.getCreatedAt() : null;
-    }
-
-    // 게시글 번호 가져오는 메서드
-    public Long getBbsId() {
-        return this.bbs != null ? this.bbs.getBbsId() : null;
-    }
-
-    // 게시글 제목 가져오는 메서드
-    public String getBbsTitle() {
-        return this.bbs != null ? this.bbs.getTitle() : null;
-    }
-
     // 댓글과의 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", nullable = true)
     @JsonBackReference
     private BbsComment comment;
-
-    // commentId 받아옴
-    public Long getCommentId() {
-        return this.comment != null ? this.comment.getCommentId() : null;
-    }
 
     // 신고자와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
@@ -78,30 +58,23 @@ public class BbsReport {
     @Column(name = "proceeded_time", nullable = true)  // nullable = true 설정
     private LocalDateTime proceededTime;
 
-    // 신고 상태를 Enum으로 관리 (PENDING, HIDDEN, VISIBLE)
-    @Enumerated(EnumType.STRING)  // EnumType.STRING을 사용하여 문자열로 저장
-    @Column(name = "status", nullable = false)
-    private Status status;
+    // 신고 상태 (PENDING, HIDDEN, VISIBLE 등 상태 관리)
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "PENDING";
 
     // 신고 생성 시 기본값 설정
     @PrePersist
     protected void onCreate() {
         this.reportedAt = LocalDateTime.now();  // 신고된 날짜와 시간 기본값
-        this.status = Status.PENDING;  // 기본 상태는 PENDING으로 설정
+        this.status = "PENDING";  // 기본 상태는 PENDING으로 설정
     }
 
     // 신고 처리 시간 업데이트
     @PreUpdate
     protected void onUpdate() {
-        if (this.status == Status.HIDDEN) {
+        if (this.status.equals("HIDDEN")) {
             this.proceededTime = LocalDateTime.now(); // 숨김 처리된 경우 처리 시간 업데이트
         }
     }
 
-    // 게시글 상태를 관리할 enum
-    public enum Status {
-        PENDING,  // 처리 대기 상태
-        HIDDEN,   // 숨김 처리된 상태
-        VISIBLE   // 노출 상태
-    }
 }

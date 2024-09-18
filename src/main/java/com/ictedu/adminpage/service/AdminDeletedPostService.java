@@ -2,10 +2,10 @@ package com.ictedu.adminpage.service;
 
 import com.ictedu.adminpage.repository.AdminDeletedCommentRepository;
 import com.ictedu.adminpage.repository.AdminDeletedPostRepository;
-import com.ictedu.bbs.dto.BbsCommentDTO;
-import com.ictedu.bbs.dto.BbsDTO;
 import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.model.entity.BbsComment;
+import com.ictedu.bbs.service.BbsCommentDTO;
+import com.ictedu.bbs.service.BbsDto;
 
 import jakarta.transaction.Transactional;
 
@@ -28,10 +28,10 @@ public class AdminDeletedPostService {
     private AdminDeletedCommentRepository adminDeletedCommentRepository;
 
     // 삭제된 게시글을 조회할 때 DTO로 변환해서 반환
-    public List<BbsDTO> getDeletedPosts() {
+    public List<BbsDto> getDeletedPosts() {
         List<Bbs> posts = adminDeletedPostRepository.findByDeleted(1);
         return posts.stream()
-                .map(this::convertToBbsDTO)
+                .map(BbsDto::toDto)  // BbsDto의 toDto 메서드를 호출
                 .collect(Collectors.toList());
     }
 
@@ -111,8 +111,8 @@ public class AdminDeletedPostService {
     }
 
     // 엔티티 -> BbsDTO 변환 메서드
-    private BbsDTO convertToBbsDTO(Bbs bbs) {
-        return BbsDTO.builder()
+    private BbsDto convertToBbsDTO(Bbs bbs) {
+        return BbsDto.builder()
                 .bbsId(bbs.getBbsId())
                 .title(bbs.getTitle())
                 .content(bbs.getContent())

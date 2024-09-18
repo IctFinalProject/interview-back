@@ -1,97 +1,94 @@
 package com.ictedu.bbs.service;
 
-import java.time.LocalDate;
-
-
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ictedu.bbs.model.entity.Bbs;
-import com.ictedu.bbs.service.BbsDto;
 import com.ictedu.user.model.entity.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class BbsDto {
-	//엔터티의 필드와 일치하지 않아도 무방 즉 필요한 필드만으로 구성
+
 	private Long id;
-	private User userId;
-	private String username;
-	private String title;
-	private String content;
-	private LocalDateTime createdAt; // LocalDate를 LocalDateTime으로 변경
-	private Long hitCount;
-	private Long likes;
-	private Integer active;
-	private Integer inactive;
-	private Integer reported;
-	private Integer deleted;
-	private LocalDateTime deleted_date;
-	private Integer edited;
-	private LocalDateTime edited_date;
-	private String type;
-	private List<FileBbsDto> files;
-	
-	
-	//DTO를 ENTITY로 변환하는 메소드
-	public Bbs toEntity() {
-		return Bbs.builder()
-				.bbsId(id)
-				.userId(userId)
-				.title(title)
-				.content(content)
-				.createdAt(createdAt)
-				.hitCount(hitCount)
-				.likes(likes)
-				.active(active)
-				.inactive(inactive)
-				.reported(reported)
-				.deleted(deleted)
-				.deleted_date(deleted_date)
-				.edited(edited)
-				.edited_date(edited_date)
-				.type(type)
-				.build();
-	}
-	
-	//ENTITY를 DTO로 변환하는 메소드
-	public static BbsDto toDto(Bbs bbs) {
-		return BbsDto.builder()
-				.id(bbs.getBbsId())
-				.userId(bbs.getUserId())
-				.title(bbs.getTitle())
-				.content(bbs.getContent())
-				.createdAt(bbs.getCreatedAt())
-				.hitCount(bbs.getHitCount())
-				.likes(bbs.getLikes())
-				.active(bbs.getActive())
-				.inactive(bbs.getInactive())
-				.reported(bbs.getReported())
-				.deleted(bbs.getDeleted())
-				.deleted_date(bbs.getDeleted_date())
-				.edited(bbs.getEdited())
-				.edited_date(bbs.getEdited_date())
-				.type(bbs.getType())
-				.build();
-	}
-	
-    // Constructor, getters, and setters
+    private Long bbsId;             // 게시글 ID
+    private String title;           // 게시글 제목
+    private String content;         // 게시글 내용
+    private String username;        // 작성자 이름
+    private Long hitCount;          // 조회수
+    private Long likes;             // 좋아요 수
+    private LocalDateTime createdAt; // 게시글 생성 날짜
+    private LocalDateTime deletedAt; // 게시글 삭제 날짜 (삭제된 경우)
+    private Integer deletedReason;  // 삭제 이유 (일반 삭제인지, 신고로 인한 삭제인지)
+    private String status;          // 게시글 상태 (VISIBLE, HIDDEN 등)
+    private User userId;            // 작성자 ID
+    private Integer active;         // 활성화 상태
+    private Integer inactive;       // 비활성화 상태
+    private Integer reported;       // 신고 여부
+    private Integer deleted;        // 삭제 여부
+    private Integer edited;         // 수정 여부
+    private LocalDateTime editedDate; // 수정 날짜
+    private String type;            // 게시글 타입
+    private List<FileBbsDto> files; // 파일 리스트
+
+    
     public BbsDto(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.userId = user;
     }
-	
-	
+    
+    // Bbs 엔티티 -> BbsDTO 변환 메서드
+    public static BbsDto toDto(Bbs bbs) {
+        return BbsDto.builder()
+                .bbsId(bbs.getBbsId())
+                .title(bbs.getTitle())
+                .content(bbs.getContent())
+                .username(bbs.getUserId() != null ? bbs.getUserId().getUsername() : "Unknown")
+                .hitCount(bbs.getHitCount())
+                .likes(bbs.getLikes())
+                .createdAt(bbs.getCreatedAt())
+                .deletedAt(bbs.getDeleted_date())
+                .deletedReason(bbs.getDeletedReason())
+                .status(bbs.getStatus())
+                .userId(bbs.getUserId())
+                .active(bbs.getActive())
+                .inactive(bbs.getInactive())
+                .reported(bbs.getReported())
+                .deleted(bbs.getDeleted())
+                .edited(bbs.getEdited())
+                .editedDate(bbs.getEdited_date())
+                .type(bbs.getType())
+                .build();
+    }
+
+    // DTO -> Bbs 엔티티 변환 메서드
+    public Bbs toEntity() {
+        return Bbs.builder()
+                .bbsId(bbsId)
+                .userId(userId)
+                .title(title)
+                .content(content)
+                .createdAt(createdAt)
+                .hitCount(hitCount)
+                .likes(likes)
+                .active(active)
+                .inactive(inactive)
+                .reported(reported)
+                .deleted(deleted)
+                .deleted_date(deletedAt)
+                .deletedReason(deletedReason)
+                .status(status)
+                .edited(edited)
+                .edited_date(editedDate)
+                .type(type)
+                .build();
+    }
 }

@@ -1,4 +1,4 @@
-package com.ictedu.bbs.dto;
+package com.ictedu.bbs.service;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

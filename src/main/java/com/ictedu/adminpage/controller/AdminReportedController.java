@@ -66,7 +66,7 @@ public class AdminReportedController {
         response.put("reason", bbsReport.getReason());
         response.put("status", bbsReport.getStatus());
         response.put("reportedAt", bbsReport.getReportedAt().toString());
-        response.put("createdAt", bbsReport.getBbsCreatedAt().toString());
+        response.put("createdAt", bbsReport.getBbs().getCreatedAt().toString()); // Bbs의 createdAt 사용
         response.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
 
         return ResponseEntity.ok(response);
@@ -86,7 +86,7 @@ public class AdminReportedController {
         }
     }
 
-    // 신고된 댓글 목록 조회 API
+ // 신고된 댓글 목록 조회 API
     @GetMapping("/reportedcomments")
     public ResponseEntity<List<Map<String, Object>>> getAllReportedComments() {
         List<BbsReport> reportedComments = adminReportedService.getAllReportedComments();
@@ -96,20 +96,21 @@ public class AdminReportedController {
             Map<String, Object> map = new HashMap<>();
             map.put("reportId", bbsReport.getId());
             map.put("commentContent", bbsReport.getComment().getContent());
-            map.put("username", bbsReport.getComment().getUsername());
+            map.put("username", bbsReport.getComment().getUser().getUsername()); // 댓글 작성자
             map.put("reason", bbsReport.getReason());
-            map.put("title", bbsReport.getBbsTitle());
-            map.put("bbsId", bbsReport.getBbsId());
+            map.put("title", bbsReport.getBbs().getTitle()); // Bbs 엔티티에서 제목 가져오기
+            map.put("bbsId", bbsReport.getBbs().getBbsId()); // Bbs 엔티티에서 ID 가져오기
             map.put("status", bbsReport.getStatus());
-            map.put("createdAt", bbsReport.getBbsCreatedAt());
+            map.put("createdAt", bbsReport.getBbs().getCreatedAt()); // Bbs 엔티티에서 생성 날짜 가져오기
             map.put("reportedAt", bbsReport.getReportedAt().toString());
             map.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
-            map.put("commentId", bbsReport.getCommentId());
+            map.put("commentId", bbsReport.getComment().getCommentId());
             return map;
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
+
 
     // 댓글을 영구 삭제하는 API
     @DeleteMapping("/deletecomment/{commentId}")
@@ -124,17 +125,18 @@ public class AdminReportedController {
         }
     }
 
-    // 게시글 상태 업데이트 API (신고 기록에 따라 상태 변경)
+ // 신고 상태 업데이트 (enum 대신 String으로 상태 처리)
     @PutMapping("/updatestatus/{reportId}/{status}")
     public ResponseEntity<Void> updateReportStatus(@PathVariable Long reportId, @PathVariable String status) {
         try {
             // 서비스 메서드를 호출하여 신고 상태를 업데이트
-            adminReportedService.updateReportStatus(reportId, status);
-            return ResponseEntity.ok().build(); // 성공적으로 상태가 업데이트되었음을 응답
+            adminReportedService.updateReportStatus(reportId, status);  // status를 String으로 받음
+            return ResponseEntity.ok().build();  // 상태 업데이트 성공 시 응답
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null); // 해당 신고번호가 존재하지 않을 경우 404 응답
+            return ResponseEntity.status(404).body(null);  // 해당 신고번호가 없을 경우 404 응답
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 그 외 다른 오류 발생 시 500 응답
+            return ResponseEntity.status(500).body(null);  // 그 외 오류 발생 시 500 응답
         }
     }
+
 }
