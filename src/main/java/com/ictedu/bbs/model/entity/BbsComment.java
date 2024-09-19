@@ -60,9 +60,6 @@ public class BbsComment {
     @Column(name = "edited_at")
     private LocalDateTime editedAt;
 
-    // 상태 (숨김, 노출 관리)
-    @Column(name = "status", nullable = false, length = 10)
-    private String status = "VISIBLE";  // 기본값은 노출 상태
 
     // 댓글 삭제 여부 (소프트 삭제)
     @Column(name = "deleted", nullable = false)
@@ -72,6 +69,16 @@ public class BbsComment {
     @Column(name = "deleted_reason", nullable = false)
     @ColumnDefault("0")
     private Integer deletedReason = 0;
+    
+    // 상태 (숨김, 노출 관리)
+    @Column(name = "status", nullable = false, length = 10)
+    private String status = "VISIBLE";  // 기본값은 노출 상태
+    
+    //상태 변경 메서드 추가
+    public void markAsReported() {
+    	this.deletedReason = 1; //신고로 인한 삭제
+    	this.status = "HIDDEN"; //상태를 숨김으로 변경
+    }
 
     // 삭제된 시간
     @Column(name = "deleted_at")

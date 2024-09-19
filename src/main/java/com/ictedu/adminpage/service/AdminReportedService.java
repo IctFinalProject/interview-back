@@ -98,25 +98,50 @@ public class AdminReportedService {
         bbsCommentRepository.deleteById(commentId);
     }
 
-    // 신고 상태 업데이트
+    // 신고 상태 업데이트 및 복구 처리
     @Transactional
     public void updateReportStatus(Long reportId, String status) {
         BbsReport bbsReport = adminReportedPostRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신고 번호가 없습니다: " + reportId));
 
+        // 게시글 상태 변경
         if (bbsReport.getBbs() != null) {
             Bbs bbs = bbsReport.getBbs();
+            
+            // 복구 시 deletedReason을 0으로 변경
+            if ("VISIBLE".equalsIgnoreCase(status)) {
+                bbs.setDeletedReason(0);
+            }
             bbs.setStatus(status);
             bbsRepository.save(bbs);
         }
 
+        // 댓글 상태 변경 및 복구 처리
         if (bbsReport.getComment() != null) {
             BbsComment comment = bbsReport.getComment();
+            
+            // 복구 시 댓글의 deletedReason을 0으로 변경
+            if ("VISIBLE".equalsIgnoreCase(status)) {
+                comment.setDeletedReason(0); // deletedReason을 0으로 설정
+            }
             comment.setStatus(status);
             bbsCommentRepository.save(comment);
         }
 
+        // 신고 상태 업데이트
         bbsReport.setStatus(status);
         adminReportedPostRepository.save(bbsReport);
+    }
+
+    // 댓글 복구 처리 로직 추가
+    @Transactional
+    public void restoreComment(Long commentId) {
+        BbsComment bbsComment = bbsCommentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다: " + commentId));
+
+        // 댓글의 deletedReason을 0으로 변경하여 복구
+        bbsComment.setDeletedReason(0);  // 삭제 이유 제거
+        bbsComment.setStatus("VISIBLE");  // 상태를 'VISIBLE'로 변경
+        bbsCommentRepository.save(bbsComment);
     }
 }

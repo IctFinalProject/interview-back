@@ -69,12 +69,11 @@ public class BbsReport {
         this.status = "PENDING";  // 기본 상태는 PENDING으로 설정
     }
 
-    // 신고 처리 시간 업데이트
-    @PreUpdate
-    protected void onUpdate() {
-        if (this.status.equals("HIDDEN")) {
-            this.proceededTime = LocalDateTime.now(); // 숨김 처리된 경우 처리 시간 업데이트
-        }
+   //신고 상태에 따른 처리 시간 업데이트 메서드 추가
+    public void updateStatus(String status) {
+    	this.status = status;
+    	if(status.equals("HIDDEN") || status.equals("RESOLVED")) {
+    		this.proceededTime = LocalDateTime.now();//처리 완료 시간
+    	}
     }
-
 }
