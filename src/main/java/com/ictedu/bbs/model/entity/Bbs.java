@@ -267,4 +267,6 @@ public class Bbs {
     public void incrementHitcount() {
         this.hitCount += 1;
     }
+
+    
 }

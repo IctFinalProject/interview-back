@@ -107,19 +107,16 @@ public class BbsController {
                 bbsService.incrementHitcount(id); // 조회수 증가
             }
             
-         // 좋아요토글
-            if (likeToggle != null) {
-                if (likeToggle) {
-                    bbsService.incrementLikes(id);  // 좋아요 추가
-                } else {
-                    bbsService.decrementLikes(id);  // 좋아요 취소
-                }
-            }
+        
             return ResponseEntity.ok().body(bbs);
         } else {
         	 return ResponseEntity.notFound().build();
         }
     }
+    
+   
+   
+    
     // 게시글 단건 조회 (POST 요청)
     @PostMapping("/search")
     public ResponseEntity<Bbs> getBbsByIdPost(@RequestBody BbsDto bbsDto) {
