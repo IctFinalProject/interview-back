@@ -66,29 +66,9 @@ public class BbsController {
     public List<BbsComment> getDeletedComments(){
     	return bbsCommentService.findAllDeletedComments();//삭제된 댓글만 반환
     }
-    /*
+    
     // 게시글 단건 조회 (GET 요청)(원본)
-    @GetMapping("/{id}")
-    public ResponseEntity<Bbs> getBbsById(@PathVariable("id") Long id,@RequestParam(value = "increment", defaultValue = "true") boolean increment) {
-        System.out.println("GET 요청: 게시글 ID: " + id); // 한글 콘솔 체크
-        System.out.println("Received increment value: " + increment);
-        Optional<Bbs> bbsOptional = bbsService.findById(id);
-        
-        if (bbsOptional.isPresent()) {
-            Bbs bbs = bbsOptional.get();
-            if (increment) {
-                bbsService.incrementHitcount(id); // 조회수 증가
-            }
-//            System.out.println("게시글 찾음: " + bbs); // 한글 콘솔 체크
-            
-            Map<String, byte[]> files = bbs.getFiles();  // 파일 정보를 가져오는 부분
-            return ResponseEntity.ok().body(bbs);
-        } else {
-            System.out.println("게시글 ID " + id + " 못 찾음"); // 한글 콘솔 체크
-            return ResponseEntity.notFound().build();
-        }
-    }
-	*/
+   
     @GetMapping("/{id}")
     public ResponseEntity<Bbs> getBbsById(
         @PathVariable("id") Long id,

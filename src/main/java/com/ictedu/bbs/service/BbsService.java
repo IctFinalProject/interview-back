@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.transaction.Transactional;
+
+import com.ictedu.adminpage.model.NoticeModel;
 import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.model.entity.BbsComment;
 import com.ictedu.bbs.repository.BbsCommentRepository;
@@ -138,26 +140,14 @@ public class BbsService {
     }
 
 	
-	//좋아요 증가
-	public void incrementLikes(Long bbsId) {
-		  // BbsRepository 또는 LikeRepository에서 좋아요 추가 로직 구현
-	    Bbs bbs = bbsRepository.findById(bbsId).orElseThrow();
-	    bbs.setLikes(bbs.getLikes() + 1);
-	    bbsRepository.save(bbs);
-
-	   
-		
+    public Bbs createdBbs(Bbs bbs) {
+		//생성 시간 설정
+		if (bbs.getCreatedAt() == null) {
+			bbs.setCreatedAt(null);
+		}
+		return bbsRepository.save(bbs);
 	}
 	
-	public void decrementLikes(Long bbsId) {
-		// BbsRepository 또는 LikeRepository에서 좋아요 취소 로직 구현
-	    Bbs bbs = bbsRepository.findById(bbsId).orElseThrow();
-	    bbs.setLikes(Math.max(bbs.getLikes() - 1, 0));
-	    bbsRepository.save(bbs);
-
-	    
-		
-	}
 	
 	
 }
