@@ -95,7 +95,7 @@ public class ChatGPTService {
         promptBuilder.append("\n\n5. 선정된 직업당 국내 기업 4개씩 추천해줘. 외국 기업은 제외해줘.");
 
         
-        // 회사 이름 중복 검사 및 특정 패턴 방지
+         // 회사 이름 중복 검사 및 특정 패턴 방지
         promptBuilder.append("\n\n6. 회사 이름의 뒤쪽에 같은 단어가 반복되지 않도록 해줘. 예를 들어, '병원', '사무소'처럼 특정 단어로 끝나는 회사가 여러 개 있다면, 그 단어가 계속 반복되지 않도록 다른 회사를 추천해줘.");
         promptBuilder.append("\n   예를 들어, '서울병원', '강남병원', '한강병원'처럼 '병원'으로 끝나는 회사는 1개만 추천해줘.");
 
@@ -124,7 +124,7 @@ public class ChatGPTService {
             promptBuilder.append("\n   간단한 전망: [직업 전망]");
         }
         
-        promptBuilder.append("\n\n<주의> 절대 추가적인 설명이나 사족을 붙이지 말고, 오직 위의 형식으로만 답변해.");
+       
 
         return promptBuilder.toString();
     }

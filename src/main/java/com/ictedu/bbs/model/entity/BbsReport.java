@@ -26,40 +26,22 @@ public class BbsReport {
     private Long id;
 
     // 게시글과의 연관 관계
-    @ManyToOne(fetch = FetchType.LAZY)  
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bbs_id", referencedColumnName = "bbs_id", nullable = false)
     @JsonBackReference
     private Bbs bbs;
 
- // 게시글 등록 날짜 가져오는 메서드
-    public LocalDateTime getBbsCreatedAt() {
-        return this.bbs != null ? this.bbs.getCreatedAt() : null;
-    }
- // 게시글 번호 가져오는 메서드
-    public Long getBbsId() {
-        return this.bbs != null ? this.bbs.getBbsId() : null;
-    }
-
-    // 게시글 제목 가져오는 메서드
-    public String getBbsTitle() {
-        return this.bbs != null ? this.bbs.getTitle() : null;
-    }
-    
     // 댓글과의 연관 관계
-    @ManyToOne(fetch = FetchType.LAZY)  
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", nullable = true)
-    @JsonBackReference 
+    @JsonBackReference
     private BbsComment comment;
-    
-    //commentId 받아옴
-    public Long getCommentId() {
-        return this.comment != null ? this.comment.getCommentId() : null;
-    }
+
     // 신고자와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)  // 신고자 ID
     private User reporter;
-    
+
     // 신고 사유
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;
@@ -76,13 +58,22 @@ public class BbsReport {
     @Column(name = "proceeded_time", nullable = true)  // nullable = true 설정
     private LocalDateTime proceededTime;
 
-    // 신고 상태
-    @Column(name = "status", nullable = false, length = 10)
-    private String status;
+    // 신고 상태 (PENDING, HIDDEN, VISIBLE 등 상태 관리)
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "PENDING";
 
     // 신고 생성 시 기본값 설정
     @PrePersist
     protected void onCreate() {
         this.reportedAt = LocalDateTime.now();  // 신고된 날짜와 시간 기본값
+        this.status = "PENDING";  // 기본 상태는 PENDING으로 설정
+    }
+
+   //신고 상태에 따른 처리 시간 업데이트 메서드 추가
+    public void updateStatus(String status) {
+    	this.status = status;
+    	if(status.equals("HIDDEN") || status.equals("RESOLVED")) {
+    		this.proceededTime = LocalDateTime.now();//처리 완료 시간
+    	}
     }
 }

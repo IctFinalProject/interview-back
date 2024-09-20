@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.transaction.Transactional;
+
+import com.ictedu.adminpage.model.NoticeModel;
 import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.model.entity.BbsComment;
 import com.ictedu.bbs.repository.BbsCommentRepository;
@@ -56,7 +58,8 @@ public class BbsService {
             }
             bbs.setFiles(fileMap);
         }
-        bbs.setDeletedReason(0);  // 앱솔: 기본값 0 설정
+        bbs.setDeletedReason(0);// 신고가 없으므로 기본값 0 설정
+        bbs.setStatus("VISIBLE"); //기본값으로 status를 VISIBLE로 설정
         return bbsRepository.save(bbs);
     }
 
@@ -72,6 +75,7 @@ public class BbsService {
                 .deleted(0)
                 .edited(0)
                 .type("normal")
+                .status("VISIBLE") // 기본값으로 VISIBLE 상태 설정
                 .userId(bbsDto.getUserId())
                 .build();
     }
@@ -80,55 +84,29 @@ public class BbsService {
         return bbsRepository.save(bbs);  // 게시글 업데이트(삭제 상태 포함)
     }
 
+    //게시글 및 댓글 삭제 처리 (신고 시)
     @Transactional
     public void deleteBbs(Long id, boolean isReport) {
         Bbs bbs = bbsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        System.out.println("테스트1");
-        // 게시글 숨김 처리 로그 추가
-        System.out.println("게시글 삭제 처리: " + bbs.getBbsId());
-        System.out.println("테스트2");
-
-        bbs.setDeleted(1);  // 게시글 숨김 처리
-        System.out.println("테스트3");
-
+       
+        bbs.setDeleted(1); //게시글 숨김 처리
+        
+        //신고로 인한 삭제일 경우 삭제 이유를 1로 설정
         if (isReport) {
-        	   System.out.println("테스트4");
-            bbs.setDeletedReason(1);  // 신고로 인한 삭제
-            System.out.println("테스트5");
+        	bbs.setDeletedReason(1); //신고로 인한 삭제
         } else {
-        	   System.out.println("테스트6");
-            bbs.setDeletedReason(0);  // 일반 삭제
-            System.out.println("테스트7");
+        	bbs.setDeletedReason(0); //일반 삭제
         }
-        System.out.println("테스트8");
-
         bbs.setDeleted_date(LocalDateTime.now());
-        System.out.println("테스트9");
-
-        // 댓글 조회 로그 추가
+        
+        // 댓글 숨김 처리
         List<BbsComment> comments = commentRepository.findByBbs_BbsId(bbs.getBbsId());
-        System.out.println("테스트10");
-        System.out.println("댓글 조회 완료: 댓글 개수 = " + comments.size());
-        System.out.println("테스트11");
-
-        // 댓글 숨김처리
         for (BbsComment comment : comments) {
-        	   System.out.println("테스트12");
-            System.out.println("댓글 숨김 처리 시작: " + comment.getCommentId());
-            System.out.println("테스트13");
             comment.setDeleted(1);  // 댓글 숨김 처리
-            System.out.println("테스트14");
             commentRepository.save(comment);  // 댓글 저장
-            System.out.println("테스트15");
-            System.out.println("댓글 숨김 처리 완료: " + comment.getCommentId());
-            System.out.println("테스트16");
         }
-
         bbsRepository.save(bbs);
-        System.out.println("테스트17");
-        System.out.println("게시글과 댓글 모두 숨김 처리 완료");
-        System.out.println("테스트18");
     }
 
 
@@ -162,26 +140,14 @@ public class BbsService {
     }
 
 	
-	//좋아요 증가
-	public void incrementLikes(Long bbsId) {
-		  // BbsRepository 또는 LikeRepository에서 좋아요 추가 로직 구현
-	    Bbs bbs = bbsRepository.findById(bbsId).orElseThrow();
-	    bbs.setLikes(bbs.getLikes() + 1);
-	    bbsRepository.save(bbs);
-
-	   
-		
+    public Bbs createdBbs(Bbs bbs) {
+		//생성 시간 설정
+		if (bbs.getCreatedAt() == null) {
+			bbs.setCreatedAt(null);
+		}
+		return bbsRepository.save(bbs);
 	}
 	
-	public void decrementLikes(Long bbsId) {
-		// BbsRepository 또는 LikeRepository에서 좋아요 취소 로직 구현
-	    Bbs bbs = bbsRepository.findById(bbsId).orElseThrow();
-	    bbs.setLikes(Math.max(bbs.getLikes() - 1, 0));
-	    bbsRepository.save(bbs);
-
-	    
-		
-	}
 	
 	
 }

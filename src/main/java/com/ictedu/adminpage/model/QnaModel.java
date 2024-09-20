@@ -64,5 +64,7 @@ public class QnaModel {
 	@Column(name = "qna_status", nullable = false, length = 1)
 	private String qnaStatus = "N";  // 상태 ('N' - New, 'T' - In Progress, 'P' - Processed)
 
+	@Column(name ="qna_pasword", nullable = false, length = 255)
+	private String qnaPassword; //QNA 패스워드
 	
 }
