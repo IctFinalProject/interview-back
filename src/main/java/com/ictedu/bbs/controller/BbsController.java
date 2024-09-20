@@ -148,7 +148,7 @@ public class BbsController {
     public ResponseEntity<?> createBbs(@RequestParam("title") String title,
                                        @RequestParam("content") String content,
                                        @RequestParam("id") String userId,
-                                       @RequestParam("files") List<MultipartFile> files) throws IOException {
+                                       @RequestParam(value="files", required = false) List<MultipartFile> files) throws IOException {
         Optional<User> userOptional = userService.findById(userId);
         if (!userOptional.isPresent()) {
             System.out.println("잘못된 사용자 ID: " + userId); // 한글 콘솔 체크
