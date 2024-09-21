@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ictedu.adminpage.model.QnaModel;
 import com.ictedu.adminpage.repository.QnaRepository;
@@ -32,7 +34,7 @@ public class QnaService {
         if (qnaOpt.isPresent()) {
             QnaModel qna = qnaOpt.get();
             Optional<User> userOpt = userRepository.findById(userId);
-            User user = userOpt.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+            User user = userOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found with id: " + userId));
             
             // 관리자는 비밀번호 없이 모든 글을 볼 수 있음
             if (user.getIsAdmin()) {
@@ -43,7 +45,8 @@ public class QnaService {
             if (qna.getQnaPassword().equals(inputPassword)) {
                 return qnaOpt;  // 비밀번호가 맞으면 반환
             } else {
-                throw new IllegalArgumentException("Incorrect password");
+            	//비밀번호가 틀렸을 때 Optional.empty()를 반환
+                return Optional.empty();
             }
         }
         return Optional.empty(); // QnA가 없으면 빈 값 반환
@@ -68,7 +71,7 @@ public class QnaService {
     }
 
     // QnA를 업데이트하는 메서드
-    public QnaModel updateQna(Long qnaId, QnaModel updatedQnaData) {
+    public Optional<QnaModel> updateQna(Long qnaId, QnaModel updatedQnaData) {
         Optional<QnaModel> qnaOpt = qnaRepository.findById(qnaId);
 
         if (qnaOpt.isPresent()) {
@@ -76,8 +79,8 @@ public class QnaService {
             qnaModel.setQnaAnswer(updatedQnaData.getQnaAnswer());
             qnaModel.setQnaStatus(updatedQnaData.getQnaStatus());
             qnaModel.setQnaEditedTime(LocalDate.now()); // 수정 시간 업데이트
-            return qnaRepository.save(qnaModel);
+            return Optional.of(qnaRepository.save(qnaModel));
         }
-        return null;
+        return Optional.empty();
     }
 }
