@@ -51,7 +51,7 @@ public class ProofreadMotivationService {
         promptBuilder.append("수정 이유를 보여줄때는 - 하이푼으로 문장을 시작하고 수정 전 문장과 수정된 문장이 반드시 함께 나와야 해.\n");
 
         promptBuilder.append("<필수>\n");
-        promptBuilder.append("위에서 언급한 3, 4, 5, 6, 7, 8, 9, 10번, 11번을 모두 지켜야 해.\n");
+        promptBuilder.append("위에서 내가 언급한 내용들을 모두 지켜야 해.\n");
         promptBuilder.append("너는 첨삭 결과 외에는 아무것도 표시하면 안 돼.\n");
         promptBuilder.append("내가 너에게 주는 지시 사항이나, 너가 나한테 대답하는 내용은 절대로 첨삭 결과에 포함되면 안 돼.\n");
         promptBuilder.append("결과에는 오직 첨삭 메시지와 관련된 내용만 포함시키고, 그 외의 불필요한 텍스트나 내용은 절대로 포함시키지 마.\n");

@@ -7,12 +7,16 @@ import com.ictedu.resume.service.ResumeService;
 import com.ictedu.user.model.entity.User;
 import com.ictedu.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +39,12 @@ public class ResumeController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadResume(@RequestParam("email") String email,
                                           @RequestParam("file") MultipartFile file,
-                                          @RequestParam("title") String title) {
+                                          @RequestParam("title") String title,
+                                          @RequestParam("desired_company") String desiredCompany) { // 원하는 기업명 추가
         try {
             Optional<User> user = userService.findByEmail(email);
             if (user.isPresent()) {
-                ResumeEntity savedResume = resumeService.saveResume(file, title, user.get());
+                ResumeEntity savedResume = resumeService.saveResume(file, title, desiredCompany, user.get());
                 return ResponseEntity.ok(Map.of("message", "이력서가 성공적으로 업로드되었습니다.", "resumeId", savedResume.getResumeId()));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
@@ -61,16 +66,35 @@ public class ResumeController {
     }
 
     @GetMapping("/download/{resumeId}")
-    public ResponseEntity<?> downloadResume(@PathVariable Long resumeId) {
+    public ResponseEntity<?> downloadResume(@PathVariable Long resumeId) throws UnsupportedEncodingException {
         Optional<ResumeEntity> resume = resumeService.findResumeById(resumeId);
         if (resume.isPresent()) {
-            return ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=resume.pdf")
-                    .body(resume.get().getResumePdf());
+            ResumeEntity resumeEntity = resume.get();
+            String resumeTitle = resumeEntity.getTitle().replaceAll("[^a-zA-Z0-9가-힣]", "_") + ".pdf";  // 제목에서 특수문자를 _로 대체하고 확장자 추가
+
+            // UTF-8로 인코딩된 파일 이름을 지원하기 위해 filename* 사용
+            String encodedFilename = URLEncoder.encode(resumeTitle, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+
+            // 디버깅 로그
+            System.out.println("파일 다운로드 요청이 처리되었습니다.");
+            System.out.println("Content-Disposition 헤더: attachment; filename=\"" + resumeTitle + "\"");
+            System.out.println("파일 크기: " + resumeEntity.getResumePdf().length + " 바이트");
+            System.out.println("실제 Content-Disposition 헤더: attachment; filename*=UTF-8''" + encodedFilename);
+            
+            ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
+                .header(HttpHeaders.CONTENT_TYPE, "application/pdf");  // MIME 타입 설정
+            
+            // 응답에 실제 Content-Disposition 헤더가 포함되었는지 확인하기 위해
+            System.out.println("ResponseEntity Headers: " + responseBuilder.build().getHeaders());
+
+            return responseBuilder.body(resumeEntity.getResumePdf());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("이력서를 찾을 수 없습니다.");
         }
     }
+
+
 
     @DeleteMapping("/delete/{resumeId}")
     public ResponseEntity<?> deleteResume(@PathVariable Long resumeId) {

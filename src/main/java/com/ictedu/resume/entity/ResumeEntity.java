@@ -55,4 +55,6 @@ public class ResumeEntity {
     @Column(name = "keywords_motivation")
     private String keywordsMotivation;
     
+    @Column(name = "desired_company")
+    private String desiredCompany;
 }

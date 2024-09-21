@@ -38,10 +38,11 @@ public class ResumeService {
     private UserService userService;
     
     @Transactional
-    public ResumeEntity saveResume(MultipartFile file, String title, User user) throws IOException {
+    public ResumeEntity saveResume(MultipartFile file, String title, String desiredCompany, User user) throws IOException {
         ResumeEntity resumeEntity = ResumeEntity.builder()
                 .resumePdf(file.getBytes())
                 .title(title)
+                .desiredCompany(desiredCompany) // 입사 희망 기업명 설정
                 .user(user)
                 .createdDate(LocalDateTime.now())
                 .build();
