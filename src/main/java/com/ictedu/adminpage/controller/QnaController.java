@@ -26,7 +26,10 @@ import com.ictedu.user.service.UserService;
 @RestController
 @RequestMapping("/api/qna")
 public class QnaController {
-	
+
+	@Autowired
+	private UserService userService;
+
 	@Autowired
 	private QnaService qnaService;
 
@@ -96,6 +99,19 @@ public class QnaController {
 		return ResponseEntity.ok(newQna);
 	}
 
+	//관리자만 접근 가능한 QnA 상세보기 엔드포인트
+	@GetMapping("/details/{qnaId}")
+	public ResponseEntity<QnaModel> getQnaDetailsById(@PathVariable Long qnaId) {
+
+		Optional<QnaModel> qnaOpt = qnaService.getQnaById(qnaId);
+		if(!qnaOpt.isPresent()) {
+			return ResponseEntity.notFound().build(); //QnA가 없을 때 404에러
+		}
+
+		QnaModel qna = qnaOpt.get();
+		return ResponseEntity.ok(qna);
+	}
+
 
 	// QnA를 업데이트하는 엔드포인트
 	@PutMapping("/{qnaId}")
@@ -112,18 +128,27 @@ public class QnaController {
 		}
 	}
 
-	 // QnA를 삭제하는 엔드포인트
-    @DeleteMapping("/{qnaId}")
-    public ResponseEntity<Void> deleteQna(@PathVariable Long qnaId, @RequestParam Long userId) {
-        Optional<QnaModel> existingQnaOpt = qnaService.getQnaById(qnaId);
-        if (existingQnaOpt.isPresent()) {
-            qnaService.deleteQna(qnaId);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-		
+	// QnA를 삭제하는 엔드포인트
+	@DeleteMapping("/{qnaId}")
+	public ResponseEntity<Void> deleteQna(@PathVariable Long qnaId, @RequestParam Long userId) {
+		// 사용자 정보 조회
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		// 삭제하려는 QnA가 본인의 것인지 또는 관리자인지 확인
+		Optional<QnaModel> existingQnaOpt = qnaService.getQnaById(qnaId);
+		if (existingQnaOpt.isPresent()) {
+			QnaModel existingQna = existingQnaOpt.get();
+			if (existingQna.getUser().getId().equals(user.getId()) || user.getIsAdmin()) {
+				qnaService.deleteQna(qnaId);
+				return ResponseEntity.noContent().build();
+			} else {
+				return ResponseEntity.status(403).build(); // 권한이 없을 때 403 Forbidden
+			}
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 	// QnA 답변을 등록하고 상태를 업데이트하는 엔드포인트
 	@PutMapping("/answer/{qnaId}")
 	public ResponseEntity<QnaModel> answerQna(
