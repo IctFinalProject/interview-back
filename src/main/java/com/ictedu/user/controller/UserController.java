@@ -419,7 +419,7 @@ public class UserController {
 		System.out.println("newPay: "+ newPaymentInfo);
 		return ResponseEntity.status(statusCode).body(newPaymentInfo);
 	}
-	
+
 	//회원 수 조회 엔드포인트 추가
 	@GetMapping("/users/count")
 	public ResponseEntity<Long> getUsersCount(){
@@ -490,5 +490,53 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
 		}
 	}
+	// 회원 비활성화 엔드포인트
+	@PostMapping("/deactivateUser")
+	public ResponseEntity<?> deactivateUser(@RequestParam("email") String email) {
+	    Optional<User> userOptional = userRepository.findByEmail(email);
+	    
+	    if (userOptional.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+	    }
+
+	    User user = userOptional.get();
+	    user.setIsActivated(0); // 비활성화
+	    userRepository.save(user);
+
+	    return ResponseEntity.ok("사용자가 성공적으로 비활성화되었습니다.");
+	}
+	// 회원 활성화 엔드포인트
+	@PostMapping("/activateUser")
+	public ResponseEntity<?> activateUser(@RequestParam("email") String email) {
+	    Optional<User> userOptional = userRepository.findByEmail(email);
+	    
+	    if (userOptional.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+	    }
+
+	    User user = userOptional.get();
+	    user.setIsActivated(1); // 활성화
+	    userRepository.save(user);
+
+	    return ResponseEntity.ok("사용자가 성공적으로 활성화되었습니다.");
+	}
+	
+	//회원 탈퇴 엔드포인트(탈퇴 시간까지)
+	@PostMapping("/deleteUser")
+	public ResponseEntity<?> deleteUser(@RequestParam("email") String email) {
+	    Optional<User> userOptional = userRepository.findByEmail(email);
+	    
+	    if (userOptional.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+	    }
+
+	    User user = userOptional.get();
+	    user.setIsDeleted(1); // 탈퇴 처리
+	    user.setDeletedTime(LocalDateTime.now()); // 탈퇴 시간 기록
+	    userRepository.save(user);
+
+	    return ResponseEntity.ok("사용자가 성공적으로 탈퇴되었습니다.");
+	}
+
 
 }
