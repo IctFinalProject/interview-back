@@ -31,20 +31,22 @@ public class AdminReportedController {
     public ResponseEntity<List<Map<String, Object>>> getAllReportedPosts() {
         List<BbsReport> reportedPosts = adminReportedService.getAllReportedPosts();
 
-        // 신고된 게시글에 대한 정보 반환
-        List<Map<String, Object>> response = reportedPosts.stream().map(bbsReport -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("reportId", bbsReport.getId());
-            map.put("title", bbsReport.getBbs().getTitle());
-            map.put("content", bbsReport.getBbs().getContent());
-            map.put("username", bbsReport.getBbs().getUsername());
-            map.put("reason", bbsReport.getReason());
-            map.put("status", bbsReport.getStatus());
-            map.put("reportedAt", bbsReport.getReportedAt().toString());
-            map.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
-            map.put("deletedReason", bbsReport.getBbs().getDeletedReason());
-            return map;
-        }).collect(Collectors.toList());
+     // 게시글에 대한 신고만 필터링
+        List<Map<String, Object>> response = reportedPosts.stream()
+            .filter(bbsReport -> bbsReport.getComment() == null) // 댓글 신고는 제외
+            .map(bbsReport -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("reportId", bbsReport.getId());
+                map.put("title", bbsReport.getBbs().getTitle());
+                map.put("content", bbsReport.getBbs().getContent());
+                map.put("username", bbsReport.getBbs().getUsername());
+                map.put("reason", bbsReport.getReason());
+                map.put("status", bbsReport.getStatus());
+                map.put("reportedAt", bbsReport.getReportedAt().toString());
+                map.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
+                map.put("deletedReason", bbsReport.getBbs().getDeletedReason());
+                return map;
+            }).collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
