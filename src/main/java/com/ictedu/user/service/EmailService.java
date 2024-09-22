@@ -17,7 +17,7 @@ public class EmailService {
         String code = generateVerificationCode();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
-        message.setSubject("[VIP] 사용자님의 인증코드 입니다.");
+        message.setSubject("[FocusJob] 사용자님의 인증코드 입니다.");
         message.setText("인증코드는: " + code);
         mailSender.send(message);
         return code;
