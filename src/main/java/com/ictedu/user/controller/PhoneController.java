@@ -45,7 +45,7 @@ public class PhoneController {
         Message message = new Message();
         message.setFrom(senderNumber); // 등록된 발신 번호 사용
         message.setTo(phoneNumber);
-        message.setSubject("[VIP] 사용자님의 인증코드 입니다.");
+        message.setSubject("[FocusJob] 사용자님의 인증코드 입니다.");
         message.setText("인증코드는: " + code);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
