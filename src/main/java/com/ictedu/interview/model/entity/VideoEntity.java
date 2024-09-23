@@ -26,6 +26,7 @@ public class VideoEntity {
     @Column(name = "question_id")
     private Long questionId;
     
+    @Lob
     @Column(name = "question_text")
     private String questionText;
 
