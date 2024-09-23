@@ -43,11 +43,13 @@ public class VideoUploadController {
     @PostMapping("/upload-video")
     public ResponseEntity<?> uploadVideo(@RequestParam("video") MultipartFile video,
                                          @RequestParam("userId") Long userId,
-                                         @RequestParam("questionId") Long questionId) {
+                                         @RequestParam("questionId") Long questionId,
+                                         @RequestParam("choosedResume") String choosedResume,
+                                         @RequestParam("questionText") String questionText) {
         logger.info("Received file: {} with size: {}", video.getOriginalFilename(), video.getSize());
         try {
             // 1. Google Drive에 파일 업로드 및 링크 생성
-            VideoEntity videoEntity = videoUploadService.processVideo(video, userId, questionId);
+            VideoEntity videoEntity = videoUploadService.processVideo(video, userId, questionId, choosedResume, questionText);
 
             // 2. FastAPI 서버에 Google Drive 링크를 보내 분석 요청
             String analysisUrl = fastApiServerUrl + "/analyze-video/";

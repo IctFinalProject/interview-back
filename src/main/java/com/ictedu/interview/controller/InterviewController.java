@@ -49,7 +49,7 @@ public class InterviewController {
         this.userRepository = userRepository;
         this.questionService = questionService;
     }
-    
+    /*
 	@GetMapping("/getmockquestion")
 	public ResponseEntity<?> getMockQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
 	    try {
@@ -104,8 +104,62 @@ public class InterviewController {
 	        System.out.println("userId 변환 실패: " + e.getMessage());
 	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
 	    }
-	}
-	
+	}*/
+    @GetMapping("/getmockquestion")
+    public ResponseEntity<?> getMockQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
+        try {
+            Long userIdLong = Long.parseLong(userId);
+            Long choosedResumeLong = Long.parseLong(choosedResume);
+            Optional<User> getUser = userRepository.findById(userIdLong);
+            User user = getUser.orElseThrow(() -> new RuntimeException("User not found"));
+            Optional<ResumeEntity> getResume = resumeService.findResumeById(choosedResumeLong);
+            ResumeEntity resume = getResume.orElseThrow(() -> new RuntimeException("Resume not found"));
+
+            String selfIntroduction = resume.getKeywordsSelfIntroduction();
+            String motivation = resume.getKeywordsMotivation();
+            String desiredCompany = resume.getDesiredCompany();
+            List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
+            
+            List<Question> commonQuestions = interviewService.generateQuestions("common", dbKeywords, 3, user, desiredCompany);
+            List<Question> resumeQuestions = interviewService.generateQuestions("resume", dbKeywords, 3, user, desiredCompany);
+
+            Map<String, List<Question>> response = new HashMap<>();
+            response.put("commonQuestions", commonQuestions);
+            response.put("resumeQuestions", resumeQuestions);
+            return ResponseEntity.ok(response);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("유저 또는 이력서 ID 형식이 일치하지 않습니다!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getrealquestion")
+    public ResponseEntity<?> getRealQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
+        try {
+            Long userIdLong = Long.parseLong(userId);
+            Long choosedResumeLong = Long.parseLong(choosedResume);
+            Optional<User> getUser = userRepository.findById(userIdLong);
+            User user = getUser.orElseThrow(() -> new RuntimeException("User not found"));
+            Optional<ResumeEntity> getResume = resumeService.findResumeById(choosedResumeLong);
+            ResumeEntity resume = getResume.orElseThrow(() -> new RuntimeException("Resume not found"));
+
+            String selfIntroduction = resume.getKeywordsSelfIntroduction();
+            String motivation = resume.getKeywordsMotivation();
+            String desiredCompany = resume.getDesiredCompany();
+            List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
+            
+            List<Question> resumeQuestions = interviewService.generateRealQuestions(dbKeywords, user, desiredCompany);
+
+            Map<String, List<Question>> response = new HashMap<>();
+            response.put("resumeQuestions", resumeQuestions);
+            return ResponseEntity.ok(response);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("유저 또는 이력서 ID 형식이 일치하지 않습니다!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @GetMapping("/getinterviewquestions")
     public ResponseEntity<?> getInterviewQuestions(@RequestParam List<Long> questionId) {
         System.out.println("Received question IDs: " + questionId);

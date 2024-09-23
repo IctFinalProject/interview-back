@@ -35,8 +35,6 @@ public class VideoAnalysis {
     @Column(name = "eye_score", nullable = true)
     private Double eyeScore;
 
-    @Column(name = "pose_score", nullable = true)
-    private Double poseScore;
 
     @Column(name = "avg_score")
     private Double avgScore;
