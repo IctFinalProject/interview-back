@@ -26,16 +26,15 @@ public class ExtractKeywordsService {
             .readTimeout(120, TimeUnit.SECONDS)
             .build();
 
-        // 프롬프트 생성
+      /// 프롬프트 생성
         StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder.append("우리는 사용자가 입력한 텍스트에서 핵심 키워드를 추출하고자 합니다.\n");
-        promptBuilder.append("다음 텍스트를 읽고 그 텍스트에서 중요한 키워드를 추출해 주세요.\n");
-        promptBuilder.append("추출된 키워드는 간결하고 의미가 잘 전달되도록 작성해 주세요.\n");
+        promptBuilder.append("우리는 사용자가 입력한 텍스트에서 가능한 많은 키워드를 추출하고자 합니다.\n");
+        promptBuilder.append("다음 텍스트를 읽고 그 텍스트에서 중요한 키워드와 관련된 모든 내용을 추출해 주세요.\n");
+        promptBuilder.append("텍스트의 모든 핵심 주제와 세부 사항을 고려한 키워드를 나열해 주세요.\n");
+        promptBuilder.append("추출된 키워드는 가능한 한 텍스트의 전반적인 내용을 반영하여 포괄적으로 작성해 주세요.\n");
         promptBuilder.append("키워드는 쉼표로 구분하여 나열해 주세요.\n");
-        promptBuilder.append("반드시 추출된 키워드 단어들만 나열해주세요.\n");
         promptBuilder.append("텍스트:\n");
         promptBuilder.append(text);
-
         String prompt = promptBuilder.toString();
 
         // JSON 요청 본문 생성
