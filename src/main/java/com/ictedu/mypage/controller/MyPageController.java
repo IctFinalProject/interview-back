@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ictedu.bbs.model.entity.Bbs;
 import com.ictedu.bbs.model.entity.BbsComment;
 import com.ictedu.bbs.service.BbsCommentService;
+import com.ictedu.bbs.service.BbsReportService;
 import com.ictedu.bbs.service.BbsService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,9 @@ public class MyPageController {
 	@Autowired
     private BbsService bbsService;
 	
+	@Autowired
+    private BbsReportService bbsReportService;
+	
 	@PostMapping("/getMyBbsComment")
     public List<BbsComment> getMyBbsComment(@RequestBody Long userId) {
         return bbsCommentService.findByUserId(userId);
@@ -37,4 +41,10 @@ public class MyPageController {
     public List<Bbs> getMyBbsPost(@RequestBody Long userId) {
         return bbsService.findByUserId(userId);
     }
+	
+	@PostMapping("/getReportPosts")
+    public List<Bbs> getReportPosts(@RequestBody Long userId) {
+        return bbsService.findByUserId(userId);
+    }
+	
 }

@@ -44,6 +44,7 @@ public class AdminReportedController {
                 map.put("status", bbsReport.getStatus());
                 map.put("reportedAt", bbsReport.getReportedAt().toString());
                 map.put("reporterName", bbsReport.getReporter() != null ? bbsReport.getReporter().getUsername() : "Unknown");
+                map.put("reporterId", bbsReport.getReporter() != null ? bbsReport.getReporter().getId() : null); // 추가한사람 윤지은
                 map.put("deletedReason", bbsReport.getBbs().getDeletedReason());
                 return map;
             }).collect(Collectors.toList());

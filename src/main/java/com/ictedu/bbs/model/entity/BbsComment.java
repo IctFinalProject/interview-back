@@ -92,6 +92,10 @@ public class BbsComment {
     public String getBbsTitle() {
         return bbs != null ? bbs.getTitle() : "No Title";
     }
+    
+    public Long getBbsId() {
+        return bbs.getBbs_id();
+    }
 
     // 삭제된 이유 반환
     public Integer getDeletedReason() {
