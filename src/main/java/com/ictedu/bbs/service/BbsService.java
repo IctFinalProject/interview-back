@@ -148,6 +148,10 @@ public class BbsService {
 		return bbsRepository.save(bbs);
 	}
     
+    public List<Bbs> findByUserId(Long id){
+    	return bbsRepository.findByUserId_Id(id);
+    }
+    
     
 	
 	

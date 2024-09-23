@@ -34,7 +34,6 @@ public class BbsComment {
     // BBS 엔티티와의 관계 (댓글이 달린 게시글)
     @ManyToOne
     @JoinColumn(name = "bbs_id", referencedColumnName = "bbs_id", nullable = false)
-    @JsonBackReference  // 양방향 참조 방지
     @JsonIgnore
     private Bbs bbs;
 

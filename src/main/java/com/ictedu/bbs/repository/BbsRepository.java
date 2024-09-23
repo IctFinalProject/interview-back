@@ -33,4 +33,6 @@ public interface BbsRepository extends JpaRepository<Bbs, Long> {
     // status가 NULL이거나 'VISIBLE'인 게시글 조회 (NULL 방지)
     @Query("SELECT b FROM Bbs b WHERE b.status IS NULL OR b.status = 'VISIBLE'")
     List<Bbs> findVisibleOrNullStatusPosts();
+    
+    List<Bbs> findByUserId_Id(Long userId);
 }
