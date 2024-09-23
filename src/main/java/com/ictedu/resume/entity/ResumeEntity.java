@@ -48,11 +48,11 @@ public class ResumeEntity {
     @Column(name = "title", nullable = false)
     private String title;
     
-    @Column(name = "keywords_self_introduction")
+    @Column(name = "keywords_self_introduction", length = 2000)
     private String keywordsSelfIntroduction;
     
 
-    @Column(name = "keywords_motivation")
+    @Column(name = "keywords_motivation", length = 2000)
     private String keywordsMotivation;
     
     @Column(name = "desired_company")
