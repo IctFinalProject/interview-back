@@ -147,6 +147,8 @@ public class BbsService {
 		}
 		return bbsRepository.save(bbs);
 	}
+    
+    
 	
 	
 	

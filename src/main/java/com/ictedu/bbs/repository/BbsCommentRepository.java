@@ -22,4 +22,6 @@ public interface BbsCommentRepository extends JpaRepository<BbsComment, Long> {
     List<BbsComment> findByStatus(String status);
     
     List<BbsComment> findByBbs_BbsId(Long bbsId);
+    
+    List<BbsComment> findByUserIdAndDeleted(Long id, int deleted);
 }

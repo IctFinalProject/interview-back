@@ -62,4 +62,8 @@ public class BbsCommentService {
     public List<BbsComment> findAllDeletedComments() {
         return commentRepository.findByDeleted(1); // deleted 값이 1인 댓글만 조회
     }
+    
+    public List<BbsComment> findByUserId(Long id) {
+        return commentRepository.findByUserIdAndDeleted(id, 0);  // 삭제 여부에 따른 게시글 조회
+    }
 }
