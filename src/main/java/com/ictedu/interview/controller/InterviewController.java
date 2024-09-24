@@ -178,7 +178,7 @@ public class InterviewController {
                     question.getUpdatedTime()
                 ))
                 .collect(Collectors.toList());
-        System.out.println("퀘스천DTO: "+questionDTOs);
+//        System.out.println("퀘스천DTO: "+questionDTOs);
         return ResponseEntity.ok(questionDTOs);  // DTO를 반환
     }
     
@@ -210,7 +210,7 @@ public class InterviewController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 비디오가 존재하지 않습니다.");
             }
             
-            System.out.println("비디오 반환: " + response);
+//            System.out.println("비디오 반환: " + response);
             return ResponseEntity.ok(response);  // DTO를 리턴
         } catch (NumberFormatException e) {
             // videoId가 Long으로 변환되지 못했을 때
