@@ -106,5 +106,9 @@ public class UserService {
             return Optional.empty();
         }
     }
+
+	public Optional<User> findUserByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
 	
 }

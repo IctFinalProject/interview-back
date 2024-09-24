@@ -96,29 +96,40 @@ public class UserController {
 
 	@PostMapping("/edituser")
 	public ResponseEntity<?> editUser(
-			@RequestParam("email") String email,
-			@RequestParam("username") String username,
-			@RequestParam("address") String address,
-			@RequestParam("birth") String birth,
-			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-		try {
-			InputUser inputUser = new InputUser(
-					email, 
-					username, 
-					address, 
-					birth, 
-					profileImage != null ? profileImage.getBytes() : null);
-			boolean isUpdated = userService.updateUser(inputUser);
-			System.out.println("isUpdated: " + isUpdated);
+	        @RequestParam("email") String email,
+	        @RequestParam("username") String username,
+	        @RequestParam("address") String address,
+	        @RequestParam("birth") String birth,
+	        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+	    try {
+	        // 기존 유저 정보를 조회
+	        Optional<User> existingUser = userService.findUserByEmail(email);
+	        byte[] profileImageData;
 
-			if (isUpdated) {
-				return ResponseEntity.ok("유저정보가 성공적으로 변경되었습니다.");
-			} else {
-				return ResponseEntity.status(515).body("유저정보 변경에 실패하였습니다.");
-			}
-		} catch (IOException e) {
-			return ResponseEntity.status(514).body("프로필 사진에서 오류가 발생하였습니다.");
-		}
+	        // 사용자가 프로필 이미지를 수정한 경우 처리
+	        if (profileImage != null && !profileImage.isEmpty()) {
+	            profileImageData = profileImage.getBytes();
+	        } else {
+	            // 수정하지 않았을 경우 기존 프로필 이미지 유지
+	            profileImageData = existingUser.get().getProfileImage();
+	        }
+
+	        InputUser inputUser = new InputUser(
+	                email, 
+	                username, 
+	                address, 
+	                birth, 
+	                profileImageData);
+	        boolean isUpdated = userService.updateUser(inputUser);
+
+	        if (isUpdated) {
+	            return ResponseEntity.ok("유저정보가 성공적으로 변경되었습니다.");
+	        } else {
+	            return ResponseEntity.status(515).body("유저정보 변경에 실패하였습니다.");
+	        }
+	    } catch (IOException e) {
+	        return ResponseEntity.status(514).body("프로필 사진에서 오류가 발생하였습니다.");
+	    }
 	}
 
 	//    @GetMapping("/findAllUser")
