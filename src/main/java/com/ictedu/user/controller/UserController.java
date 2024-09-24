@@ -188,13 +188,13 @@ public class UserController {
 		// 여러 개의 결제 정보를 가져오기 위해 findAllByUserId 사용
 		List<PaymentInfo> paymentInfoList = paymentService.findAllByUserId(optionalUser.get());
 
-		// isCanceled가 0인 결제 정보만 필터링
+		// isCanceled가 0이고, useCount가 1 이상인 결제 정보만 필터링
 		List<PaymentInfo> filteredPaymentInfoList = paymentInfoList.stream()
-				.filter(paymentInfo -> paymentInfo.getIsCanceled() == 0)
-				.collect(Collectors.toList());
+		        .filter(paymentInfo -> paymentInfo.getIsCanceled() == 0 && paymentInfo.getUseCount() >= 1)
+		        .collect(Collectors.toList());
 
 		if (filteredPaymentInfoList.isEmpty()) {
-			return ResponseEntity.notFound().build();
+		    return ResponseEntity.notFound().build();
 		}
 
 		//        System.out.println("결제정보 찾은 유저: " + filteredPaymentInfoList);
