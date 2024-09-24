@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ictedu.interview.model.dto.QuestionDTO;
+import com.ictedu.interview.model.dto.VideoDTO;
 import com.ictedu.interview.model.dto.VideoDetailsDTO;
 import com.ictedu.interview.model.entity.Question;
 import com.ictedu.interview.model.entity.VideoEntity;
@@ -186,7 +187,8 @@ public class InterviewController {
     	System.out.println("받은 userId: "+userId);
     	try {
     		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
-    		List<VideoEntity> response = interviewService.getResultsByIds(userIdLong);
+    		List<VideoDTO> response = interviewService.getResultsByIds(userIdLong);
+    		System.out.println("응답이 왔어요!");
     		return ResponseEntity.ok(response);
     	} catch (NumberFormatException e) {
 	        // 변환 실패 시 예외 처리

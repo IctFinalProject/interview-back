@@ -2,6 +2,7 @@ package com.ictedu.interview.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.ictedu.interview.model.dto.VideoDTO;
 import com.ictedu.interview.model.dto.VideoDetailsDTO;
 import com.ictedu.interview.model.entity.ClaudeAnalysis;
 import com.ictedu.interview.model.entity.Interview;
@@ -299,10 +301,11 @@ public class InterviewService {
 	    return String.format(basePrompt, type, String.join(", ", resumeKeywords), String.join(", ", companies), type);
 	}
 
-	@Transactional
-	public List<VideoEntity> getResultsByIds(Long userIdLong) {
-		List<VideoEntity> videos = videoRepository.findAllByUserId(userIdLong);
-		return videos;
+	public List<VideoDTO> getResultsByIds(Long userIdLong) {
+	    List<VideoEntity> videos = videoRepository.findAllByUserId(userIdLong);
+	    return videos.stream()
+	                 .map(video -> new VideoDTO(video.getId(), video.getFileName(), video.getFilePath(), video.getUserId(), video.getQuestionId(), video.getQuestionText(), video.getFileSize(), video.getUploadDate(), video.getAnswerDuration()))
+	                 .collect(Collectors.toList());
 	}
 
     @Transactional
