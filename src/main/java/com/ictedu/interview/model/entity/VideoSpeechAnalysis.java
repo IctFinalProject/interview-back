@@ -39,6 +39,10 @@ public class VideoSpeechAnalysis {
     @Lob
     @Column(columnDefinition = "CLOB")
     private String summary;
+    
+    @Lob
+    @Column(columnDefinition = "CLOB")
+    private String feedback;
 
     @ColumnDefault("SYSDATE")
     @CreationTimestamp
