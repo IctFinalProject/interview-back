@@ -20,4 +20,8 @@ public interface PaymentRepository extends JpaRepository<PaymentInfo, Long>{
 	Optional<PaymentInfo> findByorderId(String orderId);
 	
 	PaymentInfo findByPaymentKey(String paymentKey);
+	
+	// userId, orderName, isCanceled, useCount 값을 조건으로 조회
+    Optional<PaymentInfo> findByUserIdAndOrderNameAndIsCanceledAndUseCountGreaterThanEqual(Optional<User> getUser, String orderName, Integer isCanceled, Integer useCount);
+
 }

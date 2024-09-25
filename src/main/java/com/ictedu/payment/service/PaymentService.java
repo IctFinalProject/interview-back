@@ -178,4 +178,45 @@ public class PaymentService {
 	public List<PaymentInfo> findAll() {
 		return paymentRepository.findAll();
 	}
+	
+    public void minusBasicPlanUseCount(Optional<User> getUser) {
+        // "베이직플랜"을 가진 결제 정보를 조회
+    	// userId, orderName, isCanceled가 0이고, useCount가 1 이상인 결제 정보 조회
+        Optional<PaymentInfo> paymentInfoOpt = paymentRepository.findByUserIdAndOrderNameAndIsCanceledAndUseCountGreaterThanEqual(getUser, "베이직플랜", 0, 1);
+        
+        if (paymentInfoOpt.isPresent()) {
+            PaymentInfo paymentInfo = paymentInfoOpt.get();
+            // useCount가 0보다 클 경우만 감소
+            if (paymentInfo.getUseCount() > 0) {
+                paymentInfo.setUseCount(paymentInfo.getUseCount() - 1);
+                // 변경된 값을 저장
+                paymentRepository.save(paymentInfo);
+                System.out.println("베이직플랜 useCount 감소 완료");
+            } else {
+                System.out.println("useCount가 0 이하입니다. 감소할 수 없습니다.");
+            }
+        } else {
+            System.out.println("베이직플랜 결제를 찾을 수 없습니다.");
+        }
+    }
+    
+    public void minusPremiumPlanUseCount(Optional<User> getUser) {
+        // "프리미엄플랜"을 가진 결제 정보를 조회
+    	Optional<PaymentInfo> paymentInfoOpt = paymentRepository.findByUserIdAndOrderNameAndIsCanceledAndUseCountGreaterThanEqual(getUser, "프리미엄플랜", 0, 1);
+        
+        if (paymentInfoOpt.isPresent()) {
+            PaymentInfo paymentInfo = paymentInfoOpt.get();
+            // useCount가 0보다 클 경우만 감소
+            if (paymentInfo.getUseCount() > 0) {
+                paymentInfo.setUseCount(paymentInfo.getUseCount() - 1);
+                // 변경된 값을 저장
+                paymentRepository.save(paymentInfo);
+                System.out.println("프리미엄플랜 useCount 감소 완료");
+            } else {
+                System.out.println("useCount가 0 이하입니다. 감소할 수 없습니다.");
+            }
+        } else {
+            System.out.println("프리미엄플랜 결제를 찾을 수 없습니다.");
+        }
+    }
 }

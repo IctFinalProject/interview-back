@@ -22,6 +22,8 @@ import com.ictedu.interview.model.entity.Question;
 import com.ictedu.interview.model.entity.VideoEntity;
 import com.ictedu.interview.service.InterviewService;
 import com.ictedu.interview.service.QuestionService;
+import com.ictedu.payment.repository.PaymentRepository;
+import com.ictedu.payment.service.PaymentService;
 import com.ictedu.resume.entity.ResumeEntity;
 import com.ictedu.resume.service.ResumeService;
 import com.ictedu.user.model.entity.User;
@@ -38,14 +40,18 @@ public class InterviewController {
 	
     private final UserService userService;
     private final ResumeService resumeService;
+    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
     private final InterviewService interviewService;
     private final UserRepository userRepository;
     private final QuestionService questionService;
     
     @Autowired
-    public InterviewController(UserService userService, ResumeService resumeService, InterviewService interviewService, UserRepository userRepository, QuestionService questionService) {
+    public InterviewController(UserService userService, ResumeService resumeService, InterviewService interviewService, UserRepository userRepository, QuestionService questionService, PaymentService paymentService, PaymentRepository paymentRepository) {
         this.userService = userService;
         this.resumeService = resumeService;
+		this.paymentService = paymentService;
+		this.paymentRepository = paymentRepository;
         this.interviewService = interviewService;
         this.userRepository = userRepository;
         this.questionService = questionService;
@@ -222,4 +228,37 @@ public class InterviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버에서 처리 중 오류가 발생했습니다.");
         }
     }
+    
+    @GetMapping("/minusBasicPlanPayment")
+    public void minusBasicPlanPayment(@RequestParam("userId") String userId) {
+    	System.out.println("받은 userId: "+userId);
+    	try {
+    		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
+    		Optional<User> getUser = userRepository.findById(userIdLong);
+    		paymentService.minusBasicPlanUseCount(getUser);
+    		System.out.println("응답이 왔어요!");
+    		return;
+    	} catch (NumberFormatException e) {
+	        // 변환 실패 시 예외 처리
+	        System.out.println("userId 변환 실패: " + e.getMessage());
+	        return;
+    	}
+    }
+    
+    @GetMapping("/minusPremiumPlanPayment")
+    public void minusPremiumPlanPayment(@RequestParam("userId") String userId) {
+    	System.out.println("받은 userId: "+userId);
+    	try {
+    		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
+    		Optional<User> getUser = userRepository.findById(userIdLong);
+    		paymentService.minusPremiumPlanUseCount(getUser);
+    		System.out.println("응답이 왔어요!");
+    		return;
+    	} catch (NumberFormatException e) {
+	        // 변환 실패 시 예외 처리
+	        System.out.println("userId 변환 실패: " + e.getMessage());
+	        return;
+    	}
+    }
+    
 }

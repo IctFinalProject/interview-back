@@ -96,29 +96,40 @@ public class UserController {
 
 	@PostMapping("/edituser")
 	public ResponseEntity<?> editUser(
-			@RequestParam("email") String email,
-			@RequestParam("username") String username,
-			@RequestParam("address") String address,
-			@RequestParam("birth") String birth,
-			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-		try {
-			InputUser inputUser = new InputUser(
-					email, 
-					username, 
-					address, 
-					birth, 
-					profileImage != null ? profileImage.getBytes() : null);
-			boolean isUpdated = userService.updateUser(inputUser);
-			System.out.println("isUpdated: " + isUpdated);
+	        @RequestParam("email") String email,
+	        @RequestParam("username") String username,
+	        @RequestParam("address") String address,
+	        @RequestParam("birth") String birth,
+	        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+	    try {
+	        // 기존 유저 정보를 조회
+	        Optional<User> existingUser = userService.findUserByEmail(email);
+	        byte[] profileImageData;
 
-			if (isUpdated) {
-				return ResponseEntity.ok("유저정보가 성공적으로 변경되었습니다.");
-			} else {
-				return ResponseEntity.status(515).body("유저정보 변경에 실패하였습니다.");
-			}
-		} catch (IOException e) {
-			return ResponseEntity.status(514).body("프로필 사진에서 오류가 발생하였습니다.");
-		}
+	        // 사용자가 프로필 이미지를 수정한 경우 처리
+	        if (profileImage != null && !profileImage.isEmpty()) {
+	            profileImageData = profileImage.getBytes();
+	        } else {
+	            // 수정하지 않았을 경우 기존 프로필 이미지 유지
+	            profileImageData = existingUser.get().getProfileImage();
+	        }
+
+	        InputUser inputUser = new InputUser(
+	                email, 
+	                username, 
+	                address, 
+	                birth, 
+	                profileImageData);
+	        boolean isUpdated = userService.updateUser(inputUser);
+
+	        if (isUpdated) {
+	            return ResponseEntity.ok("유저정보가 성공적으로 변경되었습니다.");
+	        } else {
+	            return ResponseEntity.status(515).body("유저정보 변경에 실패하였습니다.");
+	        }
+	    } catch (IOException e) {
+	        return ResponseEntity.status(514).body("프로필 사진에서 오류가 발생하였습니다.");
+	    }
 	}
 
 	//    @GetMapping("/findAllUser")
@@ -174,7 +185,7 @@ public class UserController {
 	@GetMapping("/findUserByEmail")
 	public ResponseEntity<?> findUserByEmail(@RequestParam("email") String email){
 		Optional<User> user = userService.findByEmail(email);
-		System.out.println("이메일로 찾은 유저: "+ user);
+//		System.out.println("이메일로 찾은 유저: "+ user);
 		return ResponseEntity.ok(user.get());
 	}
 
@@ -188,13 +199,13 @@ public class UserController {
 		// 여러 개의 결제 정보를 가져오기 위해 findAllByUserId 사용
 		List<PaymentInfo> paymentInfoList = paymentService.findAllByUserId(optionalUser.get());
 
-		// isCanceled가 0인 결제 정보만 필터링
+		// isCanceled가 0이고, useCount가 1 이상인 결제 정보만 필터링
 		List<PaymentInfo> filteredPaymentInfoList = paymentInfoList.stream()
-				.filter(paymentInfo -> paymentInfo.getIsCanceled() == 0)
-				.collect(Collectors.toList());
+		        .filter(paymentInfo -> paymentInfo.getIsCanceled() == 0 && paymentInfo.getUseCount() >= 1)
+		        .collect(Collectors.toList());
 
 		if (filteredPaymentInfoList.isEmpty()) {
-			return ResponseEntity.notFound().build();
+		    return ResponseEntity.notFound().build();
 		}
 
 		//        System.out.println("결제정보 찾은 유저: " + filteredPaymentInfoList);
@@ -238,9 +249,9 @@ public class UserController {
 			@RequestParam("username") String username, 
 			@RequestParam("phone") String phone) {
 		Optional<User> user = userService.findEmailByUsernameAndPhone(username, phone);
-		System.out.println("user: "+user);
-		System.out.println("username: "+username);
-		System.out.println("phone: "+phone);
+//		System.out.println("user: "+user);
+//		System.out.println("username: "+username);
+//		System.out.println("phone: "+phone);
 		if (user.isPresent()) {
 			return ResponseEntity.ok(user.get().getEmail());
 		} else {
@@ -254,9 +265,9 @@ public class UserController {
 			@RequestParam("username") String username, 
 			@RequestParam("email") String email) {
 		Optional<User> user = userService.verifyUserByUsernameAndEmail(username, email);
-		System.out.println("user: "+ user);
-		System.out.println("username: "+ username);
-		System.out.println("email: "+ email);
+//		System.out.println("user: "+ user);
+//		System.out.println("username: "+ username);
+//		System.out.println("email: "+ email);
 		if (user.isPresent()) {
 			return ResponseEntity.ok(user.get().getEmail());
 		} else {
@@ -276,10 +287,6 @@ public class UserController {
 			System.out.println("이전 비밀번호랑 일치!");
 			return ResponseEntity.status(512).body("이전 비밀번호는 사용할 수 없습니다.");
 		}
-		System.out.println("password1: " + beforePassword);
-		System.out.println("username2: " + username);
-		System.out.println("email2: " + email);
-		System.out.println("newPassword: " + newPassword);
 
 		boolean isUpdated = userService.updatePassword(username, email, newPassword);
 		System.out.println("isUpdated: " + isUpdated);
@@ -352,7 +359,7 @@ public class UserController {
 		System.out.println("id: "+ id);
 		String toEncode = tossSecret + ":";
 		String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
-		System.out.println("Encoded String: " + encodedString);
+//		System.out.println("Encoded String: " + encodedString);
 		// HTTP 요청 작성
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
@@ -365,8 +372,8 @@ public class UserController {
 
 		// HTTP 요청 보내기
 		HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-		System.out.println(response.body());
-		System.out.println("응답! : "+response);
+//		System.out.println(response.body());
+//		System.out.println("응답! : "+response);
 		// 상태 코드 확인
 		int statusCode = response.statusCode();
 		if (statusCode >= 400) {
@@ -416,7 +423,7 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 orderName입니다.");
 		}
 		// 응답 상태 코드 반환
-		System.out.println("newPay: "+ newPaymentInfo);
+//		System.out.println("newPay: "+ newPaymentInfo);
 		return ResponseEntity.status(statusCode).body(newPaymentInfo);
 	}
 
@@ -431,12 +438,12 @@ public class UserController {
 	public ResponseEntity<?> paymentCancel(
 			@RequestParam("paymentKey") String paymentKey, @RequestParam("cancelReason") String cancelReason) {
 		try {
-			System.out.println("paymentKey: " + paymentKey);
-			System.out.println("cancelReason: " + cancelReason);
+//			System.out.println("paymentKey: " + paymentKey);
+//			System.out.println("cancelReason: " + cancelReason);
 
 			String toEncode = tossSecret + ":";
 			String encodedString = Base64.getEncoder().encodeToString(toEncode.getBytes());
-			System.out.println("Encoded String: " + encodedString);
+//			System.out.println("Encoded String: " + encodedString);
 
 			// JSON 본문 생성
 			String requestBody = String.format("{\"cancelReason\":\"%s\"}", cancelReason);
@@ -450,7 +457,7 @@ public class UserController {
 					.build();
 
 			HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println(response.body());
+//			System.out.println(response.body());
 
 			// 응답 JSON 파싱
 			ObjectMapper objectMapper = new ObjectMapper();
