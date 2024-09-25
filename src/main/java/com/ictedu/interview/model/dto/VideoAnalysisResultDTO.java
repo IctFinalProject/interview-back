@@ -20,6 +20,8 @@ public class VideoAnalysisResultDTO {
         private AudioAnalysisDTO audioAnalysis;
         private String headEyeMessage;
         private String poseMessage;
+        private String headEyeFeedback;
+        
     }
 
     @Data
@@ -28,6 +30,7 @@ public class VideoAnalysisResultDTO {
         private Double tempo;
         private Double averageVolume;
         private Double averageSpectralCentroid;
+        private String audioFeedback;
     }
 
     @Data
