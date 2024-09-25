@@ -72,8 +72,7 @@ public class BbsController {
     @GetMapping("/{id}")
     public ResponseEntity<Bbs> getBbsById(
         @PathVariable("id") Long id,
-        @RequestParam Map<String, String> params,
-    	@RequestParam(value = "likeToggle", required = false) Boolean likeToggle){
+        @RequestParam Map<String, String> params){
         // 쿼리 파라미터 로그
         System.out.println("Query Params: " + params);
 

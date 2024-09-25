@@ -68,7 +68,6 @@ public class BbsService {
                 .title(bbsDto.getTitle())
                 .content(bbsDto.getContent())
                 .hitCount(0L)
-                .likes(0L)
                 .active(1)
                 .inactive(0)
                 .reported(0)

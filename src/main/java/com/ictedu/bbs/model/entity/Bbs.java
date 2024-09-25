@@ -74,10 +74,6 @@ public class Bbs {
     @ColumnDefault("0")
     private Long hitCount = 0L;
 
-    @Column(name = "likes", nullable = false)
-    @ColumnDefault("0")
-    private Long likes = 0L;
-
     @Column(name = "active", nullable = false)
     @ColumnDefault("1")
     private Integer active = 1;
@@ -179,14 +175,7 @@ public class Bbs {
         this.hitCount = hitCount;
     }
 
-    public Long getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Long likes) {
-        this.likes = likes;
-    }
-
+   
     public Integer getActive() {
         return active;
     }
@@ -258,7 +247,7 @@ public class Bbs {
     public void setDeletedReason(Integer deletedReason) {  // 신고 삭제 여부 설정
         this.deletedReason = deletedReason;
     }
-
+    
     // 작성자의 username을 반환하는 메서드
     public String getUsername() {
         return userId != null ? userId.getUsername() : "Anonymous";
