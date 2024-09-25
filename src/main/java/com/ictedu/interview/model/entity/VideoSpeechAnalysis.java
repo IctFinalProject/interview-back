@@ -17,14 +17,14 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "video_speech_analysis")
 public class VideoSpeechAnalysis {
 
-	@Id
+    @Id
     @SequenceGenerator(name="seq_video_speech_analysis_id", sequenceName = "seq_video_speech_analysis_id", allocationSize = 1, initialValue = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_video_speech_analysis_id")
     private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "video_id", referencedColumnName = "id", nullable = false)
-	private VideoEntity video;
+    @ManyToOne
+    @JoinColumn(name = "video_id", referencedColumnName = "id", nullable = false)
+    private VideoEntity video;
 
     @Lob
     @Column(columnDefinition = "CLOB")
@@ -44,6 +44,4 @@ public class VideoSpeechAnalysis {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-
 }

@@ -1,10 +1,8 @@
 package com.ictedu.interview.model.entity;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,9 +33,12 @@ public class VideoAnalysis {
     @Column(name = "eye_score", nullable = true)
     private Double eyeScore;
 
-
     @Column(name = "avg_score")
     private Double avgScore;
+    
+    @Lob // 피드백 메시지를 저장할 필드
+    @Column(name = "head_eye_feedback")
+    private String headEyeFeedback;
     
     // 오디오 분석 결과 필드 추가
     @Column(name = "audio_pitch")
@@ -51,6 +52,10 @@ public class VideoAnalysis {
 
     @Column(name = "audio_spectral_centroid")
     private Double audioSpectralCentroid;
+    
+    @Lob // 피드백 메시지를 저장할 필드
+    @Column(name = "audio_feedback")
+    private String audioFeedback;
 
     @ColumnDefault("SYSDATE")
     @CreationTimestamp
