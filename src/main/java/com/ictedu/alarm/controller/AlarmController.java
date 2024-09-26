@@ -43,7 +43,19 @@ public class AlarmController {
 	@PostMapping("/disableAllAlarms")
     public ResponseEntity<String> disableAllAlarms(@RequestBody Map<String, Object> request) {
 		System.out.println("뭔데용: " + request.get("userId"));
-		Long userId = (Long.parseLong((String) request.get("userId")));
+		System.out.println("뭔데용 타입: " + request.get("userId").getClass().getName());
+		
+		// Long userId = (Long.parseLong((String) request.get("userId")));
+		
+		Object userIdObj = request.get("userId");
+		Long userId = null;
+
+		if (userIdObj instanceof String) {
+		    userId = Long.parseLong((String) userIdObj);
+		} else if (userIdObj instanceof Integer) {
+		    userId = ((Integer) userIdObj).longValue();
+		}
+		
         String type = ((String) request.get("type"));
         try {
             alarmService.disableAllAlarms(userId, type);

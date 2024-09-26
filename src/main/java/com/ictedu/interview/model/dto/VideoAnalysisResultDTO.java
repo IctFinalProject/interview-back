@@ -38,6 +38,7 @@ public class VideoAnalysisResultDTO {
         private String transcription;
         private SentimentAnalysisDTO sentimentAnalysis;
         private String textSummary;
+        private String feedback;
     }
 
     @Data
