@@ -70,7 +70,6 @@ public class CorpInfoController {
             queryParams.append("&selectedSalaries=").append(salariesParam);
         }
 
-        System.out.println("Request URL: " + url + queryParams);
 
         // URI 클래스를 사용하여 URL 생성
         URI uri;
@@ -108,7 +107,6 @@ public class CorpInfoController {
         List<Map<String, Object>> items = (List<Map<String, Object>>) itemsMap.get("item");
 
         if (items == null || items.isEmpty()) {
-            System.out.println("No items found in API response");
             return ResponseEntity.ok("No data found");
         }
 
@@ -160,13 +158,11 @@ public class CorpInfoController {
                     if (selectedSalaries == null || selectedSalaries.isEmpty()) return true;
                     Object salaryObj = item.get("enpPn1AvgSlryAmt");
                     if (salaryObj == null) {
-                        System.out.println("Salary is null for item: " + item);
                         return false;
                     }
 
                     String salaryStr = salaryObj.toString().trim();
                     if (salaryStr.isEmpty()) {
-                        System.out.println("Salary is empty for item: " + item);
                         return false;
                     }
 

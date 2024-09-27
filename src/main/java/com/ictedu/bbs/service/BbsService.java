@@ -119,11 +119,9 @@ public class BbsService {
             if (files != null && files.containsKey(fileName)) {
                 return files.get(fileName);
             } else {
-                System.out.println("File not found in the map for fileName: " + fileName);
                 return null;
             }
         }
-        System.out.println("Bbs not found for ID: " + bbsId);
         return null;
     }
 

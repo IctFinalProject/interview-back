@@ -56,62 +56,7 @@ public class InterviewController {
         this.userRepository = userRepository;
         this.questionService = questionService;
     }
-    /*
-	@GetMapping("/getmockquestion")
-	public ResponseEntity<?> getMockQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
-	    try {
-	        Long userIdLong = Long.parseLong(userId); // String -> Long 변환
-	        Long choosedResumeLong = Long.parseLong(choosedResume); // String -> Long 변환
-	        // 변환 후 처리 로직
-	        Optional<User> getUser = userRepository.findById(userIdLong);
-	        User user = getUser.get(); // 값이 반드시 존재할 때 사용 (값이 없으면 예외 발생)
-	        Optional<ResumeEntity> getResume = resumeService.findResumeById(choosedResumeLong);
-			// List<ResumeEntity> 순회하면서 각 ResumeEntity의 User의 password를 출력
-			String selfIntroduction = getResume.get().getKeywordsSelfIntroduction();
-			String motivation = getResume.get().getKeywordsMotivation();
-			List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
-			List<Question> commonQuestions = interviewService.generateQuestions("common", dbKeywords, 3, user);
-			List<Question> resumeQuestions = interviewService.generateQuestions("resume", dbKeywords, 3, user);
 
-	        // Map을 사용하여 두 리스트를 하나로 묶어 반환
-	        Map<String, List<Question>> response = new HashMap<>();
-	        response.put("commonQuestions", commonQuestions);
-	        response.put("resumeQuestions", resumeQuestions);
-	        System.out.println("끝났어요");
-	        return ResponseEntity.ok(response);
-	    } catch (NumberFormatException e) {
-	        // 변환 실패 시 예외 처리
-	        System.out.println("userId 변환 실패: " + e.getMessage());
-	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
-	    }
-	}
-	
-	@GetMapping("/getrealquestion")
-	public ResponseEntity<?> getRealQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
-	    try {
-	        Long userIdLong = Long.parseLong(userId); // String -> Long 변환
-	        Long choosedResumeLong = Long.parseLong(choosedResume); // String -> Long 변환
-	        // 변환 후 처리 로직
-	        Optional<User> getUser = userRepository.findById(userIdLong);
-	        User user = getUser.get(); // 값이 반드시 존재할 때 사용 (값이 없으면 예외 발생)
-	        Optional<ResumeEntity> getResume = resumeService.findResumeById(choosedResumeLong);
-			// List<ResumeEntity> 순회하면서 각 ResumeEntity의 User의 password를 출력
-			String selfIntroduction = getResume.get().getKeywordsSelfIntroduction();
-			String motivation = getResume.get().getKeywordsMotivation();
-			List<String> dbKeywords = interviewService.getKeywordsFromResume(motivation, selfIntroduction);
-			List<Question> resumeQuestions = interviewService.generateRealQuestions(dbKeywords, user);
-
-	        // Map을 사용하여 두 리스트를 하나로 묶어 반환
-	        Map<String, List<Question>> response = new HashMap<>();
-	        response.put("resumeQuestions", resumeQuestions);
-	        System.out.println("실전 끝났어요");
-	        return ResponseEntity.ok(response);
-	    } catch (NumberFormatException e) {
-	        // 변환 실패 시 예외 처리
-	        System.out.println("userId 변환 실패: " + e.getMessage());
-	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
-	    }
-	}*/
     @GetMapping("/getmockquestion")
     public ResponseEntity<?> getMockQuestions(@RequestParam("choosedResume") String choosedResume, @RequestParam("userId") String userId){
         try {
@@ -169,7 +114,6 @@ public class InterviewController {
     }
     @GetMapping("/getinterviewquestions")
     public ResponseEntity<?> getInterviewQuestions(@RequestParam List<Long> questionId) {
-        System.out.println("Received question IDs: " + questionId);
         List<Question> questions = questionService.getQuestionsByIds(questionId);
         
         // Question 엔티티를 QuestionDTO로 변환
@@ -184,21 +128,17 @@ public class InterviewController {
                     question.getUpdatedTime()
                 ))
                 .collect(Collectors.toList());
-//        System.out.println("퀘스천DTO: "+questionDTOs);
         return ResponseEntity.ok(questionDTOs);  // DTO를 반환
     }
     
     @GetMapping("/getinterviewresults")
     public ResponseEntity<?> getInterviewResults(@RequestParam("userId") String userId){
-    	System.out.println("받은 userId: "+userId);
     	try {
     		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
     		List<VideoDTO> response = interviewService.getResultsByIds(userIdLong);
-    		System.out.println("응답이 왔어요!");
     		return ResponseEntity.ok(response);
     	} catch (NumberFormatException e) {
 	        // 변환 실패 시 예외 처리
-	        System.out.println("userId 변환 실패: " + e.getMessage());
 	        return ResponseEntity.badRequest().body("유저 형식이 일치하지 않습니다!");
     	}
     }
@@ -206,57 +146,46 @@ public class InterviewController {
     
     @GetMapping("/fetchinterviewresult")
     public ResponseEntity<?> fetchInterviewResults(@RequestParam("videoId") String videoId) {
-        System.out.println("받은 videoId: " + videoId);
         try {
             Long videoIdLong = Long.parseLong(videoId); // String -> Long 변환
             VideoDetailsDTO response = interviewService.getVideoById(videoIdLong);
             
             if (response == null) {
-                System.out.println("해당 비디오가 존재하지 않습니다.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 비디오가 존재하지 않습니다.");
             }
             
-//            System.out.println("비디오 반환: " + response);
             return ResponseEntity.ok(response);  // DTO를 리턴
         } catch (NumberFormatException e) {
             // videoId가 Long으로 변환되지 못했을 때
-            System.out.println("videoId 변환 실패: " + e.getMessage());
             return ResponseEntity.badRequest().body("videoId 형식이 일치하지 않습니다!");
         } catch (Exception e) {
             // 그 외 발생하는 모든 예외 처리
-            System.out.println("서버 내부 오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버에서 처리 중 오류가 발생했습니다.");
         }
     }
     
     @GetMapping("/minusBasicPlanPayment")
     public void minusBasicPlanPayment(@RequestParam("userId") String userId) {
-    	System.out.println("받은 userId: "+userId);
     	try {
     		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
     		Optional<User> getUser = userRepository.findById(userIdLong);
     		paymentService.minusBasicPlanUseCount(getUser);
-    		System.out.println("응답이 왔어요!");
     		return;
     	} catch (NumberFormatException e) {
 	        // 변환 실패 시 예외 처리
-	        System.out.println("userId 변환 실패: " + e.getMessage());
 	        return;
     	}
     }
     
     @GetMapping("/minusPremiumPlanPayment")
     public void minusPremiumPlanPayment(@RequestParam("userId") String userId) {
-    	System.out.println("받은 userId: "+userId);
     	try {
     		Long userIdLong = Long.parseLong(userId); // String -> Long 변환
     		Optional<User> getUser = userRepository.findById(userIdLong);
     		paymentService.minusPremiumPlanUseCount(getUser);
-    		System.out.println("응답이 왔어요!");
     		return;
     	} catch (NumberFormatException e) {
 	        // 변환 실패 시 예외 처리
-	        System.out.println("userId 변환 실패: " + e.getMessage());
 	        return;
     	}
     }

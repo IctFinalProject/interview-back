@@ -66,19 +66,12 @@ public class ChatRoomService {
     	List<User> users = userRepository.findAllById(userIds);
     	
     	if(users.size() == 0) {
-    		//chatMessagesRepository.deleteByChatRoomId(chatroomId);
-//    		chatRoomRepository.deleteById(chatroomId);
     	}
     	else {
     		if(chatRoom.getIsTitleEdited() == 0) {
-            	
-            	System.out.println("users.size() : " + users.size());
-            	
         		String usernames = users.stream()
                         .map(User::getUsername)
                         .collect(Collectors.joining(", "));
-            	
-            	System.out.println(usernames);
             	
             	chatRoom.setChatRoomTitle(usernames);
             	chatRoomRepository.save(chatRoom);   	

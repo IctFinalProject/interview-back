@@ -90,7 +90,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String access  = jwtUtil.generateToken(username,"access",accessExpiredMs);
         String refresh  = jwtUtil.generateToken(username,"refresh",refreshExpiredMs);
         Optional<User> userOptional = userService.findByEmail(username);
-        System.out.println(userOptional);
         if(userOptional.isPresent()){
             User user = userOptional.get();
             RefreshToken refreshToken = RefreshToken.builder()
@@ -102,14 +101,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                     .build();
 
             refreshService.save(refreshToken);
-        } else {
-            // 사용자 정보를 찾을 수 없는 경우에 대한 처리
-            System.out.println("User not found: " + username);
         }
 
         // 응답 헤더에 JWT를 'Bearer' 토큰으로 추가합니다.
         response.addHeader("Authorization", "Bearer " + access);
-        System.out.println(access);
         // 여기에 Content-Type 설정을 추가합니다.
         response.setContentType("application/json;charset=UTF-8");
         // 클라이언트가 Authorization 헤더를 읽을 수 있도록, 해당 헤더를 노출시킵니다.
@@ -119,12 +114,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // 사용자의 권한이나 추가 정보를 JSON 형태로 변환하여 응답 바디에 포함시킬 수 있습니다.
         boolean isAdmin = customUserDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         Map<String, Object> responseBody = new HashMap<>();
-        
-        System.out.println("추출한 ID: "+id);
-        System.out.println("추출한 주소: "+address);
-        System.out.println("추출한 폰번호: "+phone);
-        System.out.println("추출한 생일: "+birth);
-        System.out.println("추출한 성별: "+gender);
+       
         
         responseBody.put("id", id);
         responseBody.put("gender", gender);
@@ -171,7 +161,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             // 다른 예외들을 처리
             message = "인증에 실패했습니다.";
         }
-        System.out.println(message);
         // 응답 데이터를 준비합니다.
         Map<String, Object> responseData = new HashMap<>();
         response.setContentType("application/json;charset=UTF-8");

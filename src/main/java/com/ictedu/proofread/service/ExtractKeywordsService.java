@@ -73,9 +73,6 @@ public class ExtractKeywordsService {
             // 결과를 쉼표로 구분된 키워드 배열로 변환
             String[] keywords = content.split(",\\s*");
 
-            // 콘솔에 키워드 출력
-            System.out.println("추출된 키워드: " + String.join(", ", keywords));
-
             return keywords;
         }
     }

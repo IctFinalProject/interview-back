@@ -74,19 +74,10 @@ public class ResumeController {
 
             // UTF-8로 인코딩된 파일 이름을 지원하기 위해 filename* 사용
             String encodedFilename = URLEncoder.encode(resumeTitle, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-
-            // 디버깅 로그
-            System.out.println("파일 다운로드 요청이 처리되었습니다.");
-            System.out.println("Content-Disposition 헤더: attachment; filename=\"" + resumeTitle + "\"");
-            System.out.println("파일 크기: " + resumeEntity.getResumePdf().length + " 바이트");
-            System.out.println("실제 Content-Disposition 헤더: attachment; filename*=UTF-8''" + encodedFilename);
             
             ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf");  // MIME 타입 설정
-            
-            // 응답에 실제 Content-Disposition 헤더가 포함되었는지 확인하기 위해
-            System.out.println("ResponseEntity Headers: " + responseBuilder.build().getHeaders());
 
             return responseBuilder.body(resumeEntity.getResumePdf());
         } else {

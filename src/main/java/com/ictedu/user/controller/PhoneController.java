@@ -49,7 +49,6 @@ public class PhoneController {
         message.setText("인증코드는: " + code);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-//        System.out.println(response);
 
         return "인증번호가 전송되었습니다.";
     }

@@ -71,7 +71,6 @@ public class ChatController {
 	//채팅방 나가기 (+ 채팅방 제목 자동 수정)
 	@DeleteMapping("/exitChatroom")
     public void exitChatroom(@RequestParam Long currentChatRoomId, @RequestParam Long userId) {
-		System.out.println("챗챗 테스트");
 		//ChatRoomUser에서 선택한 방과 채팅삭제 요청한 유저가 같이 들어가있는 컬럼 삭제
         chatRoomUsersService.deleteChatRoomUser(currentChatRoomId, userId);
         //요청 유저의 이름을 채팅방에서 삭제해야 함, 근데 제목 수정했을 경우에는 터치 ㄴ isTitleEdited
@@ -90,9 +89,6 @@ public class ChatController {
 		
 		Long chatRoomId = ((Number) request.get("chatRoomId")).longValue();
         String newTitle = (String) request.get("newTitle");
-        
-		//System.out.println("chatRoomId: " + chatRoomId);
-		//System.out.println("newTitle: " + newTitle);
 		
 		chatRoomService.updateChatRoomTitle(chatRoomId, newTitle);
 	}

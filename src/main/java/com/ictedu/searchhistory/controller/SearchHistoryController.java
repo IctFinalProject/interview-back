@@ -66,12 +66,9 @@ public class SearchHistoryController {
         
         // 추가: 검색어 목록이 비어있을 경우 로그 출력
         if (searchTerms.isEmpty()) {
-            System.out.println("No search terms found for user: " + user.getEmail());
         }
         
         // 반환할 검색 기록을 출력
-//        System.out.println("Returning search terms: " + searchTerms);
-        
         return ResponseEntity.ok(searchTerms);
     }
 }

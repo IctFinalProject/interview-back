@@ -65,7 +65,6 @@ public class CustomLogoutHandler implements LogoutHandler {
                 refresh.ifPresent(refreshToken -> refreshService.deleteByRefresh(refreshToken.getTokenValue()));
             }
         }
-        System.out.println("로그아웃 처리 성공");
         // 성공적인 로그아웃 응답을 설정합니다.
         response.setStatus(HttpServletResponse.SC_OK);
     }

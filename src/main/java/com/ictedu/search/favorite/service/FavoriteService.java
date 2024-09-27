@@ -19,21 +19,15 @@ public class FavoriteService {
     }
 
     public void addFavoriteCompany(User user, FavoriteCompany favoriteCompany) {
-        System.out.println("Adding favorite company: " + favoriteCompany + " for user: " + user.getEmail());
         favoriteCompany.setUser(user);
         favoriteRepository.save(favoriteCompany);
-        System.out.println("Favorite company saved.");
     }
 
     public void removeFavoriteCompany(User user, FavoriteCompany favoriteCompany) {
-        System.out.println("Removing favorite company: " + favoriteCompany + " for user: " + user.getEmail());
         FavoriteCompany favoriteToRemove = favoriteRepository.findByUserAndCompanyId(user, favoriteCompany.getCompanyId());
         
         if (favoriteToRemove != null) {
             favoriteRepository.delete(favoriteToRemove);
-            System.out.println("Favorite company removed.");
-        } else {
-            System.out.println("Favorite company not found, nothing to remove.");
         }
     }
 

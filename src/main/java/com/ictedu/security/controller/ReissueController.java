@@ -31,13 +31,11 @@ public class ReissueController {
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
         // HTTP 요청에서 'Authorization' 헤더를 통해 리프레시 토큰을 받아옵니다.
         String refresh = request.getHeader("Authorization");
-        System.out.println("refresh: "+refresh);
         if (refresh == null || !refresh.startsWith("Bearer ")) { // 토큰이 없거나 Bearer 타입이 아니면 에러 반환
             return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);
         }
 
         String token = refresh.substring("Bearer ".length()); // 실제 토큰 값을 추출합니다.
-        System.out.println("token: "+token);
 
         // 토큰 만료 여부 검사
         try {
@@ -54,7 +52,6 @@ public class ReissueController {
 
         // 리프레시 토큰이 맞는지 카테고리로 확인합니다.
         String category = jwtUtil.getCategoryFromToken(token);
-        System.out.println("category: "+category);
         if (!category.equals("refresh")) {
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }

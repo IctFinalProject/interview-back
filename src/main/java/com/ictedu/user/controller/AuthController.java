@@ -497,7 +497,6 @@ public class AuthController {
             Optional<User> optinalUserForId = userRepository.findByEmailAndIsKakao(email, 1);
             Long id = optinalUserForId.get().getId();
             String encodedUsername = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
-            System.out.println("카카오에서 로그인한 사용자의 id값: "+ id);
             
             String redirectUrl = String.format("http://localhost:3000/auth/successSocialLogin?access=%s&refresh=%s&isAdmin=%s&id=%s&gender=%s&username=%s&email=%s&birth=%s&phone=%s&profile=%s",
                     accessTokenJwt, refreshTokenJwt, optinalUserForId.get().getIsAdmin(), id, gender, encodedUsername, email, birth, phone, profileImageUrl);

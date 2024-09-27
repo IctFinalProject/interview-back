@@ -74,19 +74,13 @@ public class BbsController {
         @PathVariable("id") Long id,
         @RequestParam Map<String, String> params){
         // 쿼리 파라미터 로그
-        System.out.println("Query Params: " + params);
-
         boolean increment = Boolean.parseBoolean(params.getOrDefault("increment", "true"));
-        System.out.println("Parsed increment value: " + increment);
-
         Optional<Bbs> bbsOptional = bbsService.findById(id);
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
             if (increment) {
                 bbsService.incrementHitcount(id); // 조회수 증가
             }
-            
-        
             return ResponseEntity.ok().body(bbs);
         } else {
         	 return ResponseEntity.notFound().build();
@@ -100,14 +94,12 @@ public class BbsController {
     @PostMapping("/search")
     public ResponseEntity<Bbs> getBbsByIdPost(@RequestBody BbsDto bbsDto) {
         Long id = bbsDto.getBbsId();  // bbsDto 인스턴스를 통해 호출
-        System.out.println("POST 요청: 게시글 ID: " + id); // 한글 콘솔 체크
         Optional<Bbs> bbsOptional = bbsService.findById(id);
         
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
             return ResponseEntity.ok().body(bbs);
         } else {
-            System.out.println("게시글 ID " + id + " 못 찾음"); // 한글 콘솔 체크
             return ResponseEntity.notFound().build();
         }
     }
@@ -150,14 +142,12 @@ public class BbsController {
                                        @RequestParam(value="files", required = false) List<MultipartFile> files) throws IOException {
         Optional<User> userOptional = userService.findById(userId);
         if (!userOptional.isPresent()) {
-            System.out.println("잘못된 사용자 ID: " + userId); // 한글 콘솔 체크
             return ResponseEntity.badRequest().body("Invalid user ID");
         }
 
         User user = userOptional.get();
         BbsDto bbsDto = new BbsDto(title, content, user);
         Bbs newBbs = bbsService.insertBbs(bbsDto, files);
-//        System.out.println("새 게시글 생성됨: " + newBbs); // 한글 콘솔 체크
 
         return ResponseEntity.ok(newBbs);
     }
@@ -208,12 +198,8 @@ public class BbsController {
         @RequestParam(value = "files", required = false) List<MultipartFile> files,  // 새 파일
         @RequestParam(value = "filesToRemove", required = false) String filesToRemoveJson) throws IOException {
 
-        System.out.println("Received filesToRemove JSON: " + filesToRemoveJson); // 콘솔 로그 추가
-
         // filesToRemove JSON을 리스트로 변환
         List<String> filesToRemove = new ObjectMapper().readValue(filesToRemoveJson, new TypeReference<List<String>>() {});
-
-        System.out.println("Files to remove list: " + filesToRemove); // 파일 목록 출력
 
         Bbs bbs = bbsService.findById(id).orElseThrow(() -> new RuntimeException("게시글 못 찾음"));
 
@@ -221,7 +207,6 @@ public class BbsController {
         Map<String, byte[]> fileMap = bbs.getFiles();
         if (filesToRemove != null && !filesToRemove.isEmpty()) {
             for (String fileName : filesToRemove) {
-                System.out.println("Removing file: " + fileName); // 삭제할 파일 출력
                 fileMap.remove(fileName);  // 삭제할 파일 제거
             }
         }
@@ -247,34 +232,26 @@ public class BbsController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBbs(@PathVariable("id") Long id, @RequestParam("userId") String userId) {
-        System.out.println("게시글 삭제 요청, ID: " + id + ", 사용자 ID: " + userId); // 사용자 ID와 게시글 ID 출력
         
         Optional<Bbs> bbsOptional = bbsService.findById(id);
         if (bbsOptional.isPresent()) {
             Bbs bbs = bbsOptional.get();
-//            System.out.println("게시글 찾음: " + bbs.getBbsId() + ", 작성자: " + bbs.getUserId().getId()); // 게시글 정보 출력
             
             if (!bbs.getUserId().getId().equals(Long.valueOf(userId))) {
-                System.out.println("사용자 ID 불일치: 권한 없음"); // 권한 불일치 시 로그 출력
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this post.");
             }
             
             // 게시글 소프트 삭제 처리
-            System.out.println("게시글 삭제 처리 중...");
             bbsService.deleteBbs(id, false);  // 게시글 삭제 (일반 삭제)
 
-            System.out.println("게시글 삭제 완료: " + bbs.getBbsId());
             return ResponseEntity.ok().build();
         } else {
-            System.out.println("게시글 ID 못 찾음: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
     }
     
     @PostMapping("/report")
     public ResponseEntity<String> reportPostOrComment(@RequestBody ReportRequestDto request) {
-    	 // 전달된 userId를 로그로 확인
-        System.out.println("Received userId: " + request.getUserId());
         // 신고자를 찾음
         User reporter = userService.findById(request.getUserId())
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));

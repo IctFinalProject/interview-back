@@ -104,7 +104,6 @@ public class PaymentService {
             OffsetDateTime canceledOffsetDateTime = OffsetDateTime.parse(canceledAt, formatter);
             canceledDateTime = canceledOffsetDateTime.atZoneSameInstant(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         }
-        System.out.println("빌드 직전!");
         return PaymentInfo.builder()
         		.orderId(payment.getOrderId())
         		.orderName(payment.getOrderName())
@@ -191,12 +190,7 @@ public class PaymentService {
                 paymentInfo.setUseCount(paymentInfo.getUseCount() - 1);
                 // 변경된 값을 저장
                 paymentRepository.save(paymentInfo);
-                System.out.println("베이직플랜 useCount 감소 완료");
-            } else {
-                System.out.println("useCount가 0 이하입니다. 감소할 수 없습니다.");
             }
-        } else {
-            System.out.println("베이직플랜 결제를 찾을 수 없습니다.");
         }
     }
     
@@ -211,12 +205,7 @@ public class PaymentService {
                 paymentInfo.setUseCount(paymentInfo.getUseCount() - 1);
                 // 변경된 값을 저장
                 paymentRepository.save(paymentInfo);
-                System.out.println("프리미엄플랜 useCount 감소 완료");
-            } else {
-                System.out.println("useCount가 0 이하입니다. 감소할 수 없습니다.");
             }
-        } else {
-            System.out.println("프리미엄플랜 결제를 찾을 수 없습니다.");
         }
     }
 }

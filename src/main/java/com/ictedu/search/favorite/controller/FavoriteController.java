@@ -26,33 +26,27 @@ public class FavoriteController {
 
     @PostMapping("/addFavorite")
     public ResponseEntity<Void> addFavorite(@RequestBody FavoriteCompany favoriteCompany) {
-        System.out.println("Request to add favorite: " + favoriteCompany);
 
         Optional<User> optionalUser = userRepository.findByEmail(favoriteCompany.getUserEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             favoriteService.addFavoriteCompany(user, favoriteCompany);
-            System.out.println("Successfully added favorite for user: " + user.getEmail());
             return ResponseEntity.ok().build();
         }
 
-        System.out.println("Failed to find user with email: " + favoriteCompany.getUserEmail());
         return ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/removeFavorite")
     public ResponseEntity<Void> removeFavorite(@RequestBody FavoriteCompany favoriteCompany) {
-        System.out.println("Request to remove favorite: " + favoriteCompany);
 
         Optional<User> optionalUser = userRepository.findByEmail(favoriteCompany.getUserEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             favoriteService.removeFavoriteCompany(user, favoriteCompany);
-            System.out.println("Successfully removed favorite for user: " + user.getEmail());
             return ResponseEntity.ok().build();
         }
 
-        System.out.println("Failed to find user with email: " + favoriteCompany.getUserEmail());
         return ResponseEntity.badRequest().build();
     }
 

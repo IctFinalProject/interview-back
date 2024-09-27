@@ -314,7 +314,6 @@ public class BotService {
         logger.info("Generating bot response for input: {}", userInput);
         // 먼저 로컬 데이터셋에서 응답을 찾습니다.
         String localResponse = getResponseFromLocalDataset(userInput);
-        System.out.println("1번: " + localResponse);
         if (localResponse != null) {
             logger.info("Response found in local dataset for input: {}", userInput);
             return localResponse;

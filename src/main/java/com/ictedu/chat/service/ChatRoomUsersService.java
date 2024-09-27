@@ -50,13 +50,10 @@ public class ChatRoomUsersService {
     }
     
     public List<Map<String, Object>> findUsersByChatroomId(Long chatroomId, Long userId) {
-    	//System.out.println("내아이디: " + userId);
     	List<Long> userIds = chatRoomUsersRepository.findUserIdsByChatRoomId(chatroomId);
     	userIds.remove(userId);
-    	//System.out.println("userIds: " + userIds);
     	
     	List<User> users = userRepository.findAllById(userIds);
-//    	
     	List<Map<String, Object>> result = new ArrayList<>();
 
         for (User user : users) {
@@ -79,7 +76,6 @@ public class ChatRoomUsersService {
 
             result.add(userMap);
         }
-        System.out.println("결과 출력!");
         return result;
     }
     
